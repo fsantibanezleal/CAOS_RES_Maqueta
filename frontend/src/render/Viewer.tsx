@@ -29,14 +29,18 @@ export function Viewer({
   const [animate, setAnimate] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // create the scene once
+  // create the scene once; keep its background/lights in sync with the shell theme toggle
   useEffect(() => {
     if (!mountRef.current) return;
-    const dark = readTheme() === 'dark';
-    const scene = new MaquetaScene(mountRef.current, dark);
+    const scene = new MaquetaScene(mountRef.current, readTheme() === 'dark');
     scene.setOnPick(setPick);
     sceneRef.current = scene;
-    return () => scene.dispose();
+    const obs = new MutationObserver(() => scene.setTheme(readTheme() === 'dark'));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => {
+      obs.disconnect();
+      scene.dispose();
+    };
   }, []);
 
   // load the bundle when the place changes

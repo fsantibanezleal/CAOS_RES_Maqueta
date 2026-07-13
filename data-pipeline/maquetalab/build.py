@@ -40,7 +40,7 @@ def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict
         terrain_max_vertices=verts,
         # terrain-first areas skip the building/road fetch (they have little/none)
         include_buildings=place.tier != "C",
-        include_roads=place.tier != "C",
+        include_roads=place.tier != "C" and os.environ.get("MAQUETA_NO_ROADS", "") != "1",
         # OSM context (water/green/rail) via Overpass can be slow; MAQUETA_NO_CONTEXT=1 skips it
         # so a bake never blocks on the public Overpass queue (the context layers are optional).
         include_context=os.environ.get("MAQUETA_NO_CONTEXT", "") != "1",

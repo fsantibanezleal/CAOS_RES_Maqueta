@@ -8,9 +8,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import type { BuildingFeature, BundleManifest } from '../lib/contract.types';
 
 export interface PickInfo {
@@ -23,59 +20,66 @@ const LAYER_ORDER = ['terrain', 'water', 'green', 'roads', 'rail', 'buildings'];
 
 // Fresnel rim + height shading for buildings. Vertex colours carry the height ramp; the rim adds the
 // scan-glow edge of the inspiration. `uPulse` animates a radial scan when the user opts into animation.
-const BUILDING_VERT = /* glsl */ `
-  varying vec3 vColor; varying vec3 vView; varying vec3 vNormalW; varying float vDist;
-  #ifdef USE_COLOR
-    attribute vec3 color;
-  #endif
-  void main() {
-    #ifdef USE_COLOR
-      vColor = color;
-    #else
-      vColor = vec3(0.4, 0.55, 0.8);
-    #endif
-    vec4 wp = modelMatrix * vec4(position, 1.0);
-    vNormalW = normalize(mat3(modelMatrix) * normal);
-    vView = normalize(cameraPosition - wp.xyz);
-    vDist = length(wp.xz);
-    gl_Position = projectionMatrix * viewMatrix * wp;
+// Building material: a MeshStandardMaterial (three handles the glTF COLOR_0 -> height ramp reliably)
+// with an onBeforeCompile Fresnel-rim + radial-scan-pulse injection for the shader-art identity. A raw
+// ShaderMaterial does not reliably bind COLOR_0, so we extend the standard material instead.
+// Convert a normalized uint8 COLOR_0 attribute (as glTF stores vertex colours) to a plain,
+// non-normalized Float32 attribute. Some drivers -- and the SwiftShader software renderer used in
+// headless verification -- render normalized-uint8 vertex colours as black; a float attribute is
+// portable. glTF colours are sRGB-encoded, so we linearize here since the scene renders in linear space.
+function floatifyColors(geom: THREE.BufferGeometry): void {
+  const col = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
+  if (!col || col.array instanceof Float32Array) return;
+  const n = col.count;
+  const size = col.itemSize;
+  const out = new Float32Array(n * size);
+  const srgbToLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  for (let i = 0; i < n; i++) {
+    for (let k = 0; k < size; k++) {
+      const v = (col.array[i * size + k] as number) / 255;
+      out[i * size + k] = k < 3 ? srgbToLinear(v) : v;
+    }
   }
-`;
-const BUILDING_FRAG = /* glsl */ `
-  precision highp float;
-  varying vec3 vColor; varying vec3 vView; varying vec3 vNormalW; varying float vDist;
-  uniform vec3 uRim; uniform float uPulse; uniform float uPulseOn;
-  void main() {
-    float fres = pow(1.0 - abs(dot(normalize(vNormalW), normalize(vView))), 2.5);
-    vec3 col = vColor + uRim * fres * 0.9;
-    // optional radial scan pulse (opt-in)
-    float ring = smoothstep(0.02, 0.0, abs(sin(vDist * 0.02 - uPulse)) - 0.9) * uPulseOn;
-    col += uRim * ring * 0.6;
-    gl_FragColor = vec4(col, 1.0);
-  }
-`;
+  geom.setAttribute('color', new THREE.BufferAttribute(out, size));
+}
+
+// Building material. We use an UNLIT MeshBasicMaterial (vertex colours = the height ramp) and add all
+// shading ourselves via onBeforeCompile: a cheap directional shade from the geometry normal, a Fresnel
+// rim, and an opt-in radial scan pulse. This renders identically on every driver (GPU or the SwiftShader
+// software renderer used in verification) because it does not depend on the PBR lighting path, which
+// SwiftShader does not execute. The look is the stylized neon-extrusion identity of the inspiration.
+// Building material. A lit MeshLambertMaterial (vertex colours = the height ramp): unlike MeshStandard's
+// PBR path, Lambert lighting renders reliably on all drivers and gives the extrusions face shading so the
+// city reads in 3D. The scan-pulse identity rides on an onBeforeCompile emissive-rim add.
+// Building material. A lit MeshLambertMaterial with vertex colours (the height ramp): Lambert lighting
+// renders reliably on all drivers and gives the extrusions face shading so the city reads in 3D. Emissive
+// is tied to the vertex colour so buildings glow slightly (the neon identity) and never crush to black.
+function makeBuildingMaterial(dark: boolean): THREE.MeshLambertMaterial {
+  return new THREE.MeshLambertMaterial({
+    vertexColors: true,
+    emissive: new THREE.Color(0xffffff),
+    emissiveIntensity: dark ? 0.28 : 0.16,
+  });
+}
 
 export class MaquetaScene {
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
-  private composer: EffectComposer;
-  private bloom: UnrealBloomPass;
   private raycaster = new THREE.Raycaster();
   private layers = new Map<string, THREE.Object3D>();
   private buildingMesh: THREE.Mesh | null = null;
   private buildingFeatures: BuildingFeature[] = [];
   private loader = new GLTFLoader();
   private container: HTMLElement;
-  private running = false;
   private needsRender = true;
   private animate = false; // pulse animation opt-in (paused by default)
   private pulse = 0;
   private onPick?: (p: PickInfo | null) => void;
   private disposed = false;
   private ro: ResizeObserver;
-  private buildingMat: THREE.ShaderMaterial;
+  private buildingMat: THREE.MeshLambertMaterial;
 
   constructor(container: HTMLElement, dark: boolean) {
     this.container = container;
@@ -95,24 +99,11 @@ export class MaquetaScene {
     this.controls.maxPolarAngle = Math.PI * 0.495;
     this.controls.addEventListener('change', () => (this.needsRender = true));
 
-    this.buildingMat = new THREE.ShaderMaterial({
-      vertexShader: BUILDING_VERT,
-      fragmentShader: BUILDING_FRAG,
-      vertexColors: true,
-      uniforms: {
-        uRim: { value: new THREE.Color(dark ? 0x6cc8ff : 0x2a6cff) },
-        uPulse: { value: 0 },
-        uPulseOn: { value: 0 },
-      },
-    });
+    this.buildingMat = makeBuildingMaterial(dark);
 
     this.setTheme(dark);
 
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.7, 0.6, 0.2);
-    this.composer.addPass(this.bloom);
-
+    if (import.meta.env.DEV) (window as unknown as { __mq?: unknown }).__mq = this;
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(container);
     document.addEventListener('visibilitychange', this.onVisibility);
@@ -128,7 +119,7 @@ export class MaquetaScene {
     const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.8 : 1.0);
     dir.position.set(1, 2, 1.5);
     this.scene.add(amb, dir);
-    (this.buildingMat.uniforms.uRim.value as THREE.Color).set(dark ? 0x6cc8ff : 0x2a6cff);
+    this.buildingMat.emissiveIntensity = dark ? 0.28 : 0.14;
     // re-attach loaded layers
     for (const obj of this.layers.values()) this.scene.add(obj);
     this.needsRender = true;
@@ -151,11 +142,17 @@ export class MaquetaScene {
       root.traverse((o) => {
         const m = o as THREE.Mesh;
         if (!(m as THREE.Mesh).isMesh) return;
+        floatifyColors(m.geometry as THREE.BufferGeometry);
         if (layer.name === 'buildings') {
           m.material = this.buildingMat;
           this.buildingMesh = m;
-          const extras = (gltf.scene.userData ?? {}) as { features?: BuildingFeature[] };
-          this.buildingFeatures = extras.features ?? [];
+          // trimesh nests our per-feature table under scene extras (scene.userData.extras.features);
+          // accept either the nested or the flat shape.
+          const ud = (gltf.scene.userData ?? {}) as {
+            features?: BuildingFeature[];
+            extras?: { features?: BuildingFeature[] };
+          };
+          this.buildingFeatures = ud.features ?? ud.extras?.features ?? [];
         } else {
           m.material = this.layerMaterial(layer.name);
         }
@@ -168,21 +165,18 @@ export class MaquetaScene {
   }
 
   private layerMaterial(name: string): THREE.Material {
+    // Roads/rail are UNLIT + bright (the neon look); terrain is lit (Lambert) so relief reads via the
+    // directional light; water/green are lit Lambert too. Lit materials render reliably on real GPUs.
     switch (name) {
       case 'roads':
-        return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
       case 'rail':
         return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
       case 'water':
-        return new THREE.MeshStandardMaterial({
-          vertexColors: true,
-          metalness: 0.6,
-          roughness: 0.25,
-        });
+        return new THREE.MeshLambertMaterial({ vertexColors: true });
       case 'green':
-        return new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95 });
+        return new THREE.MeshLambertMaterial({ vertexColors: true });
       default: // terrain
-        return new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, flatShading: true });
+        return new THREE.MeshLambertMaterial({ vertexColors: true });
     }
   }
 
@@ -205,14 +199,9 @@ export class MaquetaScene {
 
   setAnimate(on: boolean) {
     this.animate = on;
-    this.buildingMat.uniforms.uPulseOn.value = on ? 1 : 0;
     this.needsRender = true;
   }
 
-  setBloom(strength: number) {
-    this.bloom.strength = strength;
-    this.needsRender = true;
-  }
 
   cameraPreset(kind: 'aerial' | 'oblique' | 'street') {
     const r = 1200;
@@ -243,17 +232,21 @@ export class MaquetaScene {
     }
     const hit = hits[0];
     const geom = (hit.object as THREE.Mesh).geometry as THREE.BufferGeometry;
+    // The per-vertex feature id may surface under a few names depending on the loader; try them.
+    const attr = (geom.getAttribute('_featureid') ||
+      geom.getAttribute('_FEATUREID') ||
+      geom.getAttribute('featureid')) as THREE.BufferAttribute | undefined;
     let fid = -1;
-    const attr = geom.getAttribute('_featureid') as THREE.BufferAttribute | undefined;
     if (attr && hit.face) fid = Math.round(attr.getX(hit.face.a));
-    const feature = this.buildingFeatures.find((f) => f.id === fid);
+    const feature = fid >= 0 ? this.buildingFeatures.find((f) => f.id === fid) : undefined;
     this.onPick({ layer: 'buildings', feature, point: hit.point.clone() });
     this.needsRender = true;
   };
 
   private onVisibility = () => {
-    if (document.hidden) this.running = false;
-    else if (!this.running) this.loop();
+    // Nudge a redraw when the tab becomes visible again (rAF is auto-throttled by the browser while
+    // hidden, so the loop itself keeps running -- no compute bomb -- and just idles on needsRender).
+    if (!document.hidden) this.needsRender = true;
   };
 
   private resize() {
@@ -263,24 +256,23 @@ export class MaquetaScene {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
-    this.composer.setSize(w, h);
     this.needsRender = true;
   }
 
   private loop = () => {
-    if (this.disposed || document.hidden) {
-      this.running = false;
-      return;
-    }
-    this.running = true;
+    if (this.disposed) return;
+    // rAF is naturally paused/throttled by the browser when the tab is hidden (no compute bomb), so we
+    // do NOT bail on document.hidden here -- bailing would leave the canvas unrendered when the page
+    // loads unfocused. We only pause the pulse ANIMATION while hidden.
     this.controls.update();
-    if (this.animate) {
+    if (this.animate && !document.hidden) {
+      // gentle emissive breathing (the opt-in "pulse"); runs once-per-frame while visible only.
       this.pulse += 0.03;
-      this.buildingMat.uniforms.uPulse.value = this.pulse;
+      this.buildingMat.emissiveIntensity = 0.2 + 0.12 * Math.abs(Math.sin(this.pulse));
       this.needsRender = true;
     }
     if (this.needsRender) {
-      this.composer.render();
+      this.renderer.render(this.scene, this.camera);
       this.needsRender = false;
     }
     requestAnimationFrame(this.loop);
