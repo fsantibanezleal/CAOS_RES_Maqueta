@@ -26,6 +26,9 @@ export interface AttrSpec {
   kind: 'numeric' | 'categorical';
   unit?: string;
   value: (f: BuildingFeature) => number | string | null;
+  // A fused topic modality: only surfaced where its source meaningfully covers the place (a global raster
+  // like SoilGrids masks dense urban land), gated by MODALITY_MIN_COVERAGE in attributes().
+  modality?: boolean;
 }
 export const ATTRIBUTES: AttrSpec[] = [
   { key: 'height', en: 'Height', es: 'Altura', kind: 'numeric', unit: 'm', value: (f) => f.height_m },
@@ -35,8 +38,8 @@ export const ATTRIBUTES: AttrSpec[] = [
   { key: 'use', en: 'Function', es: 'Funcion', kind: 'categorical', value: (f) => f.use ?? null },
   { key: 'landuse', en: 'Land cover', es: 'Cobertura', kind: 'categorical', value: (f) => (f.class != null ? String(f.class) : null) },
   // Fused topic modalities (shown only where the source covers the place - attributes() filters no-data specs).
-  { key: 'solar', en: 'Solar (GHI)', es: 'Solar (GHI)', kind: 'numeric', unit: 'kWh/m2/d', value: (f) => f.solar_ghi ?? null },
-  { key: 'soil', en: 'Soil carbon', es: 'Carbono suelo', kind: 'numeric', unit: 'g/kg', value: (f) => f.soil_soc ?? null },
+  { key: 'solar', en: 'Solar (GHI)', es: 'Solar (GHI)', kind: 'numeric', unit: 'kWh/m2/d', value: (f) => f.solar_ghi ?? null, modality: true },
+  { key: 'soil', en: 'Soil carbon', es: 'Carbono suelo', kind: 'numeric', unit: 'g/kg', value: (f) => f.soil_soc ?? null, modality: true },
 ];
 export const attrSpec = (key: string) => ATTRIBUTES.find((a) => a.key === key) ?? ATTRIBUTES[0];
 
@@ -50,6 +53,9 @@ const CAT_PALETTE: [number, number, number][] = [
 const LAYER_ORDER = ['terrain', 'population', 'water', 'green', 'roads', 'rail', 'buildings'];
 // Above this building count, edges are not auto-built on load (the user can still enable the wireframe).
 const EDGE_AUTO_MAX = 60000;
+// A fused modality attribute is only offered if at least this fraction of buildings carry a value (a
+// global raster like SoilGrids masks dense urban land, so a city would otherwise show a near-empty layer).
+const MODALITY_MIN_COVERAGE = 0.12;
 const PROVENANCE_RGB: Record<string, [number, number, number]> = {
   measured: [46, 158, 111],
   floors: [74, 134, 232],
@@ -90,6 +96,7 @@ export class MaquetaScene {
   private vFeature: Int32Array = new Int32Array(0); // per-vertex building id
   private numRanges = new Map<string, [number, number]>(); // per numeric attr [min,max]
   private catValuesByKey = new Map<string, string[]>(); // per categorical attr distinct values
+  private coverageByKey = new Map<string, number>(); // per attr: fraction of buildings carrying a value
   private colorCache = new Map<string, Float32Array>();
   private highlight: THREE.LineSegments | THREE.Mesh | null = null;
 
@@ -288,13 +295,17 @@ export class MaquetaScene {
     this.featuresById = new Map(this.features.map((f) => [f.id, f]));
     this.numRanges.clear();
     this.catValuesByKey.clear();
+    this.coverageByKey.clear();
+    const total = this.features.length || 1;
     for (const spec of ATTRIBUTES) {
+      let have = 0;
       if (spec.kind === 'numeric') {
         let lo = Infinity;
         let hi = -Infinity;
         for (const f of this.features) {
           const v = spec.value(f);
           if (typeof v === 'number' && isFinite(v)) {
+            have++;
             if (v < lo) lo = v;
             if (v > hi) hi = v;
           }
@@ -307,22 +318,28 @@ export class MaquetaScene {
         const seen = new Set<string>();
         for (const f of this.features) {
           const v = spec.value(f);
-          if (v != null) seen.add(String(v));
+          if (v != null) {
+            have++;
+            seen.add(String(v));
+          }
         }
         this.catValuesByKey.set(spec.key, [...seen].sort());
       }
+      this.coverageByKey.set(spec.key, have / total);
     }
     this.colorCache.clear();
     geom.setAttribute('aHidden', new THREE.BufferAttribute(new Float32Array(n), 1));
   }
 
   attributes(): AttrSpec[] {
-    // only expose attributes that actually have data in this scene
-    return ATTRIBUTES.filter((s) =>
-      s.kind === 'numeric'
+    // only expose attributes that actually have data in this scene; modality attributes also need enough
+    // coverage (a global raster masks dense urban land, so a city would otherwise show a near-empty layer).
+    return ATTRIBUTES.filter((s) => {
+      if (s.modality && (this.coverageByKey.get(s.key) ?? 0) < MODALITY_MIN_COVERAGE) return false;
+      return s.kind === 'numeric'
         ? (this.numRanges.get(s.key)?.[1] ?? 0) > 0
-        : (this.catValuesByKey.get(s.key)?.length ?? 0) > 0,
-    );
+        : (this.catValuesByKey.get(s.key)?.length ?? 0) > 0;
+    });
   }
   numericRange(key: string): [number, number] {
     return this.numRanges.get(key) ?? [0, 1];
