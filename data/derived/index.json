@@ -546,8 +546,8 @@
       "continent": "Europe",
       "country": "Netherlands",
       "city": "Amsterdam",
-      "n_layers": 4,
-      "total_bytes": 5843648,
+      "n_layers": 8,
+      "total_bytes": 6057124,
       "manifest_path": "amsterdam_center/manifest.json"
     },
     {

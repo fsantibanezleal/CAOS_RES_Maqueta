@@ -14,7 +14,7 @@
     "prior": 0.043
   },
   "tier_totals_mb": {
-    "A": 30.37,
+    "A": 30.58,
     "B": 946.49,
     "C": 0.46
   },
@@ -23,16 +23,16 @@
     "B": 60,
     "C": 8
   },
-  "total_mb": 977.32,
+  "total_mb": 977.54,
   "per_place": [
     {
       "slug": "amsterdam_center",
       "name": "Amsterdam Centrum",
       "tier": "A",
       "country": "Netherlands",
-      "n_layers": 4,
-      "total_triangles": 491758,
-      "total_mb": 5.844,
+      "n_layers": 8,
+      "total_triangles": 526625,
+      "total_mb": 6.057,
       "height_mix": {
         "measured": 124,
         "floors": 1025,
@@ -47,7 +47,16 @@
       },
       "measured_pct": 0.9,
       "any_noncommercial": false,
-      "ground_truth": null
+      "ground_truth": {
+        "n_fused": 14374,
+        "n_truth": 400,
+        "matched": 627,
+        "coverage_pct": 4.4,
+        "height_rmse_m": 7.8,
+        "height_mae_m": 7.21,
+        "height_bias_m": -6.77,
+        "truth_source": "3D BAG LoD2 (TU Delft)"
+      }
     },
     {
       "slug": "berlin_mitte",
