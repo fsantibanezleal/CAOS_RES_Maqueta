@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "n_places": 1,
+  "tiers": {
+    "A": [
+      "berlin_mitte",
+      "amsterdam_center",
+      "delft",
+      "manhattan_midtown",
+      "helsinki_center",
+      "zurich_center",
+      "vienna_center",
+      "singapore_downtown",
+      "tokyo_shinjuku",
+      "seattle_downtown"
+    ],
+    "B": [
+      "santiago_centro",
+      "valparaiso",
+      "concepcion",
+      "london_city",
+      "barcelona_eixample",
+      "paris_center",
+      "buenos_aires_center",
+      "mexico_city_center",
+      "sao_paulo_center",
+      "nairobi_center",
+      "mumbai_fort",
+      "seoul_jongno",
+      "sydney_cbd",
+      "san_francisco_downtown",
+      "toronto_downtown",
+      "istanbul_center",
+      "cairo_center",
+      "moscow_center",
+      "rome_center",
+      "lisbon_baixa",
+      "cape_town_center",
+      "bogota_center"
+    ],
+    "C": [
+      "chuquicamata",
+      "valle_luna",
+      "torres_paine",
+      "grand_canyon",
+      "mont_blanc",
+      "iguazu",
+      "uluru",
+      "halong_bay"
+    ]
+  },
+  "places": [
+    {
+      "slug": "berlin_mitte",
+      "name": "Berlin Mitte",
+      "tier": "A",
+      "category": "ground-truth",
+      "country": "Germany",
+      "n_layers": 2,
+      "total_bytes": 3528924,
+      "manifest_path": "berlin_mitte/manifest.json"
+    }
+  ]
+}

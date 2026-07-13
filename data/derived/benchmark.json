@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "n_places": 1,
+  "global_height_mix": {
+    "measured": 353,
+    "floors": 1706,
+    "raster": 0,
+    "prior": 731
+  },
+  "global_height_fraction": {
+    "measured": 0.127,
+    "floors": 0.611,
+    "raster": 0.0,
+    "prior": 0.262
+  },
+  "tier_totals_mb": {
+    "A": 3.53
+  },
+  "tier_counts": {
+    "A": 1
+  },
+  "total_mb": 3.53,
+  "per_place": [
+    {
+      "slug": "berlin_mitte",
+      "name": "Berlin Mitte",
+      "tier": "A",
+      "country": "Germany",
+      "n_layers": 2,
+      "total_triangles": 117783,
+      "total_mb": 3.529,
+      "height_mix": {
+        "measured": 353,
+        "floors": 1706,
+        "raster": 0,
+        "prior": 731
+      },
+      "height_fraction": {
+        "measured": 0.127,
+        "floors": 0.611,
+        "raster": 0.0,
+        "prior": 0.262
+      },
+      "measured_pct": 12.7,
+      "any_noncommercial": false
+    }
+  ]
+}

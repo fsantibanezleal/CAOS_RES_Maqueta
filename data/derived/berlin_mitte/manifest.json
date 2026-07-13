@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "aoi": {
+    "name": "Berlin Mitte",
+    "bbox_wgs84": [
+      13.38728549982931,
+      52.50622026590011,
+      13.422714500170688,
+      52.527779734099894
+    ],
+    "origin_wgs84": [
+      13.405,
+      52.517
+    ],
+    "crs_local": "+proj=aeqd +lat_0=52.517 +lon_0=13.405 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    "size_m": [
+      2400.0000000000323,
+      2399.9999999998245
+    ]
+  },
+  "layers": [
+    {
+      "name": "terrain",
+      "file": "terrain.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 5277,
+        "triangles": 10341,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Copernicus GLO-30 DSM",
+        "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
+        "license": "Copernicus-free",
+        "fetched": "2026-07-12",
+        "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
+        "extra": {
+          "tiles": [
+            "Copernicus_DSM_COG_10_N52_00_E013_00_DEM"
+          ],
+          "grid": [
+            85,
+            140
+          ]
+        },
+        "license_name": "Copernicus DEM free-of-charge license (ESA/DLR)",
+        "license_url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "buildings",
+      "file": "buildings.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 75348,
+        "triangles": 107442,
+        "features": 2790
+      },
+      "provenance": {
+        "source": "Overture Maps buildings",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-12",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_buildings": 2790
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    }
+  ],
+  "stats": {
+    "layers": [
+      "terrain",
+      "buildings"
+    ],
+    "height_mix": {
+      "measured": 353,
+      "floors": 1706,
+      "raster": 0,
+      "prior": 731
+    },
+    "budgets": {
+      "terrain": {
+        "kind": "mesh",
+        "vertices": 5277,
+        "triangles": 10341,
+        "features": 0
+      },
+      "buildings": {
+        "kind": "mesh",
+        "vertices": 75348,
+        "triangles": 107442,
+        "features": 2790
+      }
+    },
+    "notes": []
+  },
+  "any_noncommercial": false,
+  "credits": [
+    "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
+    "Overture Maps buildings (Open Data Commons Open Database License v1.0)"
+  ]
+}
