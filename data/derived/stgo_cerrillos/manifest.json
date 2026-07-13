@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "aoi": {
+    "name": "Cerrillos",
+    "bbox_wgs84": [
+      -70.75056403797802,
+      -33.53118850161696,
+      -70.68103596202198,
+      -33.473211498383044
+    ],
+    "origin_wgs84": [
+      -70.7158,
+      -33.5022
+    ],
+    "crs_local": "+proj=aeqd +lat_0=-33.5022 +lon_0=-70.7158 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    "size_m": [
+      6453.999999999331,
+      6453.999999999476
+    ]
+  },
+  "layers": [
+    {
+      "name": "terrain",
+      "file": "terrain.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 6000,
+        "triangles": 11829,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Copernicus GLO-30 DSM",
+        "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
+        "license": "Copernicus-free",
+        "fetched": "2026-07-13",
+        "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
+        "extra": {
+          "tiles": [
+            "Copernicus_DSM_COG_10_S34_00_W071_00_DEM"
+          ],
+          "grid": [
+            230,
+            275
+          ]
+        },
+        "license_name": "Copernicus DEM free-of-charge license (ESA/DLR)",
+        "license_url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "buildings",
+      "file": "buildings.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 658630,
+        "triangles": 865071,
+        "features": 61436
+      },
+      "provenance": {
+        "source": "Overture Maps buildings",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-13",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_buildings": 61436
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "buildings_lite",
+      "file": "buildings_lite.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 326774,
+        "triangles": 446159,
+        "features": 22000
+      },
+      "provenance": {
+        "source": "Overture Maps buildings",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-13",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_buildings": 61436
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "roads",
+      "file": "roads.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 213975,
+        "triangles": 185147,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Overture Maps transportation",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=transportation/type=segment",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-13",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_segments": 14414
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "population",
+      "file": "population.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 39544,
+        "triangles": 49430,
+        "features": 0
+      },
+      "provenance": {
+        "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
+        "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
+        "license": "CC-BY-4.0",
+        "fetched": "2026-07-13",
+        "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
+        "extra": {
+          "grid": [
+            65,
+            77
+          ]
+        },
+        "license_name": "Creative Commons Attribution 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "commercial_ok": true
+      }
+    }
+  ],
+  "stats": {
+    "layers": [
+      "terrain",
+      "buildings",
+      "buildings_lite",
+      "roads",
+      "population"
+    ],
+    "height_mix": {
+      "measured": 5,
+      "floors": 245,
+      "raster": 60057,
+      "prior": 1129
+    },
+    "budgets": {
+      "terrain": {
+        "kind": "mesh",
+        "vertices": 6000,
+        "triangles": 11829,
+        "features": 0
+      },
+      "buildings": {
+        "kind": "mesh",
+        "vertices": 658630,
+        "triangles": 865071,
+        "features": 61436
+      },
+      "buildings_lite": {
+        "kind": "mesh",
+        "vertices": 326774,
+        "triangles": 446159,
+        "features": 22000
+      },
+      "roads": {
+        "kind": "mesh",
+        "vertices": 213975,
+        "triangles": 185147,
+        "features": 0
+      },
+      "population": {
+        "kind": "mesh",
+        "vertices": 39544,
+        "triangles": 49430,
+        "features": 0
+      }
+    },
+    "ground_truth": null,
+    "notes": [
+      "open-buildings 2.5D raster used (32719)",
+      "modality soil_soc: 12607/61436 sampled",
+      "modality solar_ghi skipped: FileNotFoundError",
+      "lite LoD proxy: 22000/61436 buildings",
+      "population total ~33967472"
+    ]
+  },
+  "modalities": [
+    {
+      "source": "ISRIC SoilGrids 2.0",
+      "url": "/vsicurl/https://files.isric.org/soilgrids/latest/data/soc/soc_0-5cm_mean.vrt",
+      "license": "CC-BY-4.0",
+      "fetched": "2026-07-13",
+      "method": "windowed raster read, resampled to a WGS84 AOI grid, sampled per building centroid",
+      "extra": {
+        "modality": "soil_soc",
+        "unit": "g/kg"
+      },
+      "license_name": "Creative Commons Attribution 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercial_ok": true,
+      "key": "soil_soc",
+      "label": "Soil organic carbon (0-5 cm)",
+      "unit": "g/kg"
+    }
+  ],
+  "any_noncommercial": false,
+  "credits": [
+    "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
+    "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
+    "ISRIC SoilGrids 2.0 (Creative Commons Attribution 4.0)",
+    "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
+    "Overture Maps transportation (Open Data Commons Open Database License v1.0)"
+  ]
+}

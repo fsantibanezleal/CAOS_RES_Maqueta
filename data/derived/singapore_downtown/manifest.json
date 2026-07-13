@@ -32,7 +32,7 @@
         "source": "Copernicus GLO-30 DSM",
         "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
         "license": "Copernicus-free",
-        "fetched": "2026-07-12",
+        "fetched": "2026-07-13",
         "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
         "extra": {
           "tiles": [
@@ -61,7 +61,7 @@
         "source": "Overture Maps buildings",
         "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
         "license": "ODbL-1.0",
-        "fetched": "2026-07-12",
+        "fetched": "2026-07-13",
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
@@ -85,7 +85,7 @@
         "source": "Overture Maps transportation",
         "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=transportation/type=segment",
         "license": "ODbL-1.0",
-        "fetched": "2026-07-12",
+        "fetched": "2026-07-13",
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
@@ -109,7 +109,7 @@
         "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
         "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
         "license": "CC-BY-4.0",
-        "fetched": "2026-07-12",
+        "fetched": "2026-07-13",
         "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
         "extra": {
           "grid": [
@@ -165,13 +165,35 @@
     "ground_truth": null,
     "notes": [
       "open-buildings 2.5D raster used (32648)",
+      "modality soil_soc: 695/3340 sampled",
+      "modality solar_ghi skipped: FileNotFoundError",
       "population total ~2307627"
     ]
   },
+  "modalities": [
+    {
+      "source": "ISRIC SoilGrids 2.0",
+      "url": "/vsicurl/https://files.isric.org/soilgrids/latest/data/soc/soc_0-5cm_mean.vrt",
+      "license": "CC-BY-4.0",
+      "fetched": "2026-07-13",
+      "method": "windowed raster read, resampled to a WGS84 AOI grid, sampled per building centroid",
+      "extra": {
+        "modality": "soil_soc",
+        "unit": "g/kg"
+      },
+      "license_name": "Creative Commons Attribution 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercial_ok": true,
+      "key": "soil_soc",
+      "label": "Soil organic carbon (0-5 cm)",
+      "unit": "g/kg"
+    }
+  ],
   "any_noncommercial": false,
   "credits": [
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
     "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
+    "ISRIC SoilGrids 2.0 (Creative Commons Attribution 4.0)",
     "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
     "Overture Maps transportation (Open Data Commons Open Database License v1.0)"
   ]

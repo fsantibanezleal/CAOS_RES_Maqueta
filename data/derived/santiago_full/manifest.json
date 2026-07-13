@@ -196,14 +196,36 @@
     "ground_truth": null,
     "notes": [
       "open-buildings 2.5D raster used (32719)",
+      "modality soil_soc: 7924/178902 sampled",
+      "modality solar_ghi skipped: FileNotFoundError",
       "lite LoD proxy: 22000/178902 buildings",
       "population total ~78850496"
     ]
   },
+  "modalities": [
+    {
+      "source": "ISRIC SoilGrids 2.0",
+      "url": "/vsicurl/https://files.isric.org/soilgrids/latest/data/soc/soc_0-5cm_mean.vrt",
+      "license": "CC-BY-4.0",
+      "fetched": "2026-07-13",
+      "method": "windowed raster read, resampled to a WGS84 AOI grid, sampled per building centroid",
+      "extra": {
+        "modality": "soil_soc",
+        "unit": "g/kg"
+      },
+      "license_name": "Creative Commons Attribution 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercial_ok": true,
+      "key": "soil_soc",
+      "label": "Soil organic carbon (0-5 cm)",
+      "unit": "g/kg"
+    }
+  ],
   "any_noncommercial": false,
   "credits": [
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
     "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
+    "ISRIC SoilGrids 2.0 (Creative Commons Attribution 4.0)",
     "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
     "Overture Maps transportation (Open Data Commons Open Database License v1.0)"
   ]

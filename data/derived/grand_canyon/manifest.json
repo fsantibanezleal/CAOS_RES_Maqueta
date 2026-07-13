@@ -32,7 +32,7 @@
         "source": "Copernicus GLO-30 DSM",
         "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
         "license": "Copernicus-free",
-        "fetched": "2026-07-12",
+        "fetched": "2026-07-13",
         "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
         "extra": {
           "tiles": [
@@ -61,7 +61,7 @@
         "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
         "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
         "license": "CC-BY-4.0",
-        "fetched": "2026-07-12",
+        "fetched": "2026-07-13",
         "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
         "extra": {
           "grid": [
@@ -100,6 +100,7 @@
       "population total ~164440"
     ]
   },
+  "modalities": [],
   "any_noncommercial": false,
   "credits": [
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
