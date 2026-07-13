@@ -1,65 +1,34 @@
-// The Maqueta 3D viewer: loads a place's SceneBundle (per-layer .glb) and renders it with the
-// shader-art identity (Fresnel rim on buildings, emissive neon roads, fog, bloom, orbital camera).
-// Geometry arrives in AOI-local metres, Y-up (the geoscena glTF convention), so layers drop straight
-// in. Interactions: orbital camera, per-layer visibility, and raycast building picking that resolves
-// the _featureid vertex attribute to a building's {height, source}. Compute-bomb-safe: the render loop
-// is paused by default (renders on demand + while interacting) and stops when the tab is hidden.
+// The Maqueta 3D workbench engine. Loads a place's fused SceneBundle (per-source .glb layers) and
+// renders it interactively: per-layer visibility, building colour-by (height / provenance / land use),
+// live height + provenance filtering, click-to-select with a 3D highlight, camera presets, neon-road
+// glow and an opt-in emissive pulse. Everything is driven from precomputed per-vertex arrays so recolour
+// and filter are instant. Compute-safe: render-on-demand loop, rAF auto-throttled when the tab hides.
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { BuildingFeature, BundleManifest } from '../lib/contract.types';
+import { WORLDCOVER_RGB } from '../lib/labels';
 
+export type ColorMode = 'height' | 'provenance' | 'landuse';
 export interface PickInfo {
-  layer: string;
-  feature?: BuildingFeature;
+  feature: BuildingFeature;
   point: THREE.Vector3;
 }
 
-const LAYER_ORDER = ['terrain', 'water', 'green', 'roads', 'rail', 'buildings'];
+const LAYER_ORDER = ['terrain', 'population', 'water', 'green', 'roads', 'rail', 'buildings'];
+const SOURCE_CODE: Record<string, number> = { measured: 0, floors: 1, raster: 2, prior: 3 };
+const PROVENANCE_RGB: Record<string, [number, number, number]> = {
+  measured: [46, 158, 111],
+  floors: [74, 134, 232],
+  raster: [214, 130, 21],
+  prior: [154, 162, 173],
+};
 
-// Fresnel rim + height shading for buildings. Vertex colours carry the height ramp; the rim adds the
-// scan-glow edge of the inspiration. `uPulse` animates a radial scan when the user opts into animation.
-// Building material: a MeshStandardMaterial (three handles the glTF COLOR_0 -> height ramp reliably)
-// with an onBeforeCompile Fresnel-rim + radial-scan-pulse injection for the shader-art identity. A raw
-// ShaderMaterial does not reliably bind COLOR_0, so we extend the standard material instead.
-// Convert a normalized uint8 COLOR_0 attribute (as glTF stores vertex colours) to a plain,
-// non-normalized Float32 attribute. Some drivers -- and the SwiftShader software renderer used in
-// headless verification -- render normalized-uint8 vertex colours as black; a float attribute is
-// portable. glTF colours are sRGB-encoded, so we linearize here since the scene renders in linear space.
-function floatifyColors(geom: THREE.BufferGeometry): void {
-  const col = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
-  if (!col || col.array instanceof Float32Array) return;
-  const n = col.count;
-  const size = col.itemSize;
-  const out = new Float32Array(n * size);
-  const srgbToLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
-  for (let i = 0; i < n; i++) {
-    for (let k = 0; k < size; k++) {
-      const v = (col.array[i * size + k] as number) / 255;
-      out[i * size + k] = k < 3 ? srgbToLinear(v) : v;
-    }
-  }
-  geom.setAttribute('color', new THREE.BufferAttribute(out, size));
-}
-
-// Building material. We use an UNLIT MeshBasicMaterial (vertex colours = the height ramp) and add all
-// shading ourselves via onBeforeCompile: a cheap directional shade from the geometry normal, a Fresnel
-// rim, and an opt-in radial scan pulse. This renders identically on every driver (GPU or the SwiftShader
-// software renderer used in verification) because it does not depend on the PBR lighting path, which
-// SwiftShader does not execute. The look is the stylized neon-extrusion identity of the inspiration.
-// Building material. A lit MeshLambertMaterial (vertex colours = the height ramp): unlike MeshStandard's
-// PBR path, Lambert lighting renders reliably on all drivers and gives the extrusions face shading so the
-// city reads in 3D. The scan-pulse identity rides on an onBeforeCompile emissive-rim add.
-// Building material. A lit MeshLambertMaterial with vertex colours (the height ramp): Lambert lighting
-// renders reliably on all drivers and gives the extrusions face shading so the city reads in 3D. Emissive
-// is tied to the vertex colour so buildings glow slightly (the neon identity) and never crush to black.
-function makeBuildingMaterial(dark: boolean): THREE.MeshLambertMaterial {
-  return new THREE.MeshLambertMaterial({
-    vertexColors: true,
-    emissive: new THREE.Color(0xffffff),
-    emissiveIntensity: dark ? 0.28 : 0.16,
-  });
+function heightRamp(t: number): [number, number, number] {
+  // blue (low) -> teal -> amber (high)
+  const c = Math.max(0, Math.min(1, t));
+  return [40 + c * 215, 90 + c * 110, 200 - c * 150];
 }
 
 export class MaquetaScene {
@@ -69,40 +38,55 @@ export class MaquetaScene {
   private controls: OrbitControls;
   private raycaster = new THREE.Raycaster();
   private layers = new Map<string, THREE.Object3D>();
-  private buildingMesh: THREE.Mesh | null = null;
-  private buildingFeatures: BuildingFeature[] = [];
   private loader = new GLTFLoader();
   private container: HTMLElement;
-  private needsRender = true;
-  private animate = false; // pulse animation opt-in (paused by default)
+
+  private buildingMesh: THREE.Mesh | null = null;
+  private buildingMat: THREE.MeshLambertMaterial;
+  private features: BuildingFeature[] = [];
+  // per-vertex derived arrays (aligned to the building geometry vertex order)
+  private vFeature: Int32Array = new Int32Array(0);
+  private vHeight: Float32Array = new Float32Array(0);
+  private vSource: Uint8Array = new Uint8Array(0);
+  private colorByCache: Partial<Record<ColorMode, Float32Array>> = {};
+  private highlight: THREE.LineSegments | THREE.Mesh | null = null;
+
+  private colorMode: ColorMode = 'height';
+  private heightRange: [number, number] = [0, 1e9];
+  private sourceFilter = new Set(['measured', 'floors', 'raster', 'prior']);
+  private neon = 1;
+  private animate = false;
   private pulse = 0;
-  private onPick?: (p: PickInfo | null) => void;
+
+  private needsRender = true;
   private disposed = false;
   private ro: ResizeObserver;
-  private buildingMat: THREE.MeshLambertMaterial;
+  private onPick?: (p: PickInfo | null) => void;
 
   constructor(container: HTMLElement, dark: boolean) {
     this.container = container;
     const w = container.clientWidth || 800;
     const h = container.clientHeight || 500;
-
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(w, h);
     container.appendChild(this.renderer.domElement);
 
-    this.camera = new THREE.PerspectiveCamera(52, w / h, 1, 20000);
-    this.camera.position.set(900, 700, 900);
-
+    this.camera = new THREE.PerspectiveCamera(52, w / h, 1, 40000);
+    this.camera.position.set(1400, 1300, 1400);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.maxPolarAngle = Math.PI * 0.495;
     this.controls.addEventListener('change', () => (this.needsRender = true));
 
-    this.buildingMat = makeBuildingMaterial(dark);
+    this.buildingMat = new THREE.MeshLambertMaterial({
+      vertexColors: true,
+      emissive: new THREE.Color(0xffffff),
+      emissiveIntensity: dark ? 0.22 : 0.1,
+    });
+    this.installBuildingFilter(this.buildingMat);
 
     this.setTheme(dark);
-
     if (import.meta.env.DEV) (window as unknown as { __mq?: unknown }).__mq = this;
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(container);
@@ -111,26 +95,44 @@ export class MaquetaScene {
     this.loop();
   }
 
+  // Inject a per-vertex "hidden" flag into the building material so height/provenance filters can
+  // discard whole buildings without rebuilding geometry.
+  private installBuildingFilter(mat: THREE.MeshLambertMaterial) {
+    mat.onBeforeCompile = (shader) => {
+      shader.vertexShader =
+        'attribute float aHidden;\nvarying float vHidden;\n' +
+        shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vHidden = aHidden;');
+      shader.fragmentShader =
+        'varying float vHidden;\n' +
+        shader.fragmentShader.replace(
+          '#include <clipping_planes_fragment>',
+          '#include <clipping_planes_fragment>\n if (vHidden > 0.5) discard;',
+        );
+    };
+  }
+
   setTheme(dark: boolean) {
-    this.scene.background = new THREE.Color(dark ? 0x0a0e14 : 0xdfe6ef);
-    this.scene.fog = new THREE.Fog(dark ? 0x0a0e14 : 0xdfe6ef, 1800, 6000);
+    const bg = dark ? 0x0a0e14 : 0xdfe6ef;
+    this.scene.background = new THREE.Color(bg);
+    this.scene.fog = new THREE.Fog(bg, 2600, 9000);
     this.scene.clear();
-    const amb = new THREE.AmbientLight(0xffffff, dark ? 0.55 : 0.9);
-    const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.8 : 1.0);
-    dir.position.set(1, 2, 1.5);
-    this.scene.add(amb, dir);
-    this.buildingMat.emissiveIntensity = dark ? 0.28 : 0.14;
-    // re-attach loaded layers
+    this.scene.add(new THREE.AmbientLight(0xffffff, dark ? 0.6 : 0.95));
+    const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.7 : 0.9);
+    dir.position.set(1, 2, 1.4);
+    this.scene.add(dir);
+    this.buildingMat.emissiveIntensity = dark ? 0.22 : 0.1;
     for (const obj of this.layers.values()) this.scene.add(obj);
+    if (this.highlight) this.scene.add(this.highlight);
     this.needsRender = true;
   }
 
   async loadBundle(baseUrl: string, manifest: BundleManifest): Promise<void> {
-    // clear existing
     for (const obj of this.layers.values()) this.scene.remove(obj);
     this.layers.clear();
+    this.clearHighlight();
     this.buildingMesh = null;
-    this.buildingFeatures = [];
+    this.features = [];
+    this.colorByCache = {};
 
     const ordered = [...manifest.layers].sort(
       (a, b) => LAYER_ORDER.indexOf(a.name) - LAYER_ORDER.indexOf(b.name),
@@ -141,18 +143,17 @@ export class MaquetaScene {
       root.name = layer.name;
       root.traverse((o) => {
         const m = o as THREE.Mesh;
-        if (!(m as THREE.Mesh).isMesh) return;
+        if (!m.isMesh) return;
         floatifyColors(m.geometry as THREE.BufferGeometry);
         if (layer.name === 'buildings') {
           m.material = this.buildingMat;
           this.buildingMesh = m;
-          // trimesh nests our per-feature table under scene extras (scene.userData.extras.features);
-          // accept either the nested or the flat shape.
           const ud = (gltf.scene.userData ?? {}) as {
             features?: BuildingFeature[];
             extras?: { features?: BuildingFeature[] };
           };
-          this.buildingFeatures = ud.features ?? ud.extras?.features ?? [];
+          this.features = ud.features ?? ud.extras?.features ?? [];
+          this.deriveBuildingArrays(m.geometry as THREE.BufferGeometry);
         } else {
           m.material = this.layerMaterial(layer.name);
         }
@@ -160,63 +161,99 @@ export class MaquetaScene {
       this.scene.add(root);
       this.layers.set(layer.name, root);
     }
+    this.applyColorMode();
+    this.applyFilter();
     this.frameCamera(manifest.aoi.size_m);
     this.needsRender = true;
   }
 
-  private layerMaterial(name: string): THREE.Material {
-    // Roads/rail are UNLIT + bright (the neon look); terrain is lit (Lambert) so relief reads via the
-    // directional light; water/green are lit Lambert too. Lit materials render reliably on real GPUs.
-    switch (name) {
-      case 'roads':
-      case 'rail':
-        return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
-      case 'water':
-        return new THREE.MeshLambertMaterial({ vertexColors: true });
-      case 'green':
-        return new THREE.MeshLambertMaterial({ vertexColors: true });
-      default: // terrain
-        return new THREE.MeshLambertMaterial({ vertexColors: true });
+  // Build per-vertex feature id / height / source arrays + a hidden attribute.
+  private deriveBuildingArrays(geom: THREE.BufferGeometry) {
+    const fidAttr = (geom.getAttribute('_featureid') ||
+      geom.getAttribute('_FEATUREID') ||
+      geom.getAttribute('featureid')) as THREE.BufferAttribute | undefined;
+    const n = geom.getAttribute('position').count;
+    const byId = new Map<number, BuildingFeature>();
+    this.features.forEach((f) => byId.set(f.id, f));
+    this.vFeature = new Int32Array(n);
+    this.vHeight = new Float32Array(n);
+    this.vSource = new Uint8Array(n);
+    for (let i = 0; i < n; i++) {
+      const fid = fidAttr ? Math.round(fidAttr.getX(i)) : -1;
+      this.vFeature[i] = fid;
+      const f = byId.get(fid);
+      this.vHeight[i] = f ? f.height_m : 0;
+      this.vSource[i] = f ? (SOURCE_CODE[f.height_source] ?? 3) : 3;
     }
+    geom.setAttribute('aHidden', new THREE.BufferAttribute(new Float32Array(n), 1));
   }
 
-  private frameCamera([wm, hm]: [number, number]) {
-    const r = Math.max(wm, hm);
-    this.controls.target.set(0, 0, 0);
-    this.camera.position.set(r * 0.6, r * 0.55, r * 0.6);
-    this.camera.far = r * 8;
-    this.camera.updateProjectionMatrix();
-    this.controls.update();
-  }
-
-  setLayerVisible(name: string, visible: boolean) {
-    const o = this.layers.get(name);
-    if (o) {
-      o.visible = visible;
-      this.needsRender = true;
-    }
-  }
-
-  setAnimate(on: boolean) {
-    this.animate = on;
+  // ---- colour-by ----
+  setColorMode(mode: ColorMode) {
+    this.colorMode = mode;
+    this.applyColorMode();
     this.needsRender = true;
   }
 
-
-  cameraPreset(kind: 'aerial' | 'oblique' | 'street') {
-    const r = 1200;
-    if (kind === 'aerial') this.camera.position.set(0, r * 1.4, 1);
-    else if (kind === 'oblique') this.camera.position.set(r * 0.6, r * 0.55, r * 0.6);
-    else this.camera.position.set(r * 0.15, 120, r * 0.15);
-    this.controls.target.set(0, 0, 0);
-    this.controls.update();
-    this.needsRender = true;
+  private applyColorMode() {
+    if (!this.buildingMesh) return;
+    const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+    let arr = this.colorByCache[this.colorMode];
+    if (!arr) {
+      const n = this.vHeight.length;
+      arr = new Float32Array(n * 3);
+      const hmax = Math.max(1, percentile(this.vHeight, 0.95));
+      const byId = new Map<number, BuildingFeature>();
+      this.features.forEach((f) => byId.set(f.id, f));
+      for (let i = 0; i < n; i++) {
+        let rgb: [number, number, number];
+        if (this.colorMode === 'height') rgb = heightRamp(this.vHeight[i] / hmax);
+        else if (this.colorMode === 'provenance') {
+          const src = ['measured', 'floors', 'raster', 'prior'][this.vSource[i]];
+          rgb = PROVENANCE_RGB[src];
+        } else {
+          const cls = byId.get(this.vFeature[i])?.class ?? 50;
+          rgb = WORLDCOVER_RGB[cls] ?? [120, 120, 120];
+        }
+        arr[i * 3] = srgbToLinear(rgb[0] / 255);
+        arr[i * 3 + 1] = srgbToLinear(rgb[1] / 255);
+        arr[i * 3 + 2] = srgbToLinear(rgb[2] / 255);
+      }
+      this.colorByCache[this.colorMode] = arr;
+    }
+    geom.setAttribute('color', new THREE.BufferAttribute(arr, 3));
   }
 
+  // ---- filters ----
+  setHeightFilter(min: number, max: number) {
+    this.heightRange = [min, max];
+    this.applyFilter();
+    this.needsRender = true;
+  }
+  setSourceFilter(sources: Set<string>) {
+    this.sourceFilter = sources;
+    this.applyFilter();
+    this.needsRender = true;
+  }
+  private applyFilter() {
+    if (!this.buildingMesh) return;
+    const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+    const hidden = geom.getAttribute('aHidden') as THREE.BufferAttribute;
+    const [lo, hi] = this.heightRange;
+    const names = ['measured', 'floors', 'raster', 'prior'];
+    for (let i = 0; i < this.vHeight.length; i++) {
+      const h = this.vHeight[i];
+      const okH = h >= lo && h <= hi;
+      const okS = this.sourceFilter.has(names[this.vSource[i]]);
+      hidden.setX(i, okH && okS ? 0 : 1);
+    }
+    hidden.needsUpdate = true;
+  }
+
+  // ---- selection ----
   setOnPick(cb: (p: PickInfo | null) => void) {
     this.onPick = cb;
   }
-
   private onPointer = (ev: PointerEvent) => {
     if (!this.buildingMesh || !this.onPick) return;
     const rect = this.renderer.domElement.getBoundingClientRect();
@@ -225,30 +262,128 @@ export class MaquetaScene {
       -((ev.clientY - rect.top) / rect.height) * 2 + 1,
     );
     this.raycaster.setFromCamera(ndc, this.camera);
-    const hits = this.raycaster.intersectObject(this.buildingMesh, true);
-    if (!hits.length) {
+    const hit = this.raycaster.intersectObject(this.buildingMesh, true)[0];
+    if (!hit || !hit.face) {
+      this.clearHighlight();
       this.onPick(null);
+      this.needsRender = true;
       return;
     }
-    const hit = hits[0];
-    const geom = (hit.object as THREE.Mesh).geometry as THREE.BufferGeometry;
-    // The per-vertex feature id may surface under a few names depending on the loader; try them.
-    const attr = (geom.getAttribute('_featureid') ||
-      geom.getAttribute('_FEATUREID') ||
-      geom.getAttribute('featureid')) as THREE.BufferAttribute | undefined;
-    let fid = -1;
-    if (attr && hit.face) fid = Math.round(attr.getX(hit.face.a));
-    const feature = fid >= 0 ? this.buildingFeatures.find((f) => f.id === fid) : undefined;
-    this.onPick({ layer: 'buildings', feature, point: hit.point.clone() });
+    const fid = this.vFeature[hit.face.a];
+    const feature = this.features.find((f) => f.id === fid);
+    if (feature) {
+      this.highlightBuilding(fid);
+      this.onPick({ feature, point: hit.point.clone() });
+    } else {
+      this.clearHighlight();
+      this.onPick(null);
+    }
     this.needsRender = true;
   };
 
+  // Build a bright wireframe overlay around the selected building's triangles.
+  private highlightBuilding(fid: number) {
+    this.clearHighlight();
+    if (!this.buildingMesh) return;
+    const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+    const pos = geom.getAttribute('position') as THREE.BufferAttribute;
+    const pts: number[] = [];
+    const idx = geom.index;
+    const nFaces = idx ? idx.count / 3 : pos.count / 3;
+    for (let f = 0; f < nFaces; f++) {
+      const a = idx ? idx.getX(f * 3) : f * 3;
+      if (this.vFeature[a] !== fid) continue;
+      const b = idx ? idx.getX(f * 3 + 1) : f * 3 + 1;
+      const c = idx ? idx.getX(f * 3 + 2) : f * 3 + 2;
+      for (const [i, j] of [
+        [a, b],
+        [b, c],
+        [c, a],
+      ]) {
+        pts.push(pos.getX(i), pos.getY(i), pos.getZ(i), pos.getX(j), pos.getY(j), pos.getZ(j));
+      }
+    }
+    if (!pts.length) return;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    this.highlight = new THREE.LineSegments(
+      g,
+      new THREE.LineBasicMaterial({ color: 0x00e5ff, toneMapped: false, depthTest: false }),
+    );
+    this.highlight.renderOrder = 999;
+    this.scene.add(this.highlight);
+  }
+  private clearHighlight() {
+    if (this.highlight) {
+      this.scene.remove(this.highlight);
+      (this.highlight.geometry as THREE.BufferGeometry).dispose();
+      this.highlight = null;
+    }
+  }
+
+  // ---- scene controls ----
+  setLayerVisible(name: string, visible: boolean) {
+    const o = this.layers.get(name);
+    if (o) {
+      o.visible = visible;
+      this.needsRender = true;
+    }
+  }
+  setNeon(v: number) {
+    this.neon = v;
+    for (const [name, obj] of this.layers) {
+      if (name === 'roads' || name === 'rail') {
+        obj.traverse((o) => {
+          const m = (o as THREE.Mesh).material as THREE.MeshBasicMaterial | undefined;
+          if (m && 'color' in m) (m as THREE.MeshBasicMaterial).opacity = 1;
+        });
+      }
+    }
+    this.buildingMat.emissiveIntensity = 0.1 + v * 0.3;
+    this.needsRender = true;
+  }
+  setAnimate(on: boolean) {
+    this.animate = on;
+    this.needsRender = true;
+  }
+  cameraPreset(kind: 'aerial' | 'oblique' | 'street') {
+    const r = 1400;
+    if (kind === 'aerial') this.camera.position.set(0, r * 1.5, 1);
+    else if (kind === 'oblique') this.camera.position.set(r * 0.8, r * 0.75, r * 0.8);
+    else this.camera.position.set(r * 0.1, 150, r * 0.1);
+    this.controls.target.set(0, 0, 0);
+    this.controls.update();
+    this.needsRender = true;
+  }
+
+  private layerMaterial(name: string): THREE.Material {
+    switch (name) {
+      case 'roads':
+        return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
+      case 'rail':
+        return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
+      case 'water':
+        return new THREE.MeshLambertMaterial({ vertexColors: true, emissive: 0x001830, emissiveIntensity: 0.3 });
+      case 'green':
+        return new THREE.MeshLambertMaterial({ vertexColors: true });
+      case 'population':
+        return new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 0.75, emissive: 0x000000 });
+      default:
+        return new THREE.MeshLambertMaterial({ vertexColors: true });
+    }
+  }
+
+  private frameCamera([wm, hm]: [number, number]) {
+    const r = Math.max(wm, hm);
+    this.controls.target.set(0, 0, 0);
+    this.camera.position.set(r * 0.65, r * 0.6, r * 0.65);
+    this.camera.far = r * 10;
+    this.camera.updateProjectionMatrix();
+    this.controls.update();
+  }
   private onVisibility = () => {
-    // Nudge a redraw when the tab becomes visible again (rAF is auto-throttled by the browser while
-    // hidden, so the loop itself keeps running -- no compute bomb -- and just idles on needsRender).
     if (!document.hidden) this.needsRender = true;
   };
-
   private resize() {
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
@@ -258,17 +393,12 @@ export class MaquetaScene {
     this.renderer.setSize(w, h);
     this.needsRender = true;
   }
-
   private loop = () => {
     if (this.disposed) return;
-    // rAF is naturally paused/throttled by the browser when the tab is hidden (no compute bomb), so we
-    // do NOT bail on document.hidden here -- bailing would leave the canvas unrendered when the page
-    // loads unfocused. We only pause the pulse ANIMATION while hidden.
     this.controls.update();
     if (this.animate && !document.hidden) {
-      // gentle emissive breathing (the opt-in "pulse"); runs once-per-frame while visible only.
       this.pulse += 0.03;
-      this.buildingMat.emissiveIntensity = 0.2 + 0.12 * Math.abs(Math.sin(this.pulse));
+      this.buildingMat.emissiveIntensity = 0.15 + 0.15 * Math.abs(Math.sin(this.pulse)) + this.neon * 0.1;
       this.needsRender = true;
     }
     if (this.needsRender) {
@@ -277,7 +407,6 @@ export class MaquetaScene {
     }
     requestAnimationFrame(this.loop);
   };
-
   dispose() {
     this.disposed = true;
     this.ro.disconnect();
@@ -286,4 +415,37 @@ export class MaquetaScene {
     this.renderer.dispose();
     this.container.removeChild(this.renderer.domElement);
   }
+
+  heightBounds(): [number, number] {
+    if (!this.vHeight.length) return [0, 100];
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (const h of this.vHeight) {
+      if (h < lo) lo = h;
+      if (h > hi) hi = h;
+    }
+    return [Math.floor(lo), Math.ceil(hi)];
+  }
+}
+
+function floatifyColors(geom: THREE.BufferGeometry): void {
+  const col = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
+  if (!col || col.array instanceof Float32Array) return;
+  const n = col.count;
+  const size = col.itemSize;
+  const out = new Float32Array(n * size);
+  for (let i = 0; i < n; i++)
+    for (let k = 0; k < size; k++) {
+      const v = (col.array[i * size + k] as number) / 255;
+      out[i * size + k] = k < 3 ? srgbToLinear(v) : v;
+    }
+  geom.setAttribute('color', new THREE.BufferAttribute(out, size));
+}
+function srgbToLinear(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+function percentile(a: Float32Array, p: number): number {
+  if (!a.length) return 1;
+  const s = Float32Array.from(a).sort();
+  return s[Math.floor(p * (s.length - 1))];
 }
