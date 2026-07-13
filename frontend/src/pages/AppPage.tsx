@@ -21,8 +21,11 @@ export default function AppPage() {
     loadIndex()
       .then((ix) => {
         setIndex(ix);
-        // Default to the full Santiago metro case if it is baked, else the first place.
-        const def = ix.places.find((p) => p.slug === 'santiago_full') ?? ix.places[0];
+        // Default to the Providencia comuna if baked, else the full Santiago metro core, else the first place.
+        const def =
+          ix.places.find((p) => p.slug === 'stgo_providencia') ??
+          ix.places.find((p) => p.slug === 'santiago_full') ??
+          ix.places[0];
         setSlug(def?.slug ?? '');
       })
       .catch((e) => setErr(String(e)));
