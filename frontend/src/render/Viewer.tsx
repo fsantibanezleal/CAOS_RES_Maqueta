@@ -31,6 +31,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   const [edgesLarge, setEdgesLarge] = useState(false);
   const [loading, setLoading] = useState(true);
   const [buildingsLoading, setBuildingsLoading] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(true);
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
 
   useEffect(() => {
@@ -128,18 +129,21 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
 
   return (
     <div className="mq-workbench">
-      <div className="mq-stage">
-        <div className="mq-canvas" ref={mountRef}>
-          {loading && <div className="mq-loading">{t('Loading fused scene...', 'Cargando escena fusionada...')}</div>}
-          {!loading && buildingsLoading && (
-            <div className="mq-streaming">{t('Loading full detail...', 'Cargando detalle completo...')}</div>
-          )}
-          {!loading && <ColorLegend scene={sceneRef.current} attrKey={colorMode} lang={lang} />}
-        </div>
-        <SelectionPanel pick={pick} lang={lang} />
+      <div className="mq-canvas" ref={mountRef}>
+        {loading && <div className="mq-loading">{t('Loading fused scene...', 'Cargando escena fusionada...')}</div>}
+        {!loading && buildingsLoading && (
+          <div className="mq-streaming">{t('Loading full detail...', 'Cargando detalle completo...')}</div>
+        )}
+        {!loading && <ColorLegend scene={sceneRef.current} attrKey={colorMode} lang={lang} />}
       </div>
-
+      <SelectionPanel pick={pick} lang={lang} />
+      <button className="mq-panel-toggle" onClick={() => setPanelOpen((o) => !o)} title={t('Toggle controls', 'Alternar controles')}>
+        {panelOpen ? '✕' : '☰'}
+        <span>{panelOpen ? t('Hide', 'Ocultar') : t('Controls', 'Controles')}</span>
+      </button>
+      {panelOpen && (
       <aside className="mq-panel">
+        <div className="mq-panel-h">{t('Controls', 'Controles')}</div>
         <Section title={t('Layers (the fused modalities)', 'Capas (las modalidades fusionadas)')}>
           {manifest.layers.filter((l) => l.name !== 'buildings_lite').map((l) => (
             <LayerRow key={l.name} layer={l} on={visible[l.name] ?? true} swatch={LAYER_SWATCH[l.name] ?? '#888'}
@@ -205,6 +209,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
           {edgesLarge && <p className="mq-sub">{t('Large scene: edges are off by default for a fast load; enable to read building shape (may take a moment).', 'Escena grande: la malla viene apagada para cargar rapido; actívala para ver la forma de los edificios (puede tardar un momento).')}</p>}
         </Section>
       </aside>
+      )}
     </div>
   );
 }

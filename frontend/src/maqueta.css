@@ -9,6 +9,8 @@
 }
 
 .mq-page { max-width: 1320px; margin: 0 auto; padding: 0.8rem 1rem 3rem; }
+/* The App is map-first: use the full width and float the controls over the map, not a boxed grid column. */
+.mq-page.mq-app { max-width: 100%; padding: 0.5rem 0.8rem 1.4rem; }
 .mq-lead { font-size: 1.05rem; line-height: 1.55; color: var(--color-fg); }
 .mq-muted { color: var(--color-fg-subtle); }
 .mq-error { color: var(--mq-src); }
@@ -20,12 +22,14 @@
 .mq-select-place select { font: inherit; padding: 0.35rem 0.5rem; border-radius: 8px; background: var(--color-surface); color: var(--color-fg); border: 1px solid var(--color-border); }
 .mq-app-meta { color: var(--color-fg-subtle); font-size: 0.9rem; }
 
-/* ---- Workbench layout: stage (canvas + selection) beside the control panel ---- */
-.mq-workbench { display: grid; grid-template-columns: 1fr 320px; gap: 0.9rem; align-items: start; }
-@media (max-width: 900px) { .mq-workbench { grid-template-columns: 1fr; } }
-.mq-stage { display: flex; flex-direction: column; gap: 0.5rem; }
-.mq-canvas { position: relative; width: 100%; height: min(68vh, 660px); border-radius: 12px; overflow: hidden; border: 1px solid var(--color-border); background: #0a0e14; }
-.mq-canvas-empty { display: grid; place-items: center; height: min(68vh, 660px); color: var(--color-fg-subtle); border: 1px solid var(--color-border); border-radius: 12px; }
+/* ---- Workbench layout: a full-bleed map with the controls floating over it ---- */
+.mq-workbench { position: relative; }
+.mq-canvas { position: relative; width: 100%; height: min(84vh, 1040px); border-radius: 12px; overflow: hidden; border: 1px solid var(--color-border); background: #0a0e14; }
+.mq-canvas-empty { display: grid; place-items: center; height: min(84vh, 1040px); color: var(--color-fg-subtle); border: 1px solid var(--color-border); border-radius: 12px; }
+/* Floating controls: toggle button (always visible) + the collapsible panel below it, top-right over the map. */
+.mq-panel-toggle { position: absolute; top: 12px; right: 12px; z-index: 7; display: inline-flex; align-items: center; gap: 0.35rem; font: inherit; font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.6rem; border-radius: 9px; border: 1px solid var(--color-border); background: color-mix(in srgb, var(--color-surface) 86%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--color-fg); cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,0.22); }
+.mq-panel-toggle:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.mq-panel-h { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-fg-subtle); padding: 0.05rem 0.2rem 0.15rem; }
 .mq-loading { position: absolute; inset: 0; display: grid; place-items: center; color: #cdd6e0; pointer-events: none; }
 /* Non-blocking hint while the heavy buildings layer streams in over the already-visible base scene. */
 .mq-streaming { position: absolute; top: 12px; right: 12px; background: color-mix(in srgb, var(--color-surface) 88%, transparent); border: 1px solid var(--color-border); border-radius: 999px; padding: 0.3rem 0.7rem; font-size: 0.8rem; color: var(--color-fg); pointer-events: none; backdrop-filter: blur(6px); }
@@ -33,7 +37,7 @@
 @keyframes mq-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
 /* ---- Colour legend overlay ---- */
-.mq-legend-box { position: absolute; left: 12px; bottom: 12px; background: color-mix(in srgb, var(--color-surface) 88%, transparent); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.5rem 0.7rem; backdrop-filter: blur(6px); max-width: 60%; }
+.mq-legend-box { position: absolute; right: 12px; bottom: 12px; background: color-mix(in srgb, var(--color-surface) 88%, transparent); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.5rem 0.7rem; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); max-width: 40%; z-index: 5; }
 .mq-legend-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-fg-subtle); }
 .mq-ramp { margin-top: 0.3rem; width: 180px; }
 .mq-ramp-bar { display: block; height: 10px; border-radius: 5px; background: linear-gradient(90deg, rgb(40,90,200), rgb(147,200,125), rgb(255,180,50)); }
@@ -42,16 +46,32 @@
 .mq-legend-list i, .mq-srcfilter i, .mq-chip i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 0.3rem; vertical-align: middle; }
 
 /* ---- Selection panel ---- */
-.mq-select-hint { padding: 0.6rem 0.8rem; border: 1px dashed var(--color-border); border-radius: 10px; color: var(--color-fg-subtle); font-size: 0.9rem; }
-.mq-select { padding: 0.6rem 0.9rem; border: 1px solid var(--color-accent); border-radius: 10px; background: var(--color-surface); }
+/* Selection / hint float bottom-left over the map (glassy). */
+.mq-select-hint, .mq-select {
+  position: absolute; left: 12px; bottom: 12px; z-index: 5;
+  max-width: min(440px, 52%);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+}
+.mq-select-hint { padding: 0.5rem 0.75rem; border: 1px dashed var(--color-border); border-radius: 10px; color: var(--color-fg-subtle); font-size: 0.85rem; background: color-mix(in srgb, var(--color-surface) 80%, transparent); }
+.mq-select { padding: 0.55rem 0.8rem; border: 1px solid var(--color-accent); border-radius: 10px; background: color-mix(in srgb, var(--color-surface) 88%, transparent); }
 .mq-select-h { display: flex; align-items: baseline; gap: 0.8rem; }
 .mq-select-height { margin-left: auto; font-size: 1.6rem; font-weight: 700; color: var(--color-accent); }
 .mq-select-attrs { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-top: 0.3rem; font-size: 0.85rem; }
 .mq-src { color: #fff; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; }
 .mq-tag { font-size: 0.8rem; padding: 0.1rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-border); color: var(--color-fg); }
 
-/* ---- Control panel ---- */
-.mq-panel { display: flex; flex-direction: column; gap: 0.6rem; }
+/* ---- Control panel (floats over the map, top-right, below the toggle; scrolls; glassy) ---- */
+.mq-panel {
+  position: absolute; top: 52px; right: 12px; z-index: 6;
+  width: 300px; max-width: calc(100% - 24px); max-height: calc(100% - 66px); overflow-y: auto;
+  display: flex; flex-direction: column; gap: 0.5rem;
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border); border-radius: 12px; padding: 0.55rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+}
+@media (max-width: 640px) { .mq-panel { width: calc(100% - 24px); } }
 .mq-section { border: 1px solid var(--color-border); border-radius: 10px; padding: 0.6rem 0.7rem; background: var(--color-surface); }
 .mq-section h4 { margin: 0 0 0.5rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-fg-subtle); }
 .mq-seg { display: flex; gap: 0.3rem; flex-wrap: wrap; }
