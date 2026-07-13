@@ -1,45 +1,36 @@
-// The App workbench: the 3D scene + a full control panel. Every fused source is a toggleable layer
-// (with its provenance shown); buildings can be coloured by height / provenance / land use with a live
-// legend; height and provenance filters operate over the building features; clicking a building
-// highlights it in 3D and opens a detail panel. Scene dynamics: camera presets, neon intensity, pulse.
+// The App workbench: the 3D scene + a full attribute-driven control panel. Every fused source is a
+// toggleable layer (with provenance shown); buildings can be coloured by ANY attribute (height,
+// provenance, function, floors, area, land cover, and future fused modalities) with a live legend;
+// numeric attributes get range filters and categorical ones get value filters, all operating over the
+// building features and combined with AND; clicking a building highlights it in 3D and opens a detail
+// panel. Scene dynamics: camera presets, neon intensity, pulse. Edges give each extrusion 3D shape.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { readTheme } from '@fasl-work/caos-app-shell';
-import { MaquetaScene, type ColorMode, type PickInfo } from './MaquetaScene';
+import { MaquetaScene, type AttrSpec, type PickInfo } from './MaquetaScene';
 import type { BundleManifest, BundleLayer } from '../lib/contract.types';
 import { PROVENANCE, WORLDCOVER_LABELS, WORLDCOVER_RGB, rgbCss } from '../lib/labels';
 
 type Lang = 'en' | 'es';
 const LAYER_SWATCH: Record<string, string> = {
-  terrain: '#464a52',
-  buildings: '#c8a05a',
-  roads: '#78c8ff',
-  rail: '#ffa05a',
-  water: '#005faf',
-  green: '#2e783c',
-  population: '#d64828',
+  terrain: '#464a52', buildings: '#c8a05a', roads: '#78c8ff', rail: '#ffa05a',
+  water: '#005faf', green: '#2e783c', population: '#d64828',
 };
-const SOURCES: ('measured' | 'floors' | 'raster' | 'prior')[] = ['measured', 'floors', 'raster', 'prior'];
 
-export function Viewer({
-  baseUrl,
-  manifest,
-  lang,
-}: {
-  baseUrl: string;
-  manifest: BundleManifest;
-  lang: Lang;
-}) {
+export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest: BundleManifest; lang: Lang }) {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<MaquetaScene | null>(null);
   const [pick, setPick] = useState<PickInfo | null>(null);
   const [visible, setVisible] = useState<Record<string, boolean>>({});
-  const [colorMode, setColorMode] = useState<ColorMode>('height');
-  const [hBounds, setHBounds] = useState<[number, number]>([0, 200]);
-  const [hFilter, setHFilter] = useState<[number, number]>([0, 200]);
-  const [srcOn, setSrcOn] = useState<Record<string, boolean>>({ measured: true, floors: true, raster: true, prior: true });
+  const [attrs, setAttrs] = useState<AttrSpec[]>([]);
+  const [colorMode, setColorMode] = useState('height');
+  const [numFilters, setNumFilters] = useState<Record<string, [number, number]>>({});
+  const [catFilters, setCatFilters] = useState<Record<string, Set<string>>>({});
   const [neon, setNeon] = useState(1);
   const [animate, setAnimate] = useState(false);
+  const [edges, setEdgesState] = useState(true);
+  const [edgesLarge, setEdgesLarge] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [buildingsLoading, setBuildingsLoading] = useState(false);
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
 
   useEffect(() => {
@@ -49,28 +40,44 @@ export function Viewer({
     sceneRef.current = s;
     const obs = new MutationObserver(() => s.setTheme(readTheme() === 'dark'));
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => {
-      obs.disconnect();
-      s.dispose();
-    };
+    return () => { obs.disconnect(); s.dispose(); };
   }, []);
 
   useEffect(() => {
     const s = sceneRef.current;
     if (!s) return;
     setLoading(true);
+    setBuildingsLoading(false);
     setPick(null);
-    s.loadBundle(baseUrl, manifest).then(() => {
-      const v: Record<string, boolean> = {};
-      // population is a heavy overlay: default it off so the city reads; the user opts in.
-      manifest.layers.forEach((l) => (v[l.name] = l.name !== 'population'));
-      manifest.layers.forEach((l) => s.setLayerVisible(l.name, v[l.name]));
-      setVisible(v);
-      const b = s.heightBounds();
-      setHBounds(b);
-      setHFilter(b);
-      setColorMode('height');
+    // Layer visibility is known from the manifest up front (population off by default).
+    const v: Record<string, boolean> = {};
+    manifest.layers.forEach((l) => (v[l.name] = l.name !== 'population'));
+    setVisible(v);
+    s.loadBundle(baseUrl, manifest, () => {
+      // Base modalities are loaded + framed: hide the main overlay, keep a light "streaming" hint.
+      manifest.layers.forEach((l) => l.name !== 'buildings' && s.setLayerVisible(l.name, v[l.name]));
       setLoading(false);
+      setBuildingsLoading(true);
+    }).then(() => {
+      manifest.layers.forEach((l) => s.setLayerVisible(l.name, v[l.name]));
+      const a = s.attributes();
+      setAttrs(a);
+      // reset filters to full range / all categories
+      const nf: Record<string, [number, number]> = {};
+      const cf: Record<string, Set<string>> = {};
+      a.forEach((sp) => {
+        if (sp.kind === 'numeric') nf[sp.key] = s.numericRange(sp.key);
+        else cf[sp.key] = new Set(s.categories(sp.key));
+      });
+      setNumFilters(nf);
+      setCatFilters(cf);
+      setColorMode('height');
+      s.setColorMode('height');
+      const ei = s.edgesInfo();
+      setEdgesState(ei.on);
+      setEdgesLarge(ei.large);
+      setLoading(false);
+      setBuildingsLoading(false);
     });
   }, [baseUrl, manifest]);
 
@@ -78,92 +85,87 @@ export function Viewer({
     setVisible((p) => ({ ...p, [name]: on }));
     sceneRef.current?.setLayerVisible(name, on);
   };
-  const changeColor = (m: ColorMode) => {
-    setColorMode(m);
-    sceneRef.current?.setColorMode(m);
+  const changeColor = (k: string) => { setColorMode(k); sceneRef.current?.setColorMode(k); };
+  const changeNum = (key: string, lo: number, hi: number) => {
+    setNumFilters((p) => ({ ...p, [key]: [lo, hi] }));
+    sceneRef.current?.setNumericFilter(key, lo, hi);
   };
-  const changeHeight = (lo: number, hi: number) => {
-    setHFilter([lo, hi]);
-    sceneRef.current?.setHeightFilter(lo, hi);
-  };
-  const toggleSrc = (s: string) => {
-    const next = { ...srcOn, [s]: !srcOn[s] };
-    setSrcOn(next);
-    sceneRef.current?.setSourceFilter(new Set(SOURCES.filter((x) => next[x])));
+  const toggleCat = (key: string, val: string) => {
+    setCatFilters((p) => {
+      const next = new Set(p[key]);
+      next.has(val) ? next.delete(val) : next.add(val);
+      sceneRef.current?.setCategoricalFilter(key, next);
+      return { ...p, [key]: next };
+    });
   };
 
-  const classesInScene = useMemo(() => {
-    // approximate: land-use legend shows built-up + whatever the scene likely holds
-    return [50, 10, 30, 80, 40];
-  }, []);
-  const mix = manifest.stats.height_mix;
+  const colorAttrs = useMemo(() => attrs, [attrs]);
+  const numericAttrs = attrs.filter((a) => a.kind === 'numeric');
+  const categoricalAttrs = attrs.filter((a) => a.kind === 'categorical');
 
   return (
     <div className="mq-workbench">
       <div className="mq-stage">
         <div className="mq-canvas" ref={mountRef}>
           {loading && <div className="mq-loading">{t('Loading fused scene...', 'Cargando escena fusionada...')}</div>}
-          <ColorLegend mode={colorMode} lang={lang} hBounds={hBounds} classes={classesInScene} />
+          {!loading && buildingsLoading && (
+            <div className="mq-streaming">{t('Streaming buildings...', 'Cargando edificios...')}</div>
+          )}
+          {!loading && <ColorLegend scene={sceneRef.current} attrKey={colorMode} lang={lang} />}
         </div>
         <SelectionPanel pick={pick} lang={lang} />
       </div>
 
       <aside className="mq-panel">
-        <Section title={t('Layers (the fused sources)', 'Capas (las fuentes fusionadas)')}>
+        <Section title={t('Layers (the fused modalities)', 'Capas (las modalidades fusionadas)')}>
           {manifest.layers.map((l) => (
-            <LayerRow
-              key={l.name}
-              layer={l}
-              on={visible[l.name] ?? true}
-              swatch={LAYER_SWATCH[l.name] ?? '#888'}
-              onToggle={(v) => setLayer(l.name, v)}
-              lang={lang}
-            />
+            <LayerRow key={l.name} layer={l} on={visible[l.name] ?? true} swatch={LAYER_SWATCH[l.name] ?? '#888'}
+              onToggle={(v) => setLayer(l.name, v)} lang={lang} />
           ))}
         </Section>
 
         <Section title={t('Colour buildings by', 'Colorear edificios por')}>
-          <div className="mq-seg">
-            {(['height', 'provenance', 'landuse'] as ColorMode[]).map((m) => (
-              <button key={m} className={colorMode === m ? 'on' : ''} onClick={() => changeColor(m)}>
-                {m === 'height' ? t('Height', 'Altura') : m === 'provenance' ? t('Provenance', 'Procedencia') : t('Land use', 'Uso de suelo')}
+          <div className="mq-seg mq-seg-wrap">
+            {colorAttrs.map((a) => (
+              <button key={a.key} className={colorMode === a.key ? 'on' : ''} onClick={() => changeColor(a.key)}>
+                {a[lang]}
               </button>
             ))}
           </div>
         </Section>
 
         <Section title={t('Filter buildings', 'Filtrar edificios')}>
-          <div className="mq-filter">
-            <label>
-              {t('Height', 'Altura')}: {hFilter[0].toFixed(0)}-{hFilter[1].toFixed(0)} m
-            </label>
-            <div className="mq-dual">
-              <input
-                type="range"
-                min={hBounds[0]}
-                max={hBounds[1]}
-                value={hFilter[0]}
-                onChange={(e) => changeHeight(Math.min(+e.target.value, hFilter[1]), hFilter[1])}
-              />
-              <input
-                type="range"
-                min={hBounds[0]}
-                max={hBounds[1]}
-                value={hFilter[1]}
-                onChange={(e) => changeHeight(hFilter[0], Math.max(+e.target.value, hFilter[0]))}
-              />
-            </div>
-          </div>
-          <div className="mq-srcfilter">
-            <span className="mq-sub">{t('By height source', 'Por fuente de altura')}</span>
-            {SOURCES.map((s) => (
-              <label key={s} className="mq-chip" style={{ borderColor: rgbCss(PROVENANCE[s].rgb) }}>
-                <input type="checkbox" checked={srcOn[s]} onChange={() => toggleSrc(s)} />
-                <i style={{ background: rgbCss(PROVENANCE[s].rgb) }} />
-                {PROVENANCE[s][lang]} <span className="mq-muted">({mix[s] ?? 0})</span>
-              </label>
-            ))}
-          </div>
+          {numericAttrs.map((a) => {
+            const [rlo, rhi] = sceneRef.current?.numericRange(a.key) ?? [0, 1];
+            const [lo, hi] = numFilters[a.key] ?? [rlo, rhi];
+            return (
+              <div className="mq-filter" key={a.key}>
+                <label>{a[lang]}: {lo.toFixed(0)}-{hi.toFixed(0)} {a.unit ?? ''}</label>
+                <div className="mq-dual">
+                  <input type="range" min={rlo} max={rhi} value={lo} onChange={(e) => changeNum(a.key, Math.min(+e.target.value, hi), hi)} />
+                  <input type="range" min={rlo} max={rhi} value={hi} onChange={(e) => changeNum(a.key, lo, Math.max(+e.target.value, lo))} />
+                </div>
+              </div>
+            );
+          })}
+          {categoricalAttrs.map((a) => {
+            const vals = sceneRef.current?.categories(a.key) ?? [];
+            if (!vals.length) return null;
+            return (
+              <div className="mq-catfilter" key={a.key}>
+                <span className="mq-sub">{a[lang]}</span>
+                <div className="mq-chips">
+                  {vals.slice(0, 14).map((v) => (
+                    <label key={v} className="mq-chip mq-chip-sm">
+                      <input type="checkbox" checked={catFilters[a.key]?.has(v) ?? true} onChange={() => toggleCat(a.key, v)} />
+                      <i style={{ background: catSwatch(a.key, v, vals) }} />
+                      {catLabel(a.key, v, lang)}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </Section>
 
         <Section title={t('Scene', 'Escena')}>
@@ -172,14 +174,12 @@ export function Viewer({
             <button onClick={() => sceneRef.current?.cameraPreset('oblique')}>{t('Oblique', 'Oblicua')}</button>
             <button onClick={() => sceneRef.current?.cameraPreset('street')}>{t('Street', 'Calle')}</button>
           </div>
-          <label className="mq-slider">
-            {t('Neon / glow', 'Neón / brillo')}
+          <label className="mq-slider">{t('Neon / glow', 'Neon / brillo')}
             <input type="range" min={0} max={2} step={0.05} value={neon} onChange={(e) => { setNeon(+e.target.value); sceneRef.current?.setNeon(+e.target.value); }} />
           </label>
-          <label className="mq-chip">
-            <input type="checkbox" checked={animate} onChange={(e) => { setAnimate(e.target.checked); sceneRef.current?.setAnimate(e.target.checked); }} />
-            {t('Pulse animation', 'Animación de pulso')}
-          </label>
+          <label className="mq-chip"><input type="checkbox" checked={animate} onChange={(e) => { setAnimate(e.target.checked); sceneRef.current?.setAnimate(e.target.checked); }} />{t('Pulse animation', 'Animacion de pulso')}</label>
+          <label className="mq-chip"><input type="checkbox" checked={edges} onChange={(e) => { setEdgesState(e.target.checked); sceneRef.current?.setEdges(e.target.checked); }} />{t('Wireframe (building edges)', 'Malla (bordes de edificios)')}</label>
+          {edgesLarge && <p className="mq-sub">{t('Large scene: edges are off by default for a fast load; enable to read building shape (may take a moment).', 'Escena grande: la malla viene apagada para cargar rapido; actívala para ver la forma de los edificios (puede tardar un momento).')}</p>}
         </Section>
       </aside>
     </div>
@@ -187,12 +187,19 @@ export function Viewer({
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="mq-section">
-      <h4>{title}</h4>
-      {children}
-    </div>
-  );
+  return <div className="mq-section"><h4>{title}</h4>{children}</div>;
+}
+
+const CAT_PALETTE = [[66,133,244],[219,68,55],[244,180,0],[15,157,88],[171,71,188],[0,172,193],[255,112,67],[158,157,36],[94,53,177],[3,155,229],[124,179,66],[216,27,96],[141,110,99],[84,110,122]] as [number,number,number][];
+function catSwatch(key: string, val: string, vals: string[]): string {
+  if (key === 'provenance') return rgbCss(PROVENANCE[val]?.rgb ?? [140, 140, 140]);
+  if (key === 'landuse') return rgbCss(WORLDCOVER_RGB[Number(val)] ?? [140, 140, 140]);
+  return rgbCss(CAT_PALETTE[vals.indexOf(val) % CAT_PALETTE.length]);
+}
+function catLabel(key: string, val: string, lang: Lang): string {
+  if (key === 'provenance') return PROVENANCE[val]?.[lang] ?? val;
+  if (key === 'landuse') return WORLDCOVER_LABELS[Number(val)]?.[lang] ?? val;
+  return val;
 }
 
 function LayerRow({ layer, on, swatch, onToggle, lang }: { layer: BundleLayer; on: boolean; swatch: string; onToggle: (v: boolean) => void; lang: Lang }) {
@@ -215,33 +222,27 @@ function LayerRow({ layer, on, swatch, onToggle, lang }: { layer: BundleLayer; o
   );
 }
 
-function ColorLegend({ mode, lang, hBounds, classes }: { mode: ColorMode; lang: Lang; hBounds: [number, number]; classes: number[] }) {
+function ColorLegend({ scene, attrKey, lang }: { scene: MaquetaScene | null; attrKey: string; lang: Lang }) {
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
+  if (!scene) return null;
+  const spec = scene.attributes().find((a) => a.key === attrKey);
+  if (!spec) return null;
   return (
     <div className="mq-legend-box">
-      <span className="mq-legend-title">
-        {mode === 'height' ? t('Height', 'Altura') : mode === 'provenance' ? t('Height provenance', 'Procedencia de altura') : t('Land use', 'Uso de suelo')}
-      </span>
-      {mode === 'height' && (
+      <span className="mq-legend-title">{spec[lang]}{spec.unit ? ` (${spec.unit})` : ''}</span>
+      {spec.kind === 'numeric' ? (
         <div className="mq-ramp">
           <span className="mq-ramp-bar" />
-          <div className="mq-ramp-lbl"><span>{hBounds[0]} m</span><span>{hBounds[1]} m</span></div>
+          <div className="mq-ramp-lbl"><span>{scene.numericRange(attrKey)[0]}</span><span>{scene.numericRange(attrKey)[1]}</span></div>
         </div>
-      )}
-      {mode === 'provenance' && (
+      ) : (
         <div className="mq-legend-list">
-          {SOURCES.map((s) => (
-            <span key={s}><i style={{ background: rgbCss(PROVENANCE[s].rgb) }} />{PROVENANCE[s][lang]}</span>
+          {scene.categories(attrKey).slice(0, 10).map((v, i) => (
+            <span key={v}><i style={{ background: catSwatch(attrKey, v, scene.categories(attrKey)) }} />{catLabel(attrKey, v, lang)}{i === 9 ? ' ...' : ''}</span>
           ))}
         </div>
       )}
-      {mode === 'landuse' && (
-        <div className="mq-legend-list">
-          {classes.map((c) => (
-            <span key={c}><i style={{ background: rgbCss(WORLDCOVER_RGB[c] ?? [120, 120, 120]) }} />{WORLDCOVER_LABELS[c]?.[lang] ?? c}</span>
-          ))}
-        </div>
-      )}
+      {t('', '')}
     </div>
   );
 }
@@ -249,11 +250,7 @@ function ColorLegend({ mode, lang, hBounds, classes }: { mode: ColorMode; lang: 
 function SelectionPanel({ pick, lang }: { pick: PickInfo | null; lang: Lang }) {
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
   if (!pick)
-    return (
-      <div className="mq-select-hint">
-        {t('Click any building to select it (it highlights in 3D) and read its height + provenance.', 'Haz clic en un edificio para seleccionarlo (se resalta en 3D) y ver su altura y procedencia.')}
-      </div>
-    );
+    return <div className="mq-select-hint">{t('Click any building to select it (it highlights in 3D) and read all its fused attributes.', 'Haz clic en un edificio para seleccionarlo (se resalta en 3D) y ver todos sus atributos fusionados.')}</div>;
   const f = pick.feature;
   const p = PROVENANCE[f.height_source];
   return (
@@ -263,7 +260,11 @@ function SelectionPanel({ pick, lang }: { pick: PickInfo | null; lang: Lang }) {
         <span className="mq-select-height">{f.height_m.toFixed(1)} m</span>
       </div>
       <div className="mq-select-attrs">
-        <span className="mq-src" style={{ background: rgbCss(p.rgb) }}>{p[lang]}</span>
+        <span className="mq-src" style={{ background: rgbCss(p.rgb) }}>{t('height', 'altura')}: {p[lang]}</span>
+        {f.num_floors != null && <span className="mq-tag">{f.num_floors} {t('floors', 'pisos')}</span>}
+        {f.area_m2 != null && <span className="mq-tag">{f.area_m2.toLocaleString()} m2</span>}
+        {f.use && <span className="mq-tag">{f.use}</span>}
+        {f.roof_shape && <span className="mq-tag">{t('roof', 'techo')}: {f.roof_shape}</span>}
         {f.class != null && <span className="mq-muted">{WORLDCOVER_LABELS[f.class]?.[lang] ?? `class ${f.class}`}</span>}
         <span className="mq-muted">x={pick.point.x.toFixed(0)} m, z={(-pick.point.z).toFixed(0)} m</span>
       </div>

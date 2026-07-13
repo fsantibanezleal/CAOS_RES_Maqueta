@@ -1,6 +1,7 @@
-// Introduction: what Maqueta is (a multi-source fusion reconstruction, not a single-city extrusion
-// demo), the honesty thesis (provenance-tracked heights), and the scope. Content transcribed from the
-// persisted research dossiers (CAOS_MANAGE/wip/maqueta/), never improvised.
+// Introduction: what Maqueta is (a multi-modal fusion reconstruction, not a single-city extrusion
+// demo), the fusion thesis (the height map is the entry point other modalities register onto), the
+// honesty thesis (provenance-tracked heights), and the scope. Content transcribed from the persisted
+// research dossiers (CAOS_MANAGE/wip/maqueta/), never improvised.
 import { Cite, Refs, useShellLang } from '@fasl-work/caos-app-shell';
 
 export default function Introduction() {
@@ -10,8 +11,8 @@ export default function Introduction() {
       <h2>{es ? 'Introducción' : 'Introduction'}</h2>
       <p className="mq-lead">
         {es
-          ? 'Maqueta reconstruye y visualiza áreas reales del mundo en 3D interactivo, fusionando todos los geodatos públicos abiertos disponibles por lugar: huellas de edificios con alturas (y la procedencia de cada altura), relieve, cobertura de suelo, calles y vías, agua, áreas verdes y densidad de población. Un pipeline offline descarga, fusiona, mallea y hornea cada lugar en un paquete de escena estático y versionado; la app web lo renderiza con una identidad de shaders (borde Fresnel, líneas de escaneo, pulso radial, calles neón, bloom, cámara orbital).'
-          : 'Maqueta reconstructs and visualizes real-world areas in interactive 3D by fusing every available open public geodataset per place: building footprints with heights (and each height’s provenance), terrain, land cover, roads and rail, water, green areas and population density. An offline pipeline downloads, fuses, meshes and bakes each place into a static, versioned scene bundle; the web app renders it with a shader-art identity (Fresnel rim, scan lines, radial pulse, neon roads, bloom, orbital camera).'}
+          ? 'Maqueta es una herramienta de fusión multi-modal: reconstruye y visualiza áreas reales del mundo en 3D interactivo mezclando todas las modalidades de geodatos públicos abiertos disponibles por lugar. El mapa de alturas es el punto de entrada, el andamio 3D sobre el que se registran las demás modalidades: relieve, cobertura de suelo, calles y vías, agua, áreas verdes, densidad de población, y (adaptativo por lugar) verdad de terreno LoD2, alturas 2.5D, uso de suelo, vegetación, clima o energía solar donde el dato público exista. El objetivo no es solo la escena: es entender cómo mezclar información de fuentes heterogéneas. Un pipeline offline descarga, fusiona, mallea y hornea cada lugar en un paquete de escena estático y versionado; la app web lo renderiza con capas conmutables, filtros y coloreo por atributo, y una identidad de shaders (borde Fresnel, líneas de escaneo, pulso radial, calles neón, bloom, cámara orbital).'
+          : 'Maqueta is a multi-modal fusion tool: it reconstructs and visualizes real-world areas in interactive 3D by mixing every available modality of open public geodata per place. The height map is the entry point, the 3D scaffold the other modalities register onto: terrain, land cover, roads and rail, water, green areas, population density, and (adaptive per place) LoD2 ground truth, 2.5D heights, land use, vegetation, climate or solar energy wherever the public data exists. The goal is not only the scene: it is understanding how to mix information from heterogeneous sources. An offline pipeline downloads, fuses, meshes and bakes each place into a static, versioned scene bundle; the web app renders it with toggleable layers, per-attribute filters and colouring, and a shader-art identity (Fresnel rim, scan lines, radial pulse, neon roads, bloom, orbital camera).'}
       </p>
 
       <h3>{es ? 'La inspiración, y en qué se diferencia Maqueta' : 'The inspiration, and how Maqueta differs'}</h3>
@@ -21,8 +22,8 @@ export default function Introduction() {
           : 'The starting point is Milan Janosov’s work, which reconstructed Manhattan (then Berlin Mitte) as a fully interactive 3D city from OpenStreetMap footprints extruded by height, with shaders and bloom in a single HTML file.'}{' '}
         <Cite id="janosov" />{' '}
         {es
-          ? 'Maqueta comparte el impacto visual pero cambia la tesis: no es una extrusión de una fuente para una ciudad, sino una FUSIÓN multi-fuente para 30-50 lugares curados, con relieve real, cobertura de suelo, y sobre todo una escalera honesta de procedencia de alturas y un benchmark contra modelos LoD2 autoritativos.'
-          : 'Maqueta shares the visual punch but changes the thesis: it is not a single-source extrusion of one city, but a multi-source FUSION for 30-50 curated places, with real terrain, land cover, and above all an honest height-provenance ladder and a benchmark against authoritative LoD2 models.'}
+          ? 'Maqueta comparte el impacto visual pero cambia la tesis: no es una extrusión de una fuente para una ciudad, sino una FUSIÓN multi-modal para 30-50 lugares curados, con relieve real, cobertura de suelo, y sobre todo una escalera honesta de procedencia de alturas y un benchmark contra modelos LoD2 autoritativos. Donde Janosov extruye una modalidad (huellas por altura), Maqueta usa esa altura como el ancla y registra encima todas las demás modalidades que el lugar tenga disponibles.'
+          : 'Maqueta shares the visual punch but changes the thesis: it is not a single-source extrusion of one city, but a multi-modal FUSION for 30-50 curated places, with real terrain, land cover, and above all an honest height-provenance ladder and a benchmark against authoritative LoD2 models. Where Janosov extrudes one modality (footprints by height), Maqueta uses that height as the anchor and registers every other modality the place has available on top of it.'}
       </p>
 
       <h3>{es ? 'El problema' : 'The problem'}</h3>

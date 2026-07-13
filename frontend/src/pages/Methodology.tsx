@@ -9,6 +9,19 @@ export default function Methodology() {
     <section className="page-body prose">
       <h2>{es ? 'Metodología' : 'Methodology'}</h2>
 
+      <p className="mq-lead">
+        {es
+          ? 'Maqueta hace fusión de datos multi-modal a nivel de características (feature-level): no combina píxeles crudos ni decisiones finales, sino que alinea modalidades heterogéneas (huellas vectoriales, DSM raster, cobertura categórica, densidad de población, alturas 2.5D, modelos LoD2) en un único marco métrico local y luego las combina por edificio o por celda. El mapa de alturas es el punto de entrada y el andamio geométrico; las demás modalidades se registran sobre él.'
+          : 'Maqueta performs multi-modal, feature-level data fusion: it combines neither raw pixels nor final decisions, but aligns heterogeneous modalities (vector footprints, raster DSM, categorical land cover, population density, 2.5D heights, LoD2 models) into a single local metric frame and then combines them per building or per cell. The height map is the entry point and the geometric scaffold; the other modalities register onto it.'}{' '}
+        <Cite id="fusionlevels" />
+      </p>
+      <p>
+        {es
+          ? 'Continuas (cobertura, futura irradiación solar, viento, temperatura) se muestrean sobre cada edificio/celda por estadística zonal (media); categóricas (cobertura de suelo, función, geología) por mayoría; superposiciones vectoriales (uso de suelo, cuencas, inundación) se recortan al AOI. Cada valor viaja con su procedencia: la escalera de alturas (sección 2) es el caso base de una etiqueta de fuente por atributo, de modo que lo medido y lo inferido nunca se confunden. La desagregación de datos agregados (p.ej. población sobre estructuras) sigue el mapeo dasimétrico; mezclar un DSM con un DTM nacional exige cuidar el datum vertical.'
+          : 'Continuous modalities (land cover, and coming: solar irradiance, wind, temperature) are sampled onto each building/cell by zonal statistics (mean); categorical ones (land cover, function, geology) by majority; vector overlays (land use, watersheds, flood) are clipped to the AOI. Every value travels with its provenance: the height ladder (section 2) is the base case of a per-attribute source tag, so measured and inferred are never conflated. Disaggregating aggregate data (e.g. population over structures) follows dasymetric mapping; mixing a DSM with a national DTM requires vertical-datum care.'}{' '}
+        <Cite id="dasymetric" /> <Cite id="vdatum" />
+      </p>
+
       <h3>{es ? '1. El AOI y su marco métrico local' : '1. The AOI and its local metric frame'}</h3>
       <p>
         {es
@@ -58,19 +71,19 @@ export default function Methodology() {
       <h3>{es ? '4. Extrusión de edificios y cintas de calles' : '4. Building extrusion and road ribbons'}</h3>
       <p>
         {es
-          ? 'Cada huella se proyecta a metros, se triangula el techo (ear-cutting, admite polígonos cóncavos) y se extruye desde una base tomada del relieve hasta base+altura formando un prisma cerrado (techo + muros). El color por vértice codifica la altura normalizada; los atributos por edificio (altura, fuente, clase) viajan en el glTF para el lector de valores al hacer clic. Las calles se buferizan por ancho según su clase y se drapean sobre el relieve.'
-          : 'Each footprint is projected to metres, the roof is triangulated (ear-cutting, handles concave polygons) and extruded from a terrain-sampled base up to base+height forming a closed prism (roof + walls). Per-vertex colour encodes normalized height; per-building attributes (height, source, class) ride in the glTF for the click value-readout. Roads are buffered by a class half-width and draped on the terrain.'}
+          ? 'Cada huella se proyecta a metros, se triangula el techo (ear-cutting, admite polígonos cóncavos) y se extruye desde una base tomada del relieve hasta base+altura formando un prisma cerrado (techo + muros). Un id por vértice enlaza cada triángulo con su registro de edificio; los atributos por edificio (altura, fuente de la altura, cobertura, area de huella, num. de pisos, funcion, forma de techo) viajan en el glTF, de modo que el visor puede recolorear, filtrar y seleccionar por cualquier atributo sin recomputar. Las calles se buferizan por ancho según su clase y se drapean sobre el relieve.'
+          : 'Each footprint is projected to metres, the roof is triangulated (ear-cutting, handles concave polygons) and extruded from a terrain-sampled base up to base+height forming a closed prism (roof + walls). A per-vertex id links each triangle back to its building record; per-building attributes (height, height source, land cover, footprint area, floor count, function, roof shape) ride in the glTF, so the viewer can recolour, filter and select by any attribute without recomputing. Roads are buffered by a class half-width and draped on the terrain.'}
       </p>
 
       <h3>{es ? '5. Entrega web' : '5. Web delivery'}</h3>
       <p>
         {es
-          ? 'Cada capa se escribe como glTF binario (.glb) válido; la compresión meshopt/Draco es un paso de entrega (gltfpack). Para AOIs de 2-6 km con decenas de miles de edificios, un .glb por capa basta; 3D Tiles (py3dtiles) es la vía de escape si un lugar excede el presupuesto.'
-          : 'Each layer is written as valid binary glTF (.glb); meshopt/Draco compression is a delivery step (gltfpack). For 2-6 km AOIs with tens of thousands of buildings, one .glb per layer suffices; 3D Tiles (py3dtiles) is the escape hatch if a place exceeds the budget.'}{' '}
+          ? 'Cada capa se escribe como glTF binario (.glb) válido; luego el pipeline aplica compresión meshopt (EXT_meshopt_compression) como paso de entrega, sin perder precision del id por vértice ni los atributos por edificio, tipicamente ~60% mas liviano. El visor registra el decodificador meshopt. Para AOIs de pocos km, un .glb por capa basta; la escena de Santiago completo (11 km, ~179k edificios) es el caso pesado: se comprime y la malla se difiere para que la carga sea fluida. 3D Tiles (py3dtiles) es la via de escape si un lugar excede el presupuesto.'
+          : 'Each layer is written as valid binary glTF (.glb); the pipeline then applies meshopt compression (EXT_meshopt_compression) as a delivery step, lossless for the per-vertex id and the per-building attributes, typically ~60% smaller. The viewer registers the meshopt decoder. For few-km AOIs, one .glb per layer suffices; the full-Santiago scene (11 km, ~179k buildings) is the heavy case: it is compressed and its wireframe deferred so the load stays smooth. 3D Tiles (py3dtiles) is the escape hatch if a place exceeds the budget.'}{' '}
         <Cite id="gltf" />
       </p>
 
-      <Refs ids={['overture', 'openbuildings25d', 'delatin', 'gltf', 'glo30']} label={es ? 'Referencias' : 'References'} />
+      <Refs ids={['fusionlevels', 'dasymetric', 'vdatum', 'overture', 'openbuildings25d', 'delatin', 'gltf', 'glo30']} label={es ? 'Referencias' : 'References'} />
     </section>
   );
 }

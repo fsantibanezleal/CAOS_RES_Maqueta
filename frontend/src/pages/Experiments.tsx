@@ -19,8 +19,8 @@ export default function Experiments() {
       <h2>{t('Experiments', 'Experimentos')}</h2>
       <p className="mq-lead">
         {t(
-          'Each place is an experiment in multi-source fusion: which layers were available, how much of the height came from measurement vs inference, and the mesh budget it cost. These numbers are baked offline by the pipeline; nothing is computed in the browser.',
-          'Cada lugar es un experimento de fusión multi-fuente: qué capas hubo, cuánta altura vino de medición vs inferencia, y el presupuesto de malla que costó. Estos números se hornean offline; nada se calcula en el navegador.',
+          'Each place is an experiment in multi-modal fusion: which modalities (layers) were available, how much of the height came from measurement vs inference, and the mesh budget it cost. These numbers are baked offline by the pipeline; nothing is computed in the browser.',
+          'Cada lugar es un experimento de fusión multi-modal: qué modalidades (capas) hubo, cuánta altura vino de medición vs inferencia, y el presupuesto de malla que costó. Estos números se hornean offline; nada se calcula en el navegador.',
         )}
       </p>
 

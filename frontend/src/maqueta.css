@@ -27,6 +27,10 @@
 .mq-canvas { position: relative; width: 100%; height: min(68vh, 660px); border-radius: 12px; overflow: hidden; border: 1px solid var(--color-border); background: #0a0e14; }
 .mq-canvas-empty { display: grid; place-items: center; height: min(68vh, 660px); color: var(--color-fg-subtle); border: 1px solid var(--color-border); border-radius: 12px; }
 .mq-loading { position: absolute; inset: 0; display: grid; place-items: center; color: #cdd6e0; pointer-events: none; }
+/* Non-blocking hint while the heavy buildings layer streams in over the already-visible base scene. */
+.mq-streaming { position: absolute; top: 12px; right: 12px; background: color-mix(in srgb, var(--color-surface) 88%, transparent); border: 1px solid var(--color-border); border-radius: 999px; padding: 0.3rem 0.7rem; font-size: 0.8rem; color: var(--color-fg); pointer-events: none; backdrop-filter: blur(6px); }
+.mq-streaming::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 0.4rem; border-radius: 50%; background: var(--color-accent); vertical-align: middle; animation: mq-pulse 1s ease-in-out infinite; }
+@keyframes mq-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
 /* ---- Colour legend overlay ---- */
 .mq-legend-box { position: absolute; left: 12px; bottom: 12px; background: color-mix(in srgb, var(--color-surface) 88%, transparent); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.5rem 0.7rem; backdrop-filter: blur(6px); max-width: 60%; }
@@ -44,6 +48,7 @@
 .mq-select-height { margin-left: auto; font-size: 1.6rem; font-weight: 700; color: var(--color-accent); }
 .mq-select-attrs { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-top: 0.3rem; font-size: 0.85rem; }
 .mq-src { color: #fff; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; }
+.mq-tag { font-size: 0.8rem; padding: 0.1rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-border); color: var(--color-fg); }
 
 /* ---- Control panel ---- */
 .mq-panel { display: flex; flex-direction: column; gap: 0.6rem; }

@@ -64,16 +64,32 @@ export interface PlaceIndexEntry {
   name: string;
   tier: 'A' | 'B' | 'C';
   category: string;
+  continent: string;
   country: string;
+  city: string;
   n_layers: number;
   total_bytes: number;
   manifest_path: string;
+}
+
+export interface HierCity {
+  city: string;
+  slugs: string[];
+}
+export interface HierCountry {
+  country: string;
+  cities: HierCity[];
+}
+export interface HierContinent {
+  continent: string;
+  countries: HierCountry[];
 }
 
 export interface PlaceIndex {
   schema_version: number;
   n_places: number;
   tiers: Record<string, string[]>;
+  hierarchy?: HierContinent[];
   places: PlaceIndexEntry[];
 }
 
@@ -120,5 +136,11 @@ export interface BuildingFeature {
   id: number;
   height_m: number;
   height_source: 'measured' | 'floors' | 'raster' | 'prior';
-  class: number | null;
+  class: number | null; // WorldCover land-cover class
+  area_m2?: number;
+  num_floors?: number | null;
+  min_height_m?: number | null;
+  use?: string | null; // Overture building class (residential, commercial, industrial, ...)
+  subtype?: string | null;
+  roof_shape?: string | null;
 }

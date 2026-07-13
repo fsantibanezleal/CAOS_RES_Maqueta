@@ -1,4 +1,4 @@
-// The App: a real multi-source fusion workbench. A place selector (grouped by tier) drives the 3D scene
+// The App: a real multi-modal fusion workbench. A place selector (grouped by continent) drives the 3D scene
 // + full control panel (in Viewer); below, deep tabbed context per place (Scene / Sources / Provenance /
 // How to use) with the honest fusion story. Not a card grid, not placeholder text.
 import { useEffect, useMemo, useState } from 'react';
@@ -8,11 +8,6 @@ import { loadIndex, loadManifest } from '../lib/data';
 import type { BundleManifest, PlaceIndex } from '../lib/contract.types';
 import { PROVENANCE, rgbCss } from '../lib/labels';
 
-const TIER_LABEL: Record<string, { en: string; es: string }> = {
-  A: { en: 'A - ground truth', es: 'A - verdad de terreno' },
-  B: { en: 'B - global-fusion cities', es: 'B - ciudades por fusión' },
-  C: { en: 'C - terrain-first areas', es: 'C - áreas de relieve' },
-};
 
 export default function AppPage() {
   const lang: 'en' | 'es' = useShellLang() === 'es' ? 'es' : 'en';
@@ -23,7 +18,14 @@ export default function AppPage() {
   const [err, setErr] = useState('');
 
   useEffect(() => {
-    loadIndex().then((ix) => { setIndex(ix); setSlug(ix.places[0]?.slug ?? ''); }).catch((e) => setErr(String(e)));
+    loadIndex()
+      .then((ix) => {
+        setIndex(ix);
+        // Default to the full Santiago metro case if it is baked, else the first place.
+        const def = ix.places.find((p) => p.slug === 'santiago_full') ?? ix.places[0];
+        setSlug(def?.slug ?? '');
+      })
+      .catch((e) => setErr(String(e)));
   }, []);
   useEffect(() => {
     if (!slug) return;
@@ -31,9 +33,15 @@ export default function AppPage() {
     loadManifest(slug).then(setData).catch((e) => setErr(String(e)));
   }, [slug]);
 
-  const byTier = useMemo(() => {
+  // Group places by continent (hierarchy), country then city inside; the option label carries
+  // country + city so the full continent > country > city hierarchy reads in a native select.
+  const CONTINENT_ORDER = ['South America', 'North America', 'Europe', 'Africa', 'Asia', 'Oceania'];
+  const byContinent = useMemo(() => {
     const o: Record<string, PlaceIndex['places']> = {};
-    index?.places.forEach((p) => (o[p.tier] ??= []).push(p));
+    index?.places.forEach((p) => (o[p.continent || 'Other'] ??= []).push(p));
+    Object.values(o).forEach((ps) =>
+      ps.sort((a, b) => a.country.localeCompare(b.country) || a.city.localeCompare(b.city)),
+    );
     return o;
   }, [index]);
   const current = index?.places.find((p) => p.slug === slug);
@@ -51,10 +59,13 @@ export default function AppPage() {
         <label className="mq-select-place">
           {t('Place', 'Lugar')}
           <select value={slug} onChange={(e) => setSlug(e.target.value)}>
-            {Object.entries(byTier).map(([tier, ps]) => (
-              <optgroup key={tier} label={TIER_LABEL[tier]?.[lang] ?? tier}>
-                {ps.map((p) => (
-                  <option key={p.slug} value={p.slug}>{p.name} - {p.country}</option>
+            {CONTINENT_ORDER.filter((c) => byContinent[c]).map((cont) => (
+              <optgroup key={cont} label={cont}>
+                {byContinent[cont].map((p) => (
+                  <option key={p.slug} value={p.slug}>
+                    {p.country} · {p.city}
+                    {p.city !== p.name ? ` (${p.name})` : ''}
+                  </option>
                 ))}
               </optgroup>
             ))}
@@ -95,12 +106,18 @@ function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en'
         )}
       </p>
       <div className="mq-ctx-stats">
-        {manifest.layers.map((l) => (
-          <div key={l.name} className="mq-stat">
-            <b>{(l.stats.features ?? l.stats.triangles ?? l.stats.points ?? 0).toLocaleString()}</b>
-            <span>{l.name}</span>
-          </div>
-        ))}
+        {manifest.layers.map((l) => {
+          // Buildings report a feature count; other layers report triangles/points (features is 0, which
+          // is NOT nullish, so `??` would wrongly show 0). Pick the first positive count.
+          const n = (l.stats.features && l.stats.features > 0 ? l.stats.features : null)
+            ?? l.stats.triangles ?? l.stats.points ?? 0;
+          return (
+            <div key={l.name} className="mq-stat">
+              <b>{n.toLocaleString()}</b>
+              <span>{l.name}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

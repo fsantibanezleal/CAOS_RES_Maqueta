@@ -44,8 +44,8 @@ const config: ShellConfig = {
   architecture,
   footer: {
     provenance: {
-      en: 'Every place is fused offline from open public geodata (Overture, Copernicus GLO-30, ESA WorldCover, OpenStreetMap) by the geoscena pipeline; each layer carries its source, license and fetch date, and each building its height provenance. Nothing is invented.',
-      es: 'Cada lugar se fusiona offline a partir de geodatos públicos abiertos (Overture, Copernicus GLO-30, ESA WorldCover, OpenStreetMap) con el pipeline geoscena; cada capa lleva su fuente, licencia y fecha, y cada edificio la procedencia de su altura. Nada es inventado.',
+      en: 'Every place is a multi-modal fusion, assembled offline by the geoscena pipeline from open public geodata across modalities: building footprints (Overture), terrain (Copernicus GLO-30), land cover (ESA WorldCover), water / green / rail (OpenStreetMap), population (GHS-POP), 2.5D building heights (Google Open Buildings) and LoD2 ground truth (3DBAG). Each layer carries its source, license and fetch date; each building records the provenance of its height. Nothing is invented.',
+      es: 'Cada lugar es una fusión multi-modal, ensamblada offline por el pipeline geoscena a partir de geodatos públicos abiertos de varias modalidades: huellas de edificios (Overture), relieve (Copernicus GLO-30), cobertura de suelo (ESA WorldCover), agua / verde / vías (OpenStreetMap), población (GHS-POP), alturas 2.5D (Google Open Buildings) y verdad de terreno LoD2 (3DBAG). Cada capa lleva su fuente, licencia y fecha; cada edificio registra la procedencia de su altura. Nada es inventado.',
     },
     disclaimer: {
       en: 'A research reconstruction: heights are labelled by provenance (measured vs inferred), terrain from a global 30 m DSM sits slightly high in dense cores, and non-commercial layers are flagged per scene.',

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#0a0e14"/>
+  <!-- a stack of fused blocks: the multi-modal maqueta motif, in the height ramp (blue -> teal -> amber) -->
+  <g stroke="#0a0e14" stroke-width="1" stroke-linejoin="round">
+    <path d="M6 20 l6-3 l6 3 l-6 3 z" fill="#2a5cc8"/>
+    <path d="M6 20 l0 -4 l6 -3 l0 4 z" fill="#1f47a0"/>
+    <path d="M18 20 l0 -4 l-6 -3 l0 4 z" fill="#3a78e0"/>
+    <path d="M14 15 l6-3 l6 3 l-6 3 z" fill="#2e9e6f"/>
+    <path d="M14 15 l0 -4 l6 -3 l0 4 z" fill="#237a54"/>
+    <path d="M26 15 l0 -4 l-6 -3 l0 4 z" fill="#57d9a3"/>
+    <path d="M10 11 l6-3 l6 3 l-6 3 z" fill="#e0a020"/>
+    <path d="M10 11 l0 -4 l6 -3 l0 4 z" fill="#b47c14"/>
+    <path d="M22 11 l0 -4 l-6 -3 l0 4 z" fill="#ffb454"/>
+  </g>
+</svg>

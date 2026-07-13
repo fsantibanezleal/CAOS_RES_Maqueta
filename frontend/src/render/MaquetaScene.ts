@@ -6,18 +6,47 @@
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { BuildingFeature, BundleManifest } from '../lib/contract.types';
 import { WORLDCOVER_RGB } from '../lib/labels';
 
-export type ColorMode = 'height' | 'provenance' | 'landuse';
+export type ColorMode = string; // an attribute key (see ATTRIBUTES)
 export interface PickInfo {
   feature: BuildingFeature;
   point: THREE.Vector3;
 }
 
+// Generic building-attribute registry: each entry drives colour-by and filtering, so new modalities
+// (from the fusion research) plug in by adding a spec + carrying the value on the baked feature.
+export interface AttrSpec {
+  key: string;
+  en: string;
+  es: string;
+  kind: 'numeric' | 'categorical';
+  unit?: string;
+  value: (f: BuildingFeature) => number | string | null;
+}
+export const ATTRIBUTES: AttrSpec[] = [
+  { key: 'height', en: 'Height', es: 'Altura', kind: 'numeric', unit: 'm', value: (f) => f.height_m },
+  { key: 'provenance', en: 'Height provenance', es: 'Procedencia', kind: 'categorical', value: (f) => f.height_source },
+  { key: 'floors', en: 'Floors', es: 'Pisos', kind: 'numeric', value: (f) => f.num_floors ?? null },
+  { key: 'area', en: 'Footprint area', es: 'Area de huella', kind: 'numeric', unit: 'm2', value: (f) => f.area_m2 ?? null },
+  { key: 'use', en: 'Function', es: 'Funcion', kind: 'categorical', value: (f) => f.use ?? null },
+  { key: 'landuse', en: 'Land cover', es: 'Cobertura', kind: 'categorical', value: (f) => (f.class != null ? String(f.class) : null) },
+];
+export const attrSpec = (key: string) => ATTRIBUTES.find((a) => a.key === key) ?? ATTRIBUTES[0];
+
+// A stable categorical colour palette (distinct hues), plus the fixed provenance/land-cover maps.
+const CAT_PALETTE: [number, number, number][] = [
+  [66, 133, 244], [219, 68, 55], [244, 180, 0], [15, 157, 88], [171, 71, 188],
+  [0, 172, 193], [255, 112, 67], [158, 157, 36], [94, 53, 177], [3, 155, 229],
+  [124, 179, 66], [216, 27, 96], [141, 110, 99], [84, 110, 122],
+];
+
 const LAYER_ORDER = ['terrain', 'population', 'water', 'green', 'roads', 'rail', 'buildings'];
-const SOURCE_CODE: Record<string, number> = { measured: 0, floors: 1, raster: 2, prior: 3 };
+// Above this building count, edges are not auto-built on load (the user can still enable the wireframe).
+const EDGE_AUTO_MAX = 60000;
 const PROVENANCE_RGB: Record<string, [number, number, number]> = {
   measured: [46, 158, 111],
   floors: [74, 134, 232],
@@ -38,25 +67,37 @@ export class MaquetaScene {
   private controls: OrbitControls;
   private raycaster = new THREE.Raycaster();
   private layers = new Map<string, THREE.Object3D>();
-  private loader = new GLTFLoader();
+  // GLTFLoader with the Meshopt decoder so EXT_meshopt_compression bundles (the delivery-layer
+  // compression the pipeline applies) load; uncompressed bundles still load unchanged.
+  private loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   private container: HTMLElement;
 
   private buildingMesh: THREE.Mesh | null = null;
   private buildingMat: THREE.MeshLambertMaterial;
+  private edges: THREE.LineSegments | null = null;
+  private edgeMat: THREE.LineBasicMaterial;
+  // Wireframe edges give each extrusion a readable 3D shape. On very large scenes (e.g. full Santiago,
+  // ~179k buildings) building EdgesGeometry on load would jank the main thread, so edges are deferred:
+  // auto-built for scenes up to EDGE_AUTO_MAX buildings, lazily on first enable for larger ones.
+  private pendingEdgeGeom: THREE.BufferGeometry | null = null;
+  private pendingEdgeParent: THREE.Object3D | null = null;
+  private edgesOn = true;
   private features: BuildingFeature[] = [];
-  // per-vertex derived arrays (aligned to the building geometry vertex order)
-  private vFeature: Int32Array = new Int32Array(0);
-  private vHeight: Float32Array = new Float32Array(0);
-  private vSource: Uint8Array = new Uint8Array(0);
-  private colorByCache: Partial<Record<ColorMode, Float32Array>> = {};
+  private featuresById = new Map<number, BuildingFeature>();
+  private vFeature: Int32Array = new Int32Array(0); // per-vertex building id
+  private numRanges = new Map<string, [number, number]>(); // per numeric attr [min,max]
+  private catValuesByKey = new Map<string, string[]>(); // per categorical attr distinct values
+  private colorCache = new Map<string, Float32Array>();
   private highlight: THREE.LineSegments | THREE.Mesh | null = null;
 
-  private colorMode: ColorMode = 'height';
-  private heightRange: [number, number] = [0, 1e9];
-  private sourceFilter = new Set(['measured', 'floors', 'raster', 'prior']);
+  private colorMode: string = 'height';
+  private numFilters = new Map<string, [number, number]>(); // active numeric filters (AND)
+  private catFilters = new Map<string, Set<string>>(); // active categorical filters (AND)
   private neon = 1;
   private animate = false;
   private pulse = 0;
+  private dark = false;
+  private sceneR = 2000; // scene extent (max AOI side, m); drives fog + camera distance
 
   private needsRender = true;
   private disposed = false;
@@ -85,6 +126,12 @@ export class MaquetaScene {
       emissiveIntensity: dark ? 0.22 : 0.1,
     });
     this.installBuildingFilter(this.buildingMat);
+    // Edge lines give each extrusion a readable 3D shape (not a flat colour blob).
+    this.edgeMat = new THREE.LineBasicMaterial({
+      color: dark ? 0x0a0f16 : 0x2a2f38,
+      transparent: true,
+      opacity: dark ? 0.5 : 0.35,
+    });
 
     this.setTheme(dark);
     if (import.meta.env.DEV) (window as unknown as { __mq?: unknown }).__mq = this;
@@ -112,126 +159,195 @@ export class MaquetaScene {
   }
 
   setTheme(dark: boolean) {
+    this.dark = dark;
     const bg = dark ? 0x0a0e14 : 0xdfe6ef;
     this.scene.background = new THREE.Color(bg);
-    this.scene.fog = new THREE.Fog(bg, 2600, 9000);
+    // Fog scales with the scene extent, else large AOIs (full Santiago, 11 km) sit entirely beyond a
+    // fixed far-plane and the whole city washes out into the background. Only the far edge hazes.
+    this.scene.fog = new THREE.Fog(bg, this.sceneR * 1.1, this.sceneR * 3.0);
     this.scene.clear();
     this.scene.add(new THREE.AmbientLight(0xffffff, dark ? 0.6 : 0.95));
     const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.7 : 0.9);
     dir.position.set(1, 2, 1.4);
     this.scene.add(dir);
     this.buildingMat.emissiveIntensity = dark ? 0.22 : 0.1;
+    this.edgeMat.color.set(dark ? 0x0a0f16 : 0x2a2f38);
+    this.edgeMat.opacity = dark ? 0.5 : 0.35;
     for (const obj of this.layers.values()) this.scene.add(obj);
     if (this.highlight) this.scene.add(this.highlight);
     this.needsRender = true;
   }
 
-  async loadBundle(baseUrl: string, manifest: BundleManifest): Promise<void> {
+  // Progressive load: the base modalities (terrain, roads, water, green, rail, population) are small and
+  // load in ~1 s; the buildings layer can be tens of MB (full Santiago is ~54 MB). So we load and frame
+  // the base first, fire `onBaseReady` (the app hides its overlay and the scene is already navigable),
+  // then stream the buildings in. The heavy default is interactive in a second instead of ~18 s blank.
+  async loadBundle(
+    baseUrl: string,
+    manifest: BundleManifest,
+    onBaseReady?: () => void,
+  ): Promise<void> {
     for (const obj of this.layers.values()) this.scene.remove(obj);
     this.layers.clear();
     this.clearHighlight();
     this.buildingMesh = null;
+    this.edges = null;
+    this.pendingEdgeGeom = null;
+    this.pendingEdgeParent = null;
     this.features = [];
-    this.colorByCache = {};
+    this.colorCache.clear();
 
     const ordered = [...manifest.layers].sort(
       (a, b) => LAYER_ORDER.indexOf(a.name) - LAYER_ORDER.indexOf(b.name),
     );
-    for (const layer of ordered) {
-      const gltf = await this.loader.loadAsync(`${baseUrl}/${layer.file}`);
-      const root = gltf.scene;
-      root.name = layer.name;
-      root.traverse((o) => {
-        const m = o as THREE.Mesh;
-        if (!m.isMesh) return;
-        floatifyColors(m.geometry as THREE.BufferGeometry);
-        if (layer.name === 'buildings') {
-          m.material = this.buildingMat;
-          this.buildingMesh = m;
-          const ud = (gltf.scene.userData ?? {}) as {
-            features?: BuildingFeature[];
-            extras?: { features?: BuildingFeature[] };
-          };
-          this.features = ud.features ?? ud.extras?.features ?? [];
-          this.deriveBuildingArrays(m.geometry as THREE.BufferGeometry);
-        } else {
-          m.material = this.layerMaterial(layer.name);
-        }
-      });
-      this.scene.add(root);
-      this.layers.set(layer.name, root);
-    }
-    this.applyColorMode();
-    this.applyFilter();
+    const base = ordered.filter((l) => l.name !== 'buildings');
+    const buildings = ordered.find((l) => l.name === 'buildings');
+
+    for (const layer of base) await this.loadOneLayer(baseUrl, layer);
     this.frameCamera(manifest.aoi.size_m);
+    this.needsRender = true;
+    onBaseReady?.();
+
+    if (buildings) await this.loadOneLayer(baseUrl, buildings);
+    this.applyColor();
+    this.applyFilter();
     this.needsRender = true;
   }
 
-  // Build per-vertex feature id / height / source arrays + a hidden attribute.
+  private async loadOneLayer(baseUrl: string, layer: BundleManifest['layers'][number]): Promise<void> {
+    const gltf = await this.loader.loadAsync(`${baseUrl}/${layer.file}`);
+    const root = gltf.scene;
+    root.name = layer.name;
+    root.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      floatifyColors(m.geometry as THREE.BufferGeometry);
+      if (layer.name === 'buildings') {
+        m.material = this.buildingMat;
+        this.buildingMesh = m;
+        const ud = (gltf.scene.userData ?? {}) as {
+          features?: BuildingFeature[];
+          extras?: { features?: BuildingFeature[] };
+        };
+        this.features = ud.features ?? ud.extras?.features ?? [];
+        this.deriveBuildingArrays(m.geometry as THREE.BufferGeometry);
+        // Auto-build edges for small/medium scenes; defer for very large ones (built on first enable).
+        const geom = m.geometry as THREE.BufferGeometry;
+        this.pendingEdgeGeom = geom;
+        this.pendingEdgeParent = root;
+        this.edgesOn = this.features.length <= EDGE_AUTO_MAX;
+        if (this.edgesOn) this.buildEdges(geom, root);
+      } else {
+        m.material = this.layerMaterial(layer.name);
+      }
+    });
+    this.scene.add(root);
+    this.layers.set(layer.name, root);
+  }
+
+  // Index features by id, precompute per-attribute ranges/categories, store per-vertex building id.
   private deriveBuildingArrays(geom: THREE.BufferGeometry) {
     const fidAttr = (geom.getAttribute('_featureid') ||
       geom.getAttribute('_FEATUREID') ||
       geom.getAttribute('featureid')) as THREE.BufferAttribute | undefined;
     const n = geom.getAttribute('position').count;
-    const byId = new Map<number, BuildingFeature>();
-    this.features.forEach((f) => byId.set(f.id, f));
     this.vFeature = new Int32Array(n);
-    this.vHeight = new Float32Array(n);
-    this.vSource = new Uint8Array(n);
-    for (let i = 0; i < n; i++) {
-      const fid = fidAttr ? Math.round(fidAttr.getX(i)) : -1;
-      this.vFeature[i] = fid;
-      const f = byId.get(fid);
-      this.vHeight[i] = f ? f.height_m : 0;
-      this.vSource[i] = f ? (SOURCE_CODE[f.height_source] ?? 3) : 3;
+    for (let i = 0; i < n; i++) this.vFeature[i] = fidAttr ? Math.round(fidAttr.getX(i)) : -1;
+    this.featuresById = new Map(this.features.map((f) => [f.id, f]));
+    this.numRanges.clear();
+    this.catValuesByKey.clear();
+    for (const spec of ATTRIBUTES) {
+      if (spec.kind === 'numeric') {
+        let lo = Infinity;
+        let hi = -Infinity;
+        for (const f of this.features) {
+          const v = spec.value(f);
+          if (typeof v === 'number' && isFinite(v)) {
+            if (v < lo) lo = v;
+            if (v > hi) hi = v;
+          }
+        }
+        this.numRanges.set(spec.key, isFinite(lo) ? [Math.floor(lo), Math.ceil(hi)] : [0, 1]);
+      } else {
+        const seen = new Set<string>();
+        for (const f of this.features) {
+          const v = spec.value(f);
+          if (v != null) seen.add(String(v));
+        }
+        this.catValuesByKey.set(spec.key, [...seen].sort());
+      }
     }
+    this.colorCache.clear();
     geom.setAttribute('aHidden', new THREE.BufferAttribute(new Float32Array(n), 1));
   }
 
-  // ---- colour-by ----
-  setColorMode(mode: ColorMode) {
-    this.colorMode = mode;
-    this.applyColorMode();
-    this.needsRender = true;
+  attributes(): AttrSpec[] {
+    // only expose attributes that actually have data in this scene
+    return ATTRIBUTES.filter((s) =>
+      s.kind === 'numeric'
+        ? (this.numRanges.get(s.key)?.[1] ?? 0) > 0
+        : (this.catValuesByKey.get(s.key)?.length ?? 0) > 0,
+    );
+  }
+  numericRange(key: string): [number, number] {
+    return this.numRanges.get(key) ?? [0, 1];
+  }
+  categories(key: string): string[] {
+    return this.catValuesByKey.get(key) ?? [];
   }
 
-  private applyColorMode() {
+  // ---- colour-by (any attribute) ----
+  setColorMode(key: string) {
+    this.colorMode = key;
+    this.applyColor();
+    this.needsRender = true;
+  }
+  private colorFor(f: BuildingFeature | undefined, spec: AttrSpec, catIdx: Map<string, number>): [number, number, number] {
+    if (!f) return [120, 120, 120];
+    const v = spec.value(f);
+    if (spec.kind === 'numeric') {
+      const [lo, hi] = this.numRanges.get(spec.key) ?? [0, 1];
+      const t = typeof v === 'number' ? (v - lo) / (hi - lo + 1e-6) : 0;
+      return heightRamp(t);
+    }
+    if (spec.key === 'provenance') return PROVENANCE_RGB[String(v)] ?? [120, 120, 120];
+    if (spec.key === 'landuse') return WORLDCOVER_RGB[Number(v)] ?? [120, 120, 120];
+    const idx = v == null ? -1 : (catIdx.get(String(v)) ?? -1);
+    return idx < 0 ? [140, 140, 140] : CAT_PALETTE[idx % CAT_PALETTE.length];
+  }
+  private applyColor() {
     if (!this.buildingMesh) return;
     const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
-    let arr = this.colorByCache[this.colorMode];
+    let arr = this.colorCache.get(this.colorMode);
     if (!arr) {
-      const n = this.vHeight.length;
+      const spec = attrSpec(this.colorMode);
+      const catIdx = new Map((this.catValuesByKey.get(spec.key) ?? []).map((c, i) => [c, i]));
+      const n = this.vFeature.length;
       arr = new Float32Array(n * 3);
-      const hmax = Math.max(1, percentile(this.vHeight, 0.95));
-      const byId = new Map<number, BuildingFeature>();
-      this.features.forEach((f) => byId.set(f.id, f));
       for (let i = 0; i < n; i++) {
-        let rgb: [number, number, number];
-        if (this.colorMode === 'height') rgb = heightRamp(this.vHeight[i] / hmax);
-        else if (this.colorMode === 'provenance') {
-          const src = ['measured', 'floors', 'raster', 'prior'][this.vSource[i]];
-          rgb = PROVENANCE_RGB[src];
-        } else {
-          const cls = byId.get(this.vFeature[i])?.class ?? 50;
-          rgb = WORLDCOVER_RGB[cls] ?? [120, 120, 120];
-        }
+        const rgb = this.colorFor(this.featuresById.get(this.vFeature[i]), spec, catIdx);
         arr[i * 3] = srgbToLinear(rgb[0] / 255);
         arr[i * 3 + 1] = srgbToLinear(rgb[1] / 255);
         arr[i * 3 + 2] = srgbToLinear(rgb[2] / 255);
       }
-      this.colorByCache[this.colorMode] = arr;
+      this.colorCache.set(this.colorMode, arr);
     }
     geom.setAttribute('color', new THREE.BufferAttribute(arr, 3));
   }
 
-  // ---- filters ----
-  setHeightFilter(min: number, max: number) {
-    this.heightRange = [min, max];
+  // ---- filters (any attribute, combined with AND) ----
+  setNumericFilter(key: string, min: number, max: number) {
+    this.numFilters.set(key, [min, max]);
     this.applyFilter();
     this.needsRender = true;
   }
-  setSourceFilter(sources: Set<string>) {
-    this.sourceFilter = sources;
+  clearNumericFilter(key: string) {
+    this.numFilters.delete(key);
+    this.applyFilter();
+    this.needsRender = true;
+  }
+  setCategoricalFilter(key: string, allowed: Set<string>) {
+    this.catFilters.set(key, allowed);
     this.applyFilter();
     this.needsRender = true;
   }
@@ -239,14 +355,22 @@ export class MaquetaScene {
     if (!this.buildingMesh) return;
     const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
     const hidden = geom.getAttribute('aHidden') as THREE.BufferAttribute;
-    const [lo, hi] = this.heightRange;
-    const names = ['measured', 'floors', 'raster', 'prior'];
-    for (let i = 0; i < this.vHeight.length; i++) {
-      const h = this.vHeight[i];
-      const okH = h >= lo && h <= hi;
-      const okS = this.sourceFilter.has(names[this.vSource[i]]);
-      hidden.setX(i, okH && okS ? 0 : 1);
+    // precompute per-feature pass/fail (cheap, once per filter change)
+    const pass = new Map<number, boolean>();
+    for (const f of this.features) {
+      let ok = true;
+      for (const [key, [lo, hi]] of this.numFilters) {
+        const v = attrSpec(key).value(f);
+        if (typeof v !== 'number' || v < lo || v > hi) { ok = false; break; }
+      }
+      if (ok)
+        for (const [key, allowed] of this.catFilters) {
+          const v = attrSpec(key).value(f);
+          if (v == null || !allowed.has(String(v))) { ok = false; break; }
+        }
+      pass.set(f.id, ok);
     }
+    for (let i = 0; i < this.vFeature.length; i++) hidden.setX(i, pass.get(this.vFeature[i]) === false ? 1 : 0);
     hidden.needsUpdate = true;
   }
 
@@ -313,6 +437,35 @@ export class MaquetaScene {
     this.highlight.renderOrder = 999;
     this.scene.add(this.highlight);
   }
+  // Build edge lines for the buildings so each extrusion's shape reads in 3D. EdgesGeometry keeps only
+  // edges whose adjacent faces differ by > the threshold angle (building corners, roof outlines).
+  private buildEdges(geom: THREE.BufferGeometry, parent: THREE.Object3D) {
+    try {
+      const eg = new THREE.EdgesGeometry(geom, 25);
+      this.edges = new THREE.LineSegments(eg, this.edgeMat);
+      this.edges.renderOrder = 1;
+      parent.add(this.edges); // rides in the buildings group -> toggles + hides with the layer
+    } catch {
+      this.edges = null;
+    }
+  }
+
+  // Wireframe state for the panel toggle: whether edges are on, and whether this scene is "large"
+  // (edges deferred). The Viewer uses `large` to default the toggle off + show a hint on big scenes.
+  edgesInfo(): { on: boolean; large: boolean } {
+    return { on: this.edgesOn, large: this.features.length > EDGE_AUTO_MAX };
+  }
+
+  // Toggle the building wireframe. Builds the (deferred) edge geometry lazily on first enable.
+  setEdges(on: boolean) {
+    this.edgesOn = on;
+    if (on && !this.edges && this.pendingEdgeGeom && this.pendingEdgeParent) {
+      this.buildEdges(this.pendingEdgeGeom, this.pendingEdgeParent);
+    }
+    if (this.edges) this.edges.visible = on;
+    this.needsRender = true;
+  }
+
   private clearHighlight() {
     if (this.highlight) {
       this.scene.remove(this.highlight);
@@ -375,6 +528,10 @@ export class MaquetaScene {
 
   private frameCamera([wm, hm]: [number, number]) {
     const r = Math.max(wm, hm);
+    this.sceneR = r;
+    // Re-fit the fog to this scene's extent (the theme set it for the previous scene's size).
+    const bg = this.dark ? 0x0a0e14 : 0xdfe6ef;
+    this.scene.fog = new THREE.Fog(bg, this.sceneR * 1.1, this.sceneR * 3.0);
     this.controls.target.set(0, 0, 0);
     this.camera.position.set(r * 0.65, r * 0.6, r * 0.65);
     this.camera.far = r * 10;
@@ -416,16 +573,6 @@ export class MaquetaScene {
     this.container.removeChild(this.renderer.domElement);
   }
 
-  heightBounds(): [number, number] {
-    if (!this.vHeight.length) return [0, 100];
-    let lo = Infinity;
-    let hi = -Infinity;
-    for (const h of this.vHeight) {
-      if (h < lo) lo = h;
-      if (h > hi) hi = h;
-    }
-    return [Math.floor(lo), Math.ceil(hi)];
-  }
 }
 
 function floatifyColors(geom: THREE.BufferGeometry): void {
@@ -443,9 +590,4 @@ function floatifyColors(geom: THREE.BufferGeometry): void {
 }
 function srgbToLinear(c: number): number {
   return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-}
-function percentile(a: Float32Array, p: number): number {
-  if (!a.length) return 1;
-  const s = Float32Array.from(a).sort();
-  return s[Math.floor(p * (s.length - 1))];
 }
