@@ -138,6 +138,25 @@ function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en'
           ))}
         </tbody>
       </table>
+      {manifest.modalities && manifest.modalities.length > 0 && (
+        <>
+          <p className="mq-sub" style={{ marginTop: '0.8rem' }}>
+            {t('Fused topic modalities (sampled per building):', 'Modalidades temáticas fusionadas (muestreadas por edificio):')}
+          </p>
+          <table className="mq-table">
+            <thead><tr><th>{t('Modality', 'Modalidad')}</th><th>{t('Source', 'Fuente')}</th><th>{t('License', 'Licencia')}</th></tr></thead>
+            <tbody>
+              {manifest.modalities.map((m) => (
+                <tr key={m.key}>
+                  <td><b>{m.label}</b> <span className="mq-muted">({m.unit})</span></td>
+                  <td>{m.source}</td>
+                  <td>{m.license_url ? <a href={m.license_url} target="_blank" rel="noreferrer">{m.license}</a> : m.license}{m.commercial_ok === false && <span className="mq-warn"> (NC)</span>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
       {manifest.any_noncommercial && <p className="mq-warn">{t('This scene includes a non-commercial-licensed layer.', 'Esta escena incluye una capa con licencia no comercial.')}</p>}
     </div>
   );

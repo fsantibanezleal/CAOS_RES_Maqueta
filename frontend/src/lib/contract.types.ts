@@ -54,6 +54,7 @@ export interface BundleManifest {
     budgets: Record<string, LayerStats>;
     notes: string[];
   };
+  modalities?: ModalityInfo[];
   any_noncommercial: boolean;
   credits: string[];
 }
@@ -143,4 +144,21 @@ export interface BuildingFeature {
   use?: string | null; // Overture building class (residential, commercial, industrial, ...)
   subtype?: string | null;
   roof_shape?: string | null;
+  // Fused topic modalities sampled at the footprint centroid (present only where the source covers the AOI).
+  solar_ghi?: number | null; // Global Solar Atlas GHI, kWh/m2/day
+  soil_soc?: number | null; // SoilGrids soil organic carbon 0-5cm, g/kg
+}
+
+// A fused topic modality's provenance (recorded in the manifest even though it rides as a building attribute).
+export interface ModalityInfo {
+  key: string;
+  label: string;
+  unit: string;
+  source: string;
+  license: string;
+  license_name?: string;
+  license_url?: string;
+  commercial_ok?: boolean | null;
+  url?: string;
+  method?: string;
 }

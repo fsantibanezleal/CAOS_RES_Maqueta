@@ -34,6 +34,9 @@ export const ATTRIBUTES: AttrSpec[] = [
   { key: 'area', en: 'Footprint area', es: 'Area de huella', kind: 'numeric', unit: 'm2', value: (f) => f.area_m2 ?? null },
   { key: 'use', en: 'Function', es: 'Funcion', kind: 'categorical', value: (f) => f.use ?? null },
   { key: 'landuse', en: 'Land cover', es: 'Cobertura', kind: 'categorical', value: (f) => (f.class != null ? String(f.class) : null) },
+  // Fused topic modalities (shown only where the source covers the place - attributes() filters no-data specs).
+  { key: 'solar', en: 'Solar (GHI)', es: 'Solar (GHI)', kind: 'numeric', unit: 'kWh/m2/d', value: (f) => f.solar_ghi ?? null },
+  { key: 'soil', en: 'Soil carbon', es: 'Carbono suelo', kind: 'numeric', unit: 'g/kg', value: (f) => f.soil_soc ?? null },
 ];
 export const attrSpec = (key: string) => ATTRIBUTES.find((a) => a.key === key) ?? ATTRIBUTES[0];
 
@@ -296,7 +299,10 @@ export class MaquetaScene {
             if (v > hi) hi = v;
           }
         }
-        this.numRanges.set(spec.key, isFinite(lo) ? [Math.floor(lo), Math.ceil(hi)] : [0, 1]);
+        // Only record a range when the attribute actually has data, so attributes() hides no-data specs
+        // (e.g. a modality whose source does not cover this place).
+        if (isFinite(lo) && hi > lo) this.numRanges.set(spec.key, [Math.floor(lo), Math.ceil(hi)]);
+        else if (isFinite(lo)) this.numRanges.set(spec.key, [Math.floor(lo), Math.floor(lo) + 1]);
       } else {
         const seen = new Set<string>();
         for (const f of this.features) {
