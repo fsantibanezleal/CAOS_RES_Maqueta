@@ -73,6 +73,29 @@
       }
     },
     {
+      "name": "lod2",
+      "file": "lod2.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 5012,
+        "triangles": 7220,
+        "features": 149
+      },
+      "provenance": {
+        "source": "3D BAG LoD2 (TU Delft)",
+        "url": "https://api.3dbag.nl/collections/pand",
+        "license": "CC-BY-4.0",
+        "fetched": "2026-07-13",
+        "method": "OGC API items; LoD0 footprint extruded by (b3_h_dak_50p - b3_h_maaiveld); authoritative ground truth",
+        "extra": {
+          "n_buildings": 149
+        },
+        "license_name": "Creative Commons Attribution 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "commercial_ok": true
+      }
+    },
+    {
       "name": "roads",
       "file": "roads.glb",
       "stats": {
@@ -90,6 +113,75 @@
         "extra": {
           "release": "2026-06-17.0",
           "n_segments": 3610
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "water",
+      "file": "water.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 4991,
+        "triangles": 4645,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (water)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-13",
+        "method": "OSMnx features_from_bbox with tags {'natural': ['water'], 'water': True, 'waterway': ['riverbank', 'dock']}",
+        "extra": {
+          "n_features": 173
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "green",
+      "file": "green.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 12370,
+        "triangles": 10514,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (green)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-13",
+        "method": "OSMnx features_from_bbox with tags {'leisure': ['park', 'garden', 'pitch'], 'landuse': ['grass', 'forest', 'meadow'], 'natural': ['wood', 'scrub']}",
+        "extra": {
+          "n_features": 936
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "rail",
+      "file": "rail.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 2979,
+        "triangles": 2825,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (rail)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-13",
+        "method": "OSMnx features_from_bbox with tags {'railway': ['rail', 'light_rail', 'subway', 'tram']}",
+        "extra": {
+          "n_features": 77
         },
         "license_name": "Open Data Commons Open Database License v1.0",
         "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
@@ -127,7 +219,11 @@
     "layers": [
       "terrain",
       "buildings",
+      "lod2",
       "roads",
+      "water",
+      "green",
+      "rail",
       "population"
     ],
     "height_mix": {
@@ -149,10 +245,34 @@
         "triangles": 336416,
         "features": 15923
       },
+      "lod2": {
+        "kind": "mesh",
+        "vertices": 5012,
+        "triangles": 7220,
+        "features": 149
+      },
       "roads": {
         "kind": "mesh",
         "vertices": 72399,
         "triangles": 65179,
+        "features": 0
+      },
+      "water": {
+        "kind": "mesh",
+        "vertices": 4991,
+        "triangles": 4645,
+        "features": 0
+      },
+      "green": {
+        "kind": "mesh",
+        "vertices": 12370,
+        "triangles": 10514,
+        "features": 0
+      },
+      "rail": {
+        "kind": "mesh",
+        "vertices": 2979,
+        "triangles": 2825,
         "features": 0
       },
       "population": {
@@ -162,10 +282,21 @@
         "features": 0
       }
     },
-    "ground_truth": null,
+    "ground_truth": {
+      "n_fused": 15923,
+      "n_truth": 397,
+      "matched": 2722,
+      "coverage_pct": 17.1,
+      "height_rmse_m": 3.06,
+      "height_mae_m": 2.47,
+      "height_bias_m": -0.13,
+      "truth_source": "3D BAG LoD2 (TU Delft)"
+    },
     "notes": [
+      "ground-truth vs 3D BAG LoD2 (TU Delft)",
       "modality soil_soc: 67/15923 sampled",
       "modality solar_ghi skipped: FileNotFoundError",
+      "lod2 ground-truth layer: 149 authoritative 3DBAG buildings",
       "population total ~3614946"
     ]
   },
@@ -190,9 +321,13 @@
   ],
   "any_noncommercial": false,
   "credits": [
+    "3D BAG LoD2 (TU Delft) (Creative Commons Attribution 4.0)",
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
     "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
     "ISRIC SoilGrids 2.0 (Creative Commons Attribution 4.0)",
+    "OpenStreetMap (green) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (rail) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (water) (Open Data Commons Open Database License v1.0)",
     "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
     "Overture Maps transportation (Open Data Commons Open Database License v1.0)"
   ]

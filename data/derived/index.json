@@ -547,7 +547,7 @@
       "country": "Netherlands",
       "city": "Amsterdam",
       "n_layers": 4,
-      "total_bytes": 5840448,
+      "total_bytes": 5843648,
       "manifest_path": "amsterdam_center/manifest.json"
     },
     {
@@ -559,7 +559,7 @@
       "country": "Spain",
       "city": "Barcelona",
       "n_layers": 4,
-      "total_bytes": 4591256,
+      "total_bytes": 4595224,
       "manifest_path": "barcelona_eixample/manifest.json"
     },
     {
@@ -571,7 +571,7 @@
       "country": "Germany",
       "city": "Berlin",
       "n_layers": 4,
-      "total_bytes": 1813672,
+      "total_bytes": 1814872,
       "manifest_path": "berlin_mitte/manifest.json"
     },
     {
@@ -583,7 +583,7 @@
       "country": "Colombia",
       "city": "Bogota",
       "n_layers": 4,
-      "total_bytes": 7118084,
+      "total_bytes": 7122944,
       "manifest_path": "bogota_center/manifest.json"
     },
     {
@@ -595,7 +595,7 @@
       "country": "Argentina",
       "city": "Buenos Aires",
       "n_layers": 4,
-      "total_bytes": 3146688,
+      "total_bytes": 3148664,
       "manifest_path": "buenos_aires_center/manifest.json"
     },
     {
@@ -607,7 +607,7 @@
       "country": "Egypt",
       "city": "Cairo",
       "n_layers": 4,
-      "total_bytes": 2654272,
+      "total_bytes": 2655232,
       "manifest_path": "cairo_center/manifest.json"
     },
     {
@@ -619,7 +619,7 @@
       "country": "South Africa",
       "city": "Cape Town",
       "n_layers": 4,
-      "total_bytes": 2087884,
+      "total_bytes": 2088896,
       "manifest_path": "cape_town_center/manifest.json"
     },
     {
@@ -631,7 +631,7 @@
       "country": "Chile",
       "city": "Chuquicamata",
       "n_layers": 2,
-      "total_bytes": 103164,
+      "total_bytes": 103040,
       "manifest_path": "chuquicamata/manifest.json"
     },
     {
@@ -643,7 +643,7 @@
       "country": "Chile",
       "city": "Concepcion",
       "n_layers": 4,
-      "total_bytes": 3138088,
+      "total_bytes": 3138700,
       "manifest_path": "concepcion/manifest.json"
     },
     {
@@ -654,8 +654,8 @@
       "continent": "Europe",
       "country": "Netherlands",
       "city": "Delft",
-      "n_layers": 4,
-      "total_bytes": 5958828,
+      "n_layers": 8,
+      "total_bytes": 6134216,
       "manifest_path": "delft/manifest.json"
     },
     {
@@ -667,7 +667,7 @@
       "country": "USA",
       "city": "Grand Canyon",
       "n_layers": 2,
-      "total_bytes": 91468,
+      "total_bytes": 91364,
       "manifest_path": "grand_canyon/manifest.json"
     },
     {
@@ -679,7 +679,7 @@
       "country": "Vietnam",
       "city": "Ha Long",
       "n_layers": 2,
-      "total_bytes": 10872,
+      "total_bytes": 10912,
       "manifest_path": "halong_bay/manifest.json"
     },
     {
@@ -691,7 +691,7 @@
       "country": "Finland",
       "city": "Helsinki",
       "n_layers": 4,
-      "total_bytes": 1706204,
+      "total_bytes": 1707028,
       "manifest_path": "helsinki_center/manifest.json"
     },
     {
@@ -703,7 +703,7 @@
       "country": "Argentina",
       "city": "Iguazu",
       "n_layers": 2,
-      "total_bytes": 43232,
+      "total_bytes": 43100,
       "manifest_path": "iguazu/manifest.json"
     },
     {
@@ -715,7 +715,7 @@
       "country": "Turkey",
       "city": "Istanbul",
       "n_layers": 4,
-      "total_bytes": 3230628,
+      "total_bytes": 3234276,
       "manifest_path": "istanbul_center/manifest.json"
     },
     {
@@ -727,7 +727,7 @@
       "country": "Portugal",
       "city": "Lisbon",
       "n_layers": 4,
-      "total_bytes": 2597120,
+      "total_bytes": 2600272,
       "manifest_path": "lisbon_baixa/manifest.json"
     },
     {
@@ -739,7 +739,7 @@
       "country": "UK",
       "city": "London",
       "n_layers": 4,
-      "total_bytes": 3254956,
+      "total_bytes": 3258220,
       "manifest_path": "london_city/manifest.json"
     },
     {
@@ -751,7 +751,7 @@
       "country": "USA",
       "city": "New York",
       "n_layers": 4,
-      "total_bytes": 2675624,
+      "total_bytes": 2677780,
       "manifest_path": "manhattan_midtown/manifest.json"
     },
     {
@@ -763,7 +763,7 @@
       "country": "Mexico",
       "city": "Mexico City",
       "n_layers": 4,
-      "total_bytes": 2993816,
+      "total_bytes": 2995508,
       "manifest_path": "mexico_city_center/manifest.json"
     },
     {
@@ -775,7 +775,7 @@
       "country": "France",
       "city": "Mont Blanc",
       "n_layers": 1,
-      "total_bytes": 64584,
+      "total_bytes": 64308,
       "manifest_path": "mont_blanc/manifest.json"
     },
     {
@@ -787,7 +787,7 @@
       "country": "Russia",
       "city": "Moscow",
       "n_layers": 4,
-      "total_bytes": 2150864,
+      "total_bytes": 2152164,
       "manifest_path": "moscow_center/manifest.json"
     },
     {
@@ -799,7 +799,7 @@
       "country": "India",
       "city": "Mumbai",
       "n_layers": 4,
-      "total_bytes": 935900,
+      "total_bytes": 936124,
       "manifest_path": "mumbai_fort/manifest.json"
     },
     {
@@ -811,7 +811,7 @@
       "country": "Kenya",
       "city": "Nairobi",
       "n_layers": 4,
-      "total_bytes": 1891268,
+      "total_bytes": 1891844,
       "manifest_path": "nairobi_center/manifest.json"
     },
     {
@@ -823,7 +823,7 @@
       "country": "France",
       "city": "Paris",
       "n_layers": 4,
-      "total_bytes": 4739088,
+      "total_bytes": 4741536,
       "manifest_path": "paris_center/manifest.json"
     },
     {
@@ -835,7 +835,7 @@
       "country": "Italy",
       "city": "Rome",
       "n_layers": 4,
-      "total_bytes": 3079108,
+      "total_bytes": 3081120,
       "manifest_path": "rome_center/manifest.json"
     },
     {
@@ -847,7 +847,7 @@
       "country": "USA",
       "city": "San Francisco",
       "n_layers": 4,
-      "total_bytes": 2295332,
+      "total_bytes": 2297164,
       "manifest_path": "san_francisco_downtown/manifest.json"
     },
     {
@@ -859,7 +859,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 3674988,
+      "total_bytes": 3676696,
       "manifest_path": "santiago_centro/manifest.json"
     },
     {
@@ -871,7 +871,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 68821844,
+      "total_bytes": 68829804,
       "manifest_path": "santiago_full/manifest.json"
     },
     {
@@ -883,7 +883,7 @@
       "country": "Brazil",
       "city": "Sao Paulo",
       "n_layers": 4,
-      "total_bytes": 5407092,
+      "total_bytes": 5409700,
       "manifest_path": "sao_paulo_center/manifest.json"
     },
     {
@@ -895,7 +895,7 @@
       "country": "USA",
       "city": "Seattle",
       "n_layers": 4,
-      "total_bytes": 1329056,
+      "total_bytes": 1330016,
       "manifest_path": "seattle_downtown/manifest.json"
     },
     {
@@ -907,7 +907,7 @@
       "country": "South Korea",
       "city": "Seoul",
       "n_layers": 4,
-      "total_bytes": 2689932,
+      "total_bytes": 2690800,
       "manifest_path": "seoul_jongno/manifest.json"
     },
     {
@@ -919,7 +919,7 @@
       "country": "Singapore",
       "city": "Singapore",
       "n_layers": 4,
-      "total_bytes": 1441180,
+      "total_bytes": 1442596,
       "manifest_path": "singapore_downtown/manifest.json"
     },
     {
@@ -931,7 +931,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 63175608,
+      "total_bytes": 27489612,
       "manifest_path": "stgo_cerrillos/manifest.json"
     },
     {
@@ -943,7 +943,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 67648444,
+      "total_bytes": 30025300,
       "manifest_path": "stgo_cerro_navia/manifest.json"
     },
     {
@@ -955,7 +955,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 21411404,
+      "total_bytes": 9352244,
       "manifest_path": "stgo_conchali/manifest.json"
     },
     {
@@ -967,7 +967,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 32864976,
+      "total_bytes": 14631376,
       "manifest_path": "stgo_el_bosque/manifest.json"
     },
     {
@@ -979,7 +979,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 40485476,
+      "total_bytes": 17616228,
       "manifest_path": "stgo_estacion_central/manifest.json"
     },
     {
@@ -991,7 +991,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 72814008,
+      "total_bytes": 31221104,
       "manifest_path": "stgo_huechuraba/manifest.json"
     },
     {
@@ -1003,7 +1003,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 15007972,
+      "total_bytes": 6334192,
       "manifest_path": "stgo_independencia/manifest.json"
     },
     {
@@ -1015,7 +1015,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 26929444,
+      "total_bytes": 12214804,
       "manifest_path": "stgo_la_cisterna/manifest.json"
     },
     {
@@ -1027,7 +1027,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 119069732,
+      "total_bytes": 54030568,
       "manifest_path": "stgo_la_florida/manifest.json"
     },
     {
@@ -1039,7 +1039,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 61332132,
+      "total_bytes": 27132324,
       "manifest_path": "stgo_la_granja/manifest.json"
     },
     {
@@ -1051,7 +1051,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 81023264,
+      "total_bytes": 35400128,
       "manifest_path": "stgo_la_pintana/manifest.json"
     },
     {
@@ -1063,7 +1063,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 82347024,
+      "total_bytes": 36346784,
       "manifest_path": "stgo_la_reina/manifest.json"
     },
     {
@@ -1075,7 +1075,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 81652804,
+      "total_bytes": 34459268,
       "manifest_path": "stgo_las_condes/manifest.json"
     },
     {
@@ -1087,7 +1087,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 37883832,
+      "total_bytes": 14790216,
       "manifest_path": "stgo_lo_barnechea/manifest.json"
     },
     {
@@ -1099,7 +1099,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 17891256,
+      "total_bytes": 7652360,
       "manifest_path": "stgo_lo_espejo/manifest.json"
     },
     {
@@ -1111,7 +1111,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 15472164,
+      "total_bytes": 6821200,
       "manifest_path": "stgo_lo_prado/manifest.json"
     },
     {
@@ -1123,7 +1123,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 25851140,
+      "total_bytes": 11416104,
       "manifest_path": "stgo_macul/manifest.json"
     },
     {
@@ -1135,7 +1135,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 100177412,
+      "total_bytes": 47128396,
       "manifest_path": "stgo_maipu/manifest.json"
     },
     {
@@ -1147,7 +1147,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 42952592,
+      "total_bytes": 18016012,
       "manifest_path": "stgo_nunoa/manifest.json"
     },
     {
@@ -1159,7 +1159,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 22763404,
+      "total_bytes": 10522228,
       "manifest_path": "stgo_padre_hurtado/manifest.json"
     },
     {
@@ -1171,7 +1171,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 19141108,
+      "total_bytes": 8213284,
       "manifest_path": "stgo_pedro_aguirre_cerda/manifest.json"
     },
     {
@@ -1183,7 +1183,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 82422444,
+      "total_bytes": 36504692,
       "manifest_path": "stgo_penalolen/manifest.json"
     },
     {
@@ -1195,7 +1195,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 12253324,
+      "total_bytes": 5431100,
       "manifest_path": "stgo_pirque/manifest.json"
     },
     {
@@ -1207,7 +1207,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 28571660,
+      "total_bytes": 11256196,
       "manifest_path": "stgo_providencia/manifest.json"
     },
     {
@@ -1219,7 +1219,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 39854872,
+      "total_bytes": 17885300,
       "manifest_path": "stgo_pudahuel/manifest.json"
     },
     {
@@ -1231,7 +1231,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 96316604,
+      "total_bytes": 43638004,
       "manifest_path": "stgo_puente_alto/manifest.json"
     },
     {
@@ -1243,7 +1243,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 66034628,
+      "total_bytes": 28701412,
       "manifest_path": "stgo_quilicura/manifest.json"
     },
     {
@@ -1255,7 +1255,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 29159744,
+      "total_bytes": 12824832,
       "manifest_path": "stgo_quinta_normal/manifest.json"
     },
     {
@@ -1267,7 +1267,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 45096192,
+      "total_bytes": 18623120,
       "manifest_path": "stgo_recoleta/manifest.json"
     },
     {
@@ -1279,7 +1279,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 101686308,
+      "total_bytes": 44499068,
       "manifest_path": "stgo_renca/manifest.json"
     },
     {
@@ -1291,7 +1291,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 86512660,
+      "total_bytes": 37394680,
       "manifest_path": "stgo_san_bernardo/manifest.json"
     },
     {
@@ -1303,7 +1303,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 38479352,
+      "total_bytes": 16938324,
       "manifest_path": "stgo_san_joaquin/manifest.json"
     },
     {
@@ -1315,7 +1315,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 2921944,
+      "total_bytes": 1138792,
       "manifest_path": "stgo_san_jose_de_maipo/manifest.json"
     },
     {
@@ -1327,7 +1327,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 30875596,
+      "total_bytes": 13783948,
       "manifest_path": "stgo_san_miguel/manifest.json"
     },
     {
@@ -1339,7 +1339,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 32483184,
+      "total_bytes": 14327936,
       "manifest_path": "stgo_san_ramon/manifest.json"
     },
     {
@@ -1351,7 +1351,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 4,
-      "total_bytes": 45009240,
+      "total_bytes": 18506332,
       "manifest_path": "stgo_santiago/manifest.json"
     },
     {
@@ -1363,7 +1363,7 @@
       "country": "Chile",
       "city": "Santiago",
       "n_layers": 3,
-      "total_bytes": 58839076,
+      "total_bytes": 26928696,
       "manifest_path": "stgo_vitacura/manifest.json"
     },
     {
@@ -1375,7 +1375,7 @@
       "country": "Australia",
       "city": "Sydney",
       "n_layers": 4,
-      "total_bytes": 1603740,
+      "total_bytes": 1605144,
       "manifest_path": "sydney_cbd/manifest.json"
     },
     {
@@ -1387,7 +1387,7 @@
       "country": "Japan",
       "city": "Tokyo",
       "n_layers": 4,
-      "total_bytes": 4570912,
+      "total_bytes": 4572188,
       "manifest_path": "tokyo_shinjuku/manifest.json"
     },
     {
@@ -1399,7 +1399,7 @@
       "country": "Canada",
       "city": "Toronto",
       "n_layers": 4,
-      "total_bytes": 1389780,
+      "total_bytes": 1391028,
       "manifest_path": "toronto_downtown/manifest.json"
     },
     {
@@ -1411,7 +1411,7 @@
       "country": "Chile",
       "city": "Torres del Paine",
       "n_layers": 1,
-      "total_bytes": 64216,
+      "total_bytes": 64208,
       "manifest_path": "torres_paine/manifest.json"
     },
     {
@@ -1423,7 +1423,7 @@
       "country": "Australia",
       "city": "Uluru",
       "n_layers": 2,
-      "total_bytes": 22936,
+      "total_bytes": 22868,
       "manifest_path": "uluru/manifest.json"
     },
     {
@@ -1435,7 +1435,7 @@
       "country": "Chile",
       "city": "Atacama",
       "n_layers": 2,
-      "total_bytes": 64000,
+      "total_bytes": 63896,
       "manifest_path": "valle_luna/manifest.json"
     },
     {
@@ -1447,7 +1447,7 @@
       "country": "Chile",
       "city": "Valparaiso",
       "n_layers": 4,
-      "total_bytes": 3753888,
+      "total_bytes": 3755336,
       "manifest_path": "valparaiso/manifest.json"
     },
     {
@@ -1459,7 +1459,7 @@
       "country": "Austria",
       "city": "Vienna",
       "n_layers": 4,
-      "total_bytes": 2544080,
+      "total_bytes": 2545588,
       "manifest_path": "vienna_center/manifest.json"
     },
     {
@@ -1471,7 +1471,7 @@
       "country": "Switzerland",
       "city": "Zurich",
       "n_layers": 4,
-      "total_bytes": 2299060,
+      "total_bytes": 2300176,
       "manifest_path": "zurich_center/manifest.json"
     }
   ]

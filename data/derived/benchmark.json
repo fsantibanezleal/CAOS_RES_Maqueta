@@ -14,8 +14,8 @@
     "prior": 0.043
   },
   "tier_totals_mb": {
-    "A": 30.18,
-    "B": 1981.66,
+    "A": 30.37,
+    "B": 946.49,
     "C": 0.46
   },
   "tier_counts": {
@@ -23,7 +23,7 @@
     "B": 60,
     "C": 8
   },
-  "total_mb": 2012.3,
+  "total_mb": 977.32,
   "per_place": [
     {
       "slug": "amsterdam_center",
@@ -32,7 +32,7 @@
       "country": "Netherlands",
       "n_layers": 4,
       "total_triangles": 491758,
-      "total_mb": 5.84,
+      "total_mb": 5.844,
       "height_mix": {
         "measured": 124,
         "floors": 1025,
@@ -56,7 +56,7 @@
       "country": "Germany",
       "n_layers": 4,
       "total_triangles": 232480,
-      "total_mb": 1.814,
+      "total_mb": 1.815,
       "height_mix": {
         "measured": 353,
         "floors": 1706,
@@ -78,9 +78,9 @@
       "name": "Delft",
       "tier": "A",
       "country": "Netherlands",
-      "n_layers": 4,
-      "total_triangles": 414844,
-      "total_mb": 5.959,
+      "n_layers": 8,
+      "total_triangles": 440048,
+      "total_mb": 6.134,
       "height_mix": {
         "measured": 44,
         "floors": 6566,
@@ -95,7 +95,16 @@
       },
       "measured_pct": 0.3,
       "any_noncommercial": false,
-      "ground_truth": null
+      "ground_truth": {
+        "n_fused": 15923,
+        "n_truth": 397,
+        "matched": 2722,
+        "coverage_pct": 17.1,
+        "height_rmse_m": 3.06,
+        "height_mae_m": 2.47,
+        "height_bias_m": -0.13,
+        "truth_source": "3D BAG LoD2 (TU Delft)"
+      }
     },
     {
       "slug": "helsinki_center",
@@ -104,7 +113,7 @@
       "country": "Finland",
       "n_layers": 4,
       "total_triangles": 277396,
-      "total_mb": 1.706,
+      "total_mb": 1.707,
       "height_mix": {
         "measured": 301,
         "floors": 1226,
@@ -128,7 +137,7 @@
       "country": "USA",
       "n_layers": 4,
       "total_triangles": 254517,
-      "total_mb": 2.676,
+      "total_mb": 2.678,
       "height_mix": {
         "measured": 5852,
         "floors": 18,
@@ -152,7 +161,7 @@
       "country": "USA",
       "n_layers": 4,
       "total_triangles": 199085,
-      "total_mb": 1.329,
+      "total_mb": 1.33,
       "height_mix": {
         "measured": 1585,
         "floors": 42,
@@ -176,7 +185,7 @@
       "country": "Singapore",
       "n_layers": 4,
       "total_triangles": 152431,
-      "total_mb": 1.441,
+      "total_mb": 1.443,
       "height_mix": {
         "measured": 1585,
         "floors": 510,
@@ -200,7 +209,7 @@
       "country": "Japan",
       "n_layers": 4,
       "total_triangles": 309626,
-      "total_mb": 4.571,
+      "total_mb": 4.572,
       "height_mix": {
         "measured": 737,
         "floors": 666,
@@ -224,7 +233,7 @@
       "country": "Austria",
       "n_layers": 4,
       "total_triangles": 317673,
-      "total_mb": 2.544,
+      "total_mb": 2.546,
       "height_mix": {
         "measured": 1599,
         "floors": 1778,
@@ -248,7 +257,7 @@
       "country": "Switzerland",
       "n_layers": 4,
       "total_triangles": 252099,
-      "total_mb": 2.299,
+      "total_mb": 2.3,
       "height_mix": {
         "measured": 1042,
         "floors": 1103,
@@ -272,7 +281,7 @@
       "country": "Spain",
       "n_layers": 4,
       "total_triangles": 451595,
-      "total_mb": 4.591,
+      "total_mb": 4.595,
       "height_mix": {
         "measured": 1007,
         "floors": 4537,
@@ -296,7 +305,7 @@
       "country": "Colombia",
       "n_layers": 4,
       "total_triangles": 466546,
-      "total_mb": 7.118,
+      "total_mb": 7.123,
       "height_mix": {
         "measured": 8,
         "floors": 120,
@@ -320,7 +329,7 @@
       "country": "Argentina",
       "n_layers": 4,
       "total_triangles": 203903,
-      "total_mb": 3.147,
+      "total_mb": 3.149,
       "height_mix": {
         "measured": 188,
         "floors": 192,
@@ -344,7 +353,7 @@
       "country": "Egypt",
       "n_layers": 4,
       "total_triangles": 196529,
-      "total_mb": 2.654,
+      "total_mb": 2.655,
       "height_mix": {
         "measured": 73,
         "floors": 51,
@@ -368,7 +377,7 @@
       "country": "South Africa",
       "n_layers": 4,
       "total_triangles": 195359,
-      "total_mb": 2.088,
+      "total_mb": 2.089,
       "height_mix": {
         "measured": 73,
         "floors": 671,
@@ -392,7 +401,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 198984,
-      "total_mb": 3.138,
+      "total_mb": 3.139,
       "height_mix": {
         "measured": 644,
         "floors": 226,
@@ -416,7 +425,7 @@
       "country": "Turkey",
       "n_layers": 4,
       "total_triangles": 240424,
-      "total_mb": 3.231,
+      "total_mb": 3.234,
       "height_mix": {
         "measured": 37,
         "floors": 141,
@@ -440,7 +449,7 @@
       "country": "Portugal",
       "n_layers": 4,
       "total_triangles": 216757,
-      "total_mb": 2.597,
+      "total_mb": 2.6,
       "height_mix": {
         "measured": 386,
         "floors": 1709,
@@ -464,7 +473,7 @@
       "country": "UK",
       "n_layers": 4,
       "total_triangles": 404431,
-      "total_mb": 3.255,
+      "total_mb": 3.258,
       "height_mix": {
         "measured": 875,
         "floors": 2492,
@@ -488,7 +497,7 @@
       "country": "Mexico",
       "n_layers": 4,
       "total_triangles": 200067,
-      "total_mb": 2.994,
+      "total_mb": 2.996,
       "height_mix": {
         "measured": 10,
         "floors": 257,
@@ -512,7 +521,7 @@
       "country": "Russia",
       "n_layers": 4,
       "total_triangles": 303880,
-      "total_mb": 2.151,
+      "total_mb": 2.152,
       "height_mix": {
         "measured": 102,
         "floors": 2377,
@@ -560,7 +569,7 @@
       "country": "Kenya",
       "n_layers": 4,
       "total_triangles": 144158,
-      "total_mb": 1.891,
+      "total_mb": 1.892,
       "height_mix": {
         "measured": 44,
         "floors": 183,
@@ -584,7 +593,7 @@
       "country": "France",
       "n_layers": 4,
       "total_triangles": 518532,
-      "total_mb": 4.739,
+      "total_mb": 4.742,
       "height_mix": {
         "measured": 351,
         "floors": 5641,
@@ -608,7 +617,7 @@
       "country": "Italy",
       "n_layers": 4,
       "total_triangles": 327014,
-      "total_mb": 3.079,
+      "total_mb": 3.081,
       "height_mix": {
         "measured": 432,
         "floors": 782,
@@ -632,7 +641,7 @@
       "country": "USA",
       "n_layers": 4,
       "total_triangles": 241878,
-      "total_mb": 2.295,
+      "total_mb": 2.297,
       "height_mix": {
         "measured": 4344,
         "floors": 155,
@@ -656,7 +665,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 292704,
-      "total_mb": 3.675,
+      "total_mb": 3.677,
       "height_mix": {
         "measured": 127,
         "floors": 332,
@@ -680,7 +689,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 4077092,
-      "total_mb": 68.822,
+      "total_mb": 68.83,
       "height_mix": {
         "measured": 853,
         "floors": 8599,
@@ -704,7 +713,7 @@
       "country": "Brazil",
       "n_layers": 4,
       "total_triangles": 443513,
-      "total_mb": 5.407,
+      "total_mb": 5.41,
       "height_mix": {
         "measured": 12181,
         "floors": 33,
@@ -728,7 +737,7 @@
       "country": "South Korea",
       "n_layers": 4,
       "total_triangles": 206918,
-      "total_mb": 2.69,
+      "total_mb": 2.691,
       "height_mix": {
         "measured": 381,
         "floors": 370,
@@ -752,7 +761,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1557636,
-      "total_mb": 63.176,
+      "total_mb": 27.49,
       "height_mix": {
         "measured": 5,
         "floors": 245,
@@ -776,7 +785,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1647127,
-      "total_mb": 67.648,
+      "total_mb": 30.025,
       "height_mix": {
         "measured": 3,
         "floors": 503,
@@ -800,7 +809,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 527000,
-      "total_mb": 21.411,
+      "total_mb": 9.352,
       "height_mix": {
         "measured": 0,
         "floors": 84,
@@ -824,7 +833,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 799171,
-      "total_mb": 32.865,
+      "total_mb": 14.631,
       "height_mix": {
         "measured": 1,
         "floors": 25,
@@ -848,7 +857,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 991055,
-      "total_mb": 40.485,
+      "total_mb": 17.616,
       "height_mix": {
         "measured": 9,
         "floors": 571,
@@ -872,7 +881,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1809367,
-      "total_mb": 72.814,
+      "total_mb": 31.221,
       "height_mix": {
         "measured": 2,
         "floors": 174,
@@ -896,7 +905,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 378910,
-      "total_mb": 15.008,
+      "total_mb": 6.334,
       "height_mix": {
         "measured": 1,
         "floors": 144,
@@ -920,7 +929,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 646691,
-      "total_mb": 26.929,
+      "total_mb": 12.215,
       "height_mix": {
         "measured": 0,
         "floors": 76,
@@ -944,7 +953,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 2816588,
-      "total_mb": 119.07,
+      "total_mb": 54.031,
       "height_mix": {
         "measured": 857,
         "floors": 2811,
@@ -968,7 +977,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1500605,
-      "total_mb": 61.332,
+      "total_mb": 27.132,
       "height_mix": {
         "measured": 598,
         "floors": 177,
@@ -992,7 +1001,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1997205,
-      "total_mb": 81.023,
+      "total_mb": 35.4,
       "height_mix": {
         "measured": 20,
         "floors": 340,
@@ -1016,7 +1025,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 2006107,
-      "total_mb": 82.347,
+      "total_mb": 36.347,
       "height_mix": {
         "measured": 25,
         "floors": 3480,
@@ -1040,7 +1049,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 2048619,
-      "total_mb": 81.653,
+      "total_mb": 34.459,
       "height_mix": {
         "measured": 45,
         "floors": 2320,
@@ -1064,7 +1073,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 995501,
-      "total_mb": 37.884,
+      "total_mb": 14.79,
       "height_mix": {
         "measured": 6,
         "floors": 164,
@@ -1088,7 +1097,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 448106,
-      "total_mb": 17.891,
+      "total_mb": 7.652,
       "height_mix": {
         "measured": 11,
         "floors": 105,
@@ -1112,7 +1121,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 379007,
-      "total_mb": 15.472,
+      "total_mb": 6.821,
       "height_mix": {
         "measured": 4,
         "floors": 180,
@@ -1136,7 +1145,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 624798,
-      "total_mb": 25.851,
+      "total_mb": 11.416,
       "height_mix": {
         "measured": 31,
         "floors": 616,
@@ -1160,7 +1169,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 2293805,
-      "total_mb": 100.177,
+      "total_mb": 47.128,
       "height_mix": {
         "measured": 36,
         "floors": 162,
@@ -1184,7 +1193,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1077237,
-      "total_mb": 42.953,
+      "total_mb": 18.016,
       "height_mix": {
         "measured": 13,
         "floors": 7227,
@@ -1208,7 +1217,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 535928,
-      "total_mb": 22.763,
+      "total_mb": 10.522,
       "height_mix": {
         "measured": 0,
         "floors": 23,
@@ -1232,7 +1241,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 476814,
-      "total_mb": 19.141,
+      "total_mb": 8.213,
       "height_mix": {
         "measured": 11,
         "floors": 300,
@@ -1256,7 +1265,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1997692,
-      "total_mb": 82.422,
+      "total_mb": 36.505,
       "height_mix": {
         "measured": 7,
         "floors": 1352,
@@ -1280,7 +1289,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 300700,
-      "total_mb": 12.253,
+      "total_mb": 5.431,
       "height_mix": {
         "measured": 3,
         "floors": 2,
@@ -1304,7 +1313,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 750218,
-      "total_mb": 28.572,
+      "total_mb": 11.256,
       "height_mix": {
         "measured": 52,
         "floors": 5838,
@@ -1328,7 +1337,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 951830,
-      "total_mb": 39.855,
+      "total_mb": 17.885,
       "height_mix": {
         "measured": 2,
         "floors": 387,
@@ -1352,7 +1361,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 2287955,
-      "total_mb": 96.317,
+      "total_mb": 43.638,
       "height_mix": {
         "measured": 29,
         "floors": 166,
@@ -1376,7 +1385,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1615761,
-      "total_mb": 66.035,
+      "total_mb": 28.701,
       "height_mix": {
         "measured": 1,
         "floors": 311,
@@ -1400,7 +1409,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 712243,
-      "total_mb": 29.16,
+      "total_mb": 12.825,
       "height_mix": {
         "measured": 6,
         "floors": 99,
@@ -1424,7 +1433,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1143036,
-      "total_mb": 45.096,
+      "total_mb": 18.623,
       "height_mix": {
         "measured": 76,
         "floors": 2034,
@@ -1448,7 +1457,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 2487949,
-      "total_mb": 101.686,
+      "total_mb": 44.499,
       "height_mix": {
         "measured": 2,
         "floors": 492,
@@ -1472,7 +1481,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 2144325,
-      "total_mb": 86.513,
+      "total_mb": 37.395,
       "height_mix": {
         "measured": 24,
         "floors": 135,
@@ -1496,7 +1505,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 933560,
-      "total_mb": 38.479,
+      "total_mb": 16.938,
       "height_mix": {
         "measured": 469,
         "floors": 608,
@@ -1520,7 +1529,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 81232,
-      "total_mb": 2.922,
+      "total_mb": 1.139,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -1544,7 +1553,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 746383,
-      "total_mb": 30.876,
+      "total_mb": 13.784,
       "height_mix": {
         "measured": 17,
         "floors": 287,
@@ -1568,7 +1577,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 793728,
-      "total_mb": 32.483,
+      "total_mb": 14.328,
       "height_mix": {
         "measured": 47,
         "floors": 76,
@@ -1592,7 +1601,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 1149385,
-      "total_mb": 45.009,
+      "total_mb": 18.506,
       "height_mix": {
         "measured": 772,
         "floors": 2024,
@@ -1616,7 +1625,7 @@
       "country": "Chile",
       "n_layers": 3,
       "total_triangles": 1424186,
-      "total_mb": 58.839,
+      "total_mb": 26.929,
       "height_mix": {
         "measured": 135,
         "floors": 2997,
@@ -1640,7 +1649,7 @@
       "country": "Australia",
       "n_layers": 4,
       "total_triangles": 214424,
-      "total_mb": 1.604,
+      "total_mb": 1.605,
       "height_mix": {
         "measured": 185,
         "floors": 2110,
@@ -1664,7 +1673,7 @@
       "country": "Canada",
       "n_layers": 4,
       "total_triangles": 190150,
-      "total_mb": 1.39,
+      "total_mb": 1.391,
       "height_mix": {
         "measured": 539,
         "floors": 762,
@@ -1688,7 +1697,7 @@
       "country": "Chile",
       "n_layers": 4,
       "total_triangles": 221109,
-      "total_mb": 3.754,
+      "total_mb": 3.755,
       "height_mix": {
         "measured": 321,
         "floors": 297,
@@ -1808,7 +1817,7 @@
       "country": "France",
       "n_layers": 1,
       "total_triangles": 17737,
-      "total_mb": 0.065,
+      "total_mb": 0.064,
       "height_mix": {
         "measured": 0,
         "floors": 0,
