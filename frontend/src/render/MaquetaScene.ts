@@ -50,7 +50,7 @@ const CAT_PALETTE: [number, number, number][] = [
   [124, 179, 66], [216, 27, 96], [141, 110, 99], [84, 110, 122],
 ];
 
-const LAYER_ORDER = ['terrain', 'population', 'water', 'green', 'roads', 'rail', 'buildings'];
+const LAYER_ORDER = ['terrain', 'population', 'water', 'green', 'roads', 'rail', 'buildings', 'lod2'];
 // Above this building count, edges are not auto-built on load (the user can still enable the wireframe).
 const EDGE_AUTO_MAX = 60000;
 // A fused modality attribute is only offered if at least this fraction of buildings carry a value (a
@@ -595,6 +595,17 @@ export class MaquetaScene {
         return new THREE.MeshLambertMaterial({ vertexColors: true });
       case 'population':
         return new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 0.75, emissive: 0x000000 });
+      case 'lod2':
+        // Authoritative 3DBAG ground truth, rendered as a distinct warm, semi-transparent overlay (not the
+        // blue height ramp) so it reads clearly ON TOP of the fused buildings for a visual comparison.
+        return new THREE.MeshPhongMaterial({
+          color: 0xffa94d,
+          flatShading: true,
+          transparent: true,
+          opacity: 0.5,
+          emissive: new THREE.Color(0x2a1c08),
+          emissiveIntensity: 0.25,
+        });
       default:
         return new THREE.MeshLambertMaterial({ vertexColors: true });
     }

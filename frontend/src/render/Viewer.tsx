@@ -13,7 +13,7 @@ import { PROVENANCE, WORLDCOVER_LABELS, WORLDCOVER_RGB, rgbCss } from '../lib/la
 type Lang = 'en' | 'es';
 const LAYER_SWATCH: Record<string, string> = {
   terrain: '#464a52', buildings: '#c8a05a', roads: '#78c8ff', rail: '#ffa05a',
-  water: '#005faf', green: '#2e783c', population: '#d64828',
+  water: '#005faf', green: '#2e783c', population: '#d64828', lod2: '#ffa94d',
 };
 
 export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest: BundleManifest; lang: Lang }) {
@@ -74,7 +74,8 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     // Layer visibility is known from the manifest up front (population off by default; the internal
     // buildings_lite proxy is not a user layer).
     const v: Record<string, boolean> = {};
-    manifest.layers.forEach((l) => (v[l.name] = l.name !== 'population'));
+    // population + the lod2 ground-truth overlay default OFF (toggle on to compare fusion vs authoritative).
+    manifest.layers.forEach((l) => (v[l.name] = l.name !== 'population' && l.name !== 'lod2'));
     setVisible(v);
     const hasLite = manifest.layers.some((l) => l.name === 'buildings_lite');
     s.loadBundle(
