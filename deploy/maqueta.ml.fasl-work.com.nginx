@@ -1,15 +1,15 @@
-# Static nginx site for Maqueta on the ml/heavy box (hetzner-ml-fasl-work, 89.167.4.175).
-# Maqueta is a static product (ADR-0057 replay): no backend, no proxy. The built frontend/dist is
-# served from /var/www/maqueta.ml.fasl-work.com. certbot adds the 443 server + redirect.
+# Sample static nginx site for Maqueta. No backend, no proxy: the built frontend/dist is served
+# directly, with an SPA fallback and cache headers tuned for the baked bundles. Adapt server_name /
+# root to your host.
 #
-# Install on the box:
-#   cp maqueta.ml.fasl-work.com.nginx /etc/nginx/sites-available/maqueta.ml.fasl-work.com
-#   ln -s /etc/nginx/sites-available/maqueta.ml.fasl-work.com /etc/nginx/sites-enabled/
+# Install (on the server):
+#   cp maqueta.ml.fasl-work.com.nginx /etc/nginx/sites-available/maqueta
+#   ln -s /etc/nginx/sites-available/maqueta /etc/nginx/sites-enabled/
 #   nginx -t && systemctl reload nginx
-#   certbot --nginx -d maqueta.ml.fasl-work.com
+#   certbot --nginx -d maqueta.ml.fasl-work.com    # TLS
 server {
     server_name maqueta.ml.fasl-work.com;
-    root /var/www/maqueta.ml.fasl-work.com;
+    root /var/www/maqueta;
     index index.html;
 
     # SPA: unknown routes fall back to index.html (react-router BrowserRouter deep links).
@@ -17,10 +17,11 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    # GLB bundles + data: long-cache the hashed JS/CSS, short-cache the versioned data JSON.
+    # GLB bundles: long-cache (content is versioned by the place set).
     location ~* \.(glb)$ {
         add_header Cache-Control "public, max-age=604800";
     }
+    # data JSON is cache-busted by the app version; short-cache.
     location /data/ {
         add_header Cache-Control "public, max-age=3600";
     }

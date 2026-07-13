@@ -45,16 +45,18 @@ python -m maquetalab.pipeline --fetched 2026-07-12                # all 40
 cd frontend && npm install && npm run dev
 ```
 
-Raw data lives on an out-of-git volume (`E:\_Datos\maqueta`); only compact baked bundles are committed.
+Raw source downloads live on an out-of-git data volume (set `GEOSCENA_CACHE`); only the compact baked
+bundles are committed.
 
 ## Deploy
 
-Static site on the ml/heavy VPS (`hetzner-ml-fasl-work`) at **maqueta.ml.fasl-work.com** (large baked
-bundles want the disk headroom). The pipeline bakes offline; nginx serves the built `dist/`.
+Maqueta is a static site: bake the bundles offline, `npm run build` the frontend, and serve the
+resulting `dist/` from any static host (nginx or a CDN). The live instance runs at
+**[maqueta.ml.fasl-work.com](https://maqueta.ml.fasl-work.com)**. See [`deploy/`](deploy/) for a sample
+nginx config.
 
 ## Status
 
-`0.x` while the place set and API stabilize. See `docs/` for the wiki, and the CAOS_MANAGE
-`plans/maqueta/` for the 5-axis status.
+`0.x` while the place set and API stabilize. See [`docs/`](docs/) for the wiki.
 
 Owner: Felipe Santibanez-Leal · fsantibanez@gmail.com · [@fsantibanezleal](https://github.com/fsantibanezleal)
