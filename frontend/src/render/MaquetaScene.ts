@@ -94,6 +94,7 @@ export class MaquetaScene {
   private features: BuildingFeature[] = [];
   private featuresById = new Map<number, BuildingFeature>();
   private vFeature: Int32Array = new Int32Array(0); // per-vertex building id
+  private vShade: Float32Array = new Float32Array(0); // per-vertex baked shade (base darker -> roof lighter)
   private numRanges = new Map<string, [number, number]>(); // per numeric attr [min,max]
   private catValuesByKey = new Map<string, string[]>(); // per categorical attr distinct values
   private coverageByKey = new Map<string, number>(); // per attr: fraction of buildings carrying a value
@@ -108,6 +109,8 @@ export class MaquetaScene {
   private pulse = 0;
   private dark = false;
   private sceneR = 2000; // scene extent (max AOI side, m); drives fog + camera distance
+  private keyLight: THREE.DirectionalLight | null = null; // sun; casts the shadows that give the city depth
+  private shadows = true;
 
   private needsRender = true;
   private disposed = false;
@@ -121,6 +124,10 @@ export class MaquetaScene {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(w, h);
+    // Filmic tone mapping gives the colours a richer, less flat response. (Real-time cast shadows were
+    // tried but produced acne on the normal-less baked terrain; a baked soft AO gradient is used instead.)
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.05;
     container.appendChild(this.renderer.domElement);
 
     this.camera = new THREE.PerspectiveCamera(52, w / h, 1, 40000);
@@ -180,23 +187,32 @@ export class MaquetaScene {
     const bg = dark ? 0x0a0e14 : 0xdfe6ef;
     this.scene.background = new THREE.Color(bg);
     // Fog scales with the scene extent, else large AOIs (full Santiago, 11 km) sit entirely beyond a
-    // fixed far-plane and the whole city washes out into the background. Only the far edge hazes.
-    this.scene.fog = new THREE.Fog(bg, this.sceneR * 1.1, this.sceneR * 3.0);
+    // fixed far-plane and the whole city washes out into the background. The city core stays crisp; the
+    // far relief (e.g. the Andes at the edge of the AOI, where the terrain TIN is seen edge-on) hazes into
+    // the sky as atmospheric depth instead of a hard, torn silhouette.
+    this.scene.fog = new THREE.Fog(bg, this.sceneR * 0.95, this.sceneR * 1.85);
     this.scene.clear();
     // Lower ambient + a dominant key light so flat-shaded faces get real contrast (lit roof vs shaded
     // walls = depth). A hemisphere sky/ground fill keeps the shadowed sides from going dead-flat, and a
     // weak back-fill from the opposite side stops silhouettes from crushing to black.
-    this.scene.add(new THREE.AmbientLight(0xffffff, dark ? 0.32 : 0.5));
+    // Balanced so the sun's cast shadows read as soft GREY (depth), not black holes: enough sky/ambient
+    // fill to keep shadowed ground legible, with the sun still clearly the key.
+    this.scene.add(new THREE.AmbientLight(0xffffff, dark ? 0.34 : 0.5));
     this.scene.add(
-      new THREE.HemisphereLight(dark ? 0x6f86b0 : 0xbcd2f0, dark ? 0x0a0e14 : 0x9a8c78, dark ? 0.5 : 0.55),
+      new THREE.HemisphereLight(dark ? 0x6f86b0 : 0xbcd2f0, dark ? 0x1a2230 : 0x9aa0a8, dark ? 0.4 : 0.46),
     );
-    const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.95 : 1.05);
-    dir.position.set(0.75, 1.3, 0.9);
+    const dir = new THREE.DirectionalLight(dark ? 0xfff2df : 0xfff4e6, dark ? 1.05 : 1.25);
+    dir.castShadow = this.shadows;
+    dir.shadow.mapSize.set(2048, 2048);
+    dir.shadow.bias = -0.0006;
+    this.keyLight = dir;
     this.scene.add(dir);
-    const fill = new THREE.DirectionalLight(0xffffff, dark ? 0.22 : 0.28);
+    this.scene.add(dir.target);
+    this.applyShadowCamera();
+    const fill = new THREE.DirectionalLight(dark ? 0x9fb4dc : 0xcfe0f5, dark ? 0.16 : 0.18);
     fill.position.set(-0.8, 0.5, -0.7);
     this.scene.add(fill);
-    this.buildingMat.emissiveIntensity = dark ? 0.14 : 0.06;
+    this.buildingMat.emissiveIntensity = dark ? 0.12 : 0.05;
     this.edgeMat.color.set(dark ? 0x0a0f16 : 0x2a2f38);
     this.edgeMat.opacity = dark ? 0.5 : 0.35;
     for (const obj of this.layers.values()) this.scene.add(obj);
@@ -230,6 +246,11 @@ export class MaquetaScene {
     const lite = ordered.find((l) => l.name === 'buildings_lite');
     const full = ordered.find((l) => l.name === 'buildings');
     const base = ordered.filter((l) => l.name !== 'buildings' && l.name !== 'buildings_lite');
+
+    // Shadows give the city its depth, but a full shadow pass over a huge scene (full Santiago, ~179k
+    // buildings / 3.5M tris) is too costly, so gate them by building count (on for comunas + normal places).
+    this.shadows = ((full?.stats.features as number) ?? 0) <= 90000;
+    if (this.keyLight) this.keyLight.castShadow = this.shadows;
 
     // Phase 1: base modalities + frame the camera. Fire onBaseReady NOW so the app hides its overlay the
     // moment terrain + roads are on screen (a couple of MB), the fastest possible first paint.
@@ -279,6 +300,8 @@ export class MaquetaScene {
       floatifyColors(m.geometry as THREE.BufferGeometry);
       if (isBuildings) {
         m.material = this.buildingMat;
+        m.castShadow = true;
+        m.receiveShadow = true;
         this.buildingMesh = m;
         const ud = (gltf.scene.userData ?? {}) as {
           features?: BuildingFeature[];
@@ -294,6 +317,11 @@ export class MaquetaScene {
         if (this.edgesOn) this.buildEdges(geom, root);
       } else {
         m.material = this.layerMaterial(layer.name);
+        if (layer.name === 'terrain') this.prepareTerrain(m.geometry as THREE.BufferGeometry);
+        else if (layer.name === 'lod2') {
+          m.castShadow = true;
+          m.receiveShadow = true;
+        }
       }
     });
     this.scene.add(root);
@@ -308,6 +336,33 @@ export class MaquetaScene {
     const n = geom.getAttribute('position').count;
     this.vFeature = new Int32Array(n);
     for (let i = 0; i < n; i++) this.vFeature[i] = fidAttr ? Math.round(fidAttr.getX(i)) : -1;
+
+    // Bake a soft vertical shade per vertex: darker at the building base (ambient-occlusion feel where
+    // walls meet the ground), lighter toward the roof (sky light). This is what gives each block a solid,
+    // "not flat" read without real-time shadows (which acne on the normal-less baked terrain). Computed
+    // once from each building's own height range (Y is the up axis after the Y-up export).
+    const posY = geom.getAttribute('position') as THREE.BufferAttribute;
+    this.vShade = new Float32Array(n);
+    const loY = new Map<number, number>();
+    const hiY = new Map<number, number>();
+    for (let i = 0; i < n; i++) {
+      const id = this.vFeature[i];
+      const y = posY.getY(i);
+      const lo = loY.get(id);
+      const hi = hiY.get(id);
+      if (lo === undefined || y < lo) loY.set(id, y);
+      if (hi === undefined || y > hi) hiY.set(id, y);
+    }
+    for (let i = 0; i < n; i++) {
+      const id = this.vFeature[i];
+      const lo = loY.get(id) ?? 0;
+      const hi = hiY.get(id) ?? lo;
+      const span = hi - lo;
+      // frac 0 at base -> 1 at roof; ease so the darkening hugs the lower third (occlusion falls off fast).
+      const frac = span > 1e-3 ? (posY.getY(i) - lo) / span : 1;
+      this.vShade[i] = 0.62 + 0.38 * Math.pow(frac, 0.6);
+    }
+
     this.featuresById = new Map(this.features.map((f) => [f.id, f]));
     this.numRanges.clear();
     this.catValuesByKey.clear();
@@ -392,11 +447,13 @@ export class MaquetaScene {
       const catIdx = new Map((this.catValuesByKey.get(spec.key) ?? []).map((c, i) => [c, i]));
       const n = this.vFeature.length;
       arr = new Float32Array(n * 3);
+      const hasShade = this.vShade.length === n;
       for (let i = 0; i < n; i++) {
         const rgb = this.colorFor(this.featuresById.get(this.vFeature[i]), spec, catIdx);
-        arr[i * 3] = srgbToLinear(rgb[0] / 255);
-        arr[i * 3 + 1] = srgbToLinear(rgb[1] / 255);
-        arr[i * 3 + 2] = srgbToLinear(rgb[2] / 255);
+        const s = hasShade ? this.vShade[i] : 1;
+        arr[i * 3] = srgbToLinear(rgb[0] / 255) * s;
+        arr[i * 3 + 1] = srgbToLinear(rgb[1] / 255) * s;
+        arr[i * 3 + 2] = srgbToLinear(rgb[2] / 255) * s;
       }
       this.colorCache.set(this.colorMode, arr);
     }
@@ -583,8 +640,68 @@ export class MaquetaScene {
     this.needsRender = true;
   }
 
+  // The baked terrain TIN ships without normals. We want smooth hill-shading so the relief reads as real
+  // 3D, but meshopt position quantization collapses near-coincident vertices on steep slopes (the Andes)
+  // into ZERO-AREA triangles. Any normal built from a zero-area face is a zero/NaN vector, and normalize()
+  // of that in the shader yields NaN which renders as pure black (swallowing even the emissive floor) over
+  // the whole steep region. So: drop the degenerate triangles from the index first, THEN compute normals.
+  private prepareTerrain(geom: THREE.BufferGeometry) {
+    const pos = geom.getAttribute('position') as THREE.BufferAttribute | undefined;
+    if (!pos) return;
+    const idx = geom.getIndex();
+    const ax = new THREE.Vector3();
+    const bx = new THREE.Vector3();
+    const cx = new THREE.Vector3();
+    const e1 = new THREE.Vector3();
+    const e2 = new THREE.Vector3();
+    // area^2 threshold in the geometry's local (pre-node-scale) units; tiny, only kills truly collapsed tris.
+    const EPS2 = 1e-14;
+    let dropped = 0;
+    if (idx) {
+      const src = idx.array;
+      const kept: number[] = [];
+      for (let t = 0; t < src.length; t += 3) {
+        const i = src[t];
+        const j = src[t + 1];
+        const k = src[t + 2];
+        ax.fromBufferAttribute(pos, i);
+        bx.fromBufferAttribute(pos, j);
+        cx.fromBufferAttribute(pos, k);
+        e1.subVectors(bx, ax);
+        e2.subVectors(cx, ax);
+        if (e1.cross(e2).lengthSq() > EPS2) kept.push(i, j, k);
+        else dropped++;
+      }
+      if (dropped) geom.setIndex(kept);
+    }
+    geom.deleteAttribute('normal');
+    geom.computeVertexNormals();
+    // Belt-and-suspenders: any residual zero-length normal (isolated vertex) becomes straight up.
+    const nrm = geom.getAttribute('normal') as THREE.BufferAttribute;
+    const na = nrm.array as Float32Array;
+    for (let i = 0; i < na.length; i += 3) {
+      if (!(na[i] * na[i] + na[i + 1] * na[i + 1] + na[i + 2] * na[i + 2] > 1e-8)) {
+        na[i] = 0;
+        na[i + 1] = 1;
+        na[i + 2] = 0;
+      }
+    }
+    nrm.needsUpdate = true;
+    if (dropped && import.meta.env.DEV) console.debug(`terrain: dropped ${dropped} degenerate triangle(s)`);
+  }
+
   private layerMaterial(name: string): THREE.Material {
     switch (name) {
+      case 'terrain':
+        // A grey self-illumination floor so steep relief that faces away from the sun (the Andes north of
+        // Santiago) reads as light grey rock hazing into the sky, never a crushed-black silhouette. The
+        // floor has to be this strong because those far slopes get almost no diffuse AND sit deep in the
+        // distance fog; a weaker floor collapsed to black there.
+        return new THREE.MeshLambertMaterial({
+          vertexColors: true,
+          emissive: new THREE.Color(0x6f757e),
+          emissiveIntensity: 1.0,
+        });
       case 'roads':
         return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
       case 'rail':
@@ -611,12 +728,35 @@ export class MaquetaScene {
     }
   }
 
+  // Position the sun + size its orthographic shadow frustum to the current scene, so shadows cover the
+  // whole AOI at a usable resolution. Sun comes from the NW and high, for long, readable building shadows.
+  private applyShadowCamera() {
+    const d = this.keyLight;
+    if (!d) return;
+    const r = this.sceneR;
+    // Sun from the west at ~40 deg elevation: shadows long enough to read the built form, short enough to
+    // not swamp the ground. The ortho frustum is widened so the shadows are not clipped.
+    d.position.set(-r * 0.72, r * 0.78, r * 0.48);
+    d.target.position.set(0, 0, 0);
+    d.target.updateMatrixWorld();
+    const cam = d.shadow.camera as THREE.OrthographicCamera;
+    cam.left = -r * 0.72;
+    cam.right = r * 0.72;
+    cam.top = r * 0.72;
+    cam.bottom = -r * 0.72;
+    cam.near = r * 0.05;
+    cam.far = r * 4.0;
+    d.shadow.bias = -0.0003 - r * 1.5e-8; // scale the depth bias a touch with scene size to fight acne
+    cam.updateProjectionMatrix();
+  }
+
   private frameCamera([wm, hm]: [number, number]) {
     const r = Math.max(wm, hm);
     this.sceneR = r;
+    this.applyShadowCamera();
     // Re-fit the fog to this scene's extent (the theme set it for the previous scene's size).
     const bg = this.dark ? 0x0a0e14 : 0xdfe6ef;
-    this.scene.fog = new THREE.Fog(bg, this.sceneR * 1.1, this.sceneR * 3.0);
+    this.scene.fog = new THREE.Fog(bg, this.sceneR * 0.95, this.sceneR * 1.85);
     this.controls.target.set(0, 0, 0);
     this.camera.position.set(r * 0.65, r * 0.6, r * 0.65);
     this.camera.far = r * 10;
