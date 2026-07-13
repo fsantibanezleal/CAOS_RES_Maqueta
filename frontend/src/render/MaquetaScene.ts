@@ -997,8 +997,11 @@ export class MaquetaScene {
     // Re-fit the fog to this scene's extent (the theme set it for the previous scene's size).
     const bg = this.dark ? 0x0a0e14 : 0xdfe6ef;
     this.scene.fog = new THREE.Fog(bg, this.sceneR * 0.95, this.sceneR * 1.85);
-    this.controls.target.set(0, 0, 0);
-    this.camera.position.set(r * 0.65, r * 0.6, r * 0.65);
+    // Open on the most cinematic framing: a low oblique that fills the frame with the built fabric and
+    // lets it recede to the far relief hazing into the sky (the Andes on the Santiago default). Closer and
+    // lower than a plain overview so the first impression is the 3D city, not a distant plan.
+    this.controls.target.set(0, r * 0.02, 0);
+    this.camera.position.set(r * 0.52, r * 0.4, r * 0.52);
     this.camera.far = r * 10;
     this.camera.updateProjectionMatrix();
     this.controls.update();
