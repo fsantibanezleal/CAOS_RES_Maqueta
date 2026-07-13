@@ -186,6 +186,7 @@ export class MaquetaScene {
     baseUrl: string,
     manifest: BundleManifest,
     onBaseReady?: () => void,
+    onProxyReady?: () => void,
   ): Promise<void> {
     for (const obj of this.layers.values()) this.scene.remove(obj);
     this.layers.clear();
@@ -200,29 +201,57 @@ export class MaquetaScene {
     const ordered = [...manifest.layers].sort(
       (a, b) => LAYER_ORDER.indexOf(a.name) - LAYER_ORDER.indexOf(b.name),
     );
-    const base = ordered.filter((l) => l.name !== 'buildings');
-    const buildings = ordered.find((l) => l.name === 'buildings');
+    const lite = ordered.find((l) => l.name === 'buildings_lite');
+    const full = ordered.find((l) => l.name === 'buildings');
+    const base = ordered.filter((l) => l.name !== 'buildings' && l.name !== 'buildings_lite');
 
+    // Phase 1: base modalities + frame the camera. Fire onBaseReady NOW so the app hides its overlay the
+    // moment terrain + roads are on screen (a couple of MB), the fastest possible first paint.
     for (const layer of base) await this.loadOneLayer(baseUrl, layer);
     this.frameCamera(manifest.aoi.size_m);
     this.needsRender = true;
     onBaseReady?.();
 
-    if (buildings) await this.loadOneLayer(baseUrl, buildings);
+    // Phase 2: the buildings PROXY (the lite LoD if the place has one, else the full layer). This is what
+    // makes a heavy scene interactive fast: the ~22k-building lite proxy is a few MB, so the city + all
+    // controls light up shortly after the base. onProxyReady lets the app populate the panel.
+    const proxy = lite ?? full;
+    if (proxy) await this.loadOneLayer(baseUrl, proxy);
     this.applyColor();
     this.applyFilter();
     this.needsRender = true;
+    onProxyReady?.();
+
+    // Phase 3: if we showed a lite proxy, stream the FULL buildings in the background and swap it in.
+    if (lite && full) {
+      const liteRoot = this.layers.get('buildings_lite') ?? null;
+      await this.loadOneLayer(baseUrl, full); // buildingMesh/features now point at the full layer
+      if (liteRoot) {
+        this.scene.remove(liteRoot);
+        this.layers.delete('buildings_lite');
+        liteRoot.traverse((o) => {
+          const mm = o as THREE.Mesh;
+          if (mm.isMesh && mm.geometry) (mm.geometry as THREE.BufferGeometry).dispose();
+        });
+      }
+      this.edges = null; // the lite proxy's edges went with its root; the full layer defers edges
+      this.clearHighlight(); // a selection made on the lite proxy no longer maps to the full layer
+      this.applyColor();
+      this.applyFilter();
+      this.needsRender = true;
+    }
   }
 
   private async loadOneLayer(baseUrl: string, layer: BundleManifest['layers'][number]): Promise<void> {
     const gltf = await this.loader.loadAsync(`${baseUrl}/${layer.file}`);
     const root = gltf.scene;
     root.name = layer.name;
+    const isBuildings = layer.name === 'buildings' || layer.name === 'buildings_lite';
     root.traverse((o) => {
       const m = o as THREE.Mesh;
       if (!m.isMesh) return;
       floatifyColors(m.geometry as THREE.BufferGeometry);
-      if (layer.name === 'buildings') {
+      if (isBuildings) {
         m.material = this.buildingMat;
         this.buildingMesh = m;
         const ud = (gltf.scene.userData ?? {}) as {
@@ -480,6 +509,11 @@ export class MaquetaScene {
     if (o) {
       o.visible = visible;
       this.needsRender = true;
+    }
+    // The "buildings" toggle also drives the lite LoD proxy while it stands in for the full layer.
+    if (name === 'buildings') {
+      const proxy = this.layers.get('buildings_lite');
+      if (proxy) proxy.visible = visible;
     }
   }
   setNeon(v: number) {

@@ -64,7 +64,7 @@ def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict
         "city": place.city,
         "note": place.note,
         "layers": [l["name"] for l in man["layers"]],
-        "n_layers": len(man["layers"]),
+        "n_layers": len([l for l in man["layers"] if l["name"] != "buildings_lite"]),
         "total_triangles": int(total_tris),
         "total_bytes": int(total_bytes),
         "height_mix": man["stats"].get("height_mix", {}),

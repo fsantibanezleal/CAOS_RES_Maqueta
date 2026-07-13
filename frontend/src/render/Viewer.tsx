@@ -43,39 +43,61 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     return () => { obs.disconnect(); s.dispose(); };
   }, []);
 
+  // Sync the control panel from whatever buildings layer is currently active (the lite LoD proxy first,
+  // then the full layer after it swaps in). Attribute ranges/categories are read from the live scene.
+  const syncFromScene = (s: MaquetaScene, keepColorMode = false) => {
+    const a = s.attributes();
+    setAttrs(a);
+    const nf: Record<string, [number, number]> = {};
+    const cf: Record<string, Set<string>> = {};
+    a.forEach((sp) => {
+      if (sp.kind === 'numeric') nf[sp.key] = s.numericRange(sp.key);
+      else cf[sp.key] = new Set(s.categories(sp.key));
+    });
+    setNumFilters(nf);
+    setCatFilters(cf);
+    if (!keepColorMode) {
+      setColorMode('height');
+      s.setColorMode('height');
+    }
+    const ei = s.edgesInfo();
+    setEdgesState(ei.on);
+    setEdgesLarge(ei.large);
+  };
+
   useEffect(() => {
     const s = sceneRef.current;
     if (!s) return;
     setLoading(true);
     setBuildingsLoading(false);
     setPick(null);
-    // Layer visibility is known from the manifest up front (population off by default).
+    // Layer visibility is known from the manifest up front (population off by default; the internal
+    // buildings_lite proxy is not a user layer).
     const v: Record<string, boolean> = {};
     manifest.layers.forEach((l) => (v[l.name] = l.name !== 'population'));
     setVisible(v);
-    s.loadBundle(baseUrl, manifest, () => {
-      // Base modalities are loaded + framed: hide the main overlay, keep a light "streaming" hint.
-      manifest.layers.forEach((l) => l.name !== 'buildings' && s.setLayerVisible(l.name, v[l.name]));
-      setLoading(false);
-      setBuildingsLoading(true);
-    }).then(() => {
-      manifest.layers.forEach((l) => s.setLayerVisible(l.name, v[l.name]));
-      const a = s.attributes();
-      setAttrs(a);
-      // reset filters to full range / all categories
-      const nf: Record<string, [number, number]> = {};
-      const cf: Record<string, Set<string>> = {};
-      a.forEach((sp) => {
-        if (sp.kind === 'numeric') nf[sp.key] = s.numericRange(sp.key);
-        else cf[sp.key] = new Set(s.categories(sp.key));
-      });
-      setNumFilters(nf);
-      setCatFilters(cf);
-      setColorMode('height');
-      s.setColorMode('height');
-      const ei = s.edgesInfo();
-      setEdgesState(ei.on);
-      setEdgesLarge(ei.large);
+    const hasLite = manifest.layers.some((l) => l.name === 'buildings_lite');
+    s.loadBundle(
+      baseUrl,
+      manifest,
+      () => {
+        // Base (terrain + roads) is on screen: hide the overlay immediately (fastest first paint) and keep
+        // a light "loading" hint while the buildings arrive.
+        manifest.layers.forEach((l) => l.name !== 'buildings_lite' && s.setLayerVisible(l.name, v[l.name]));
+        setLoading(false);
+        setBuildingsLoading(true);
+      },
+      () => {
+        // The buildings proxy (lite where present) is in: populate the control panel so the scene is fully
+        // interactive; keep the hint only if a lite proxy stood in and the full layer is still streaming.
+        syncFromScene(s);
+        setBuildingsLoading(hasLite);
+      },
+    ).then(() => {
+      // Full buildings are in (if a lite proxy was used, it has been swapped out): re-sync ranges, keep the
+      // user's current colour mode.
+      manifest.layers.forEach((l) => l.name !== 'buildings_lite' && s.setLayerVisible(l.name, v[l.name]));
+      syncFromScene(s, true);
       setLoading(false);
       setBuildingsLoading(false);
     });
@@ -109,7 +131,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
         <div className="mq-canvas" ref={mountRef}>
           {loading && <div className="mq-loading">{t('Loading fused scene...', 'Cargando escena fusionada...')}</div>}
           {!loading && buildingsLoading && (
-            <div className="mq-streaming">{t('Streaming buildings...', 'Cargando edificios...')}</div>
+            <div className="mq-streaming">{t('Loading full detail...', 'Cargando detalle completo...')}</div>
           )}
           {!loading && <ColorLegend scene={sceneRef.current} attrKey={colorMode} lang={lang} />}
         </div>
@@ -118,7 +140,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
 
       <aside className="mq-panel">
         <Section title={t('Layers (the fused modalities)', 'Capas (las modalidades fusionadas)')}>
-          {manifest.layers.map((l) => (
+          {manifest.layers.filter((l) => l.name !== 'buildings_lite').map((l) => (
             <LayerRow key={l.name} layer={l} on={visible[l.name] ?? true} swatch={LAYER_SWATCH[l.name] ?? '#888'}
               onToggle={(v) => setLayer(l.name, v)} lang={lang} />
           ))}

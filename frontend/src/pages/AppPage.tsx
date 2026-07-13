@@ -92,6 +92,8 @@ export default function AppPage() {
 
 function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en' | 'es' }) {
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
+  // The buildings_lite layer is an internal LoD proxy, not a user-facing modality.
+  const userLayers = manifest.layers.filter((l) => l.name !== 'buildings_lite');
   const mix = manifest.stats.height_mix;
   const totalB = (mix.measured + mix.floors + mix.raster + mix.prior) || 1;
   const a = manifest.aoi;
@@ -106,7 +108,7 @@ function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en'
         )}
       </p>
       <div className="mq-ctx-stats">
-        {manifest.layers.map((l) => {
+        {userLayers.map((l) => {
           // Buildings report a feature count; other layers report triangles/points (features is 0, which
           // is NOT nullish, so `??` would wrongly show 0). Pick the first positive count.
           const n = (l.stats.features && l.stats.features > 0 ? l.stats.features : null)
@@ -126,7 +128,7 @@ function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en'
       <table className="mq-table">
         <thead><tr><th>{t('Layer', 'Capa')}</th><th>{t('Source', 'Fuente')}</th><th>{t('License', 'Licencia')}</th><th>{t('Method', 'Método')}</th></tr></thead>
         <tbody>
-          {manifest.layers.map((l) => (
+          {userLayers.map((l) => (
             <tr key={l.name}>
               <td><b>{l.name}</b></td>
               <td>{l.provenance.source}</td>

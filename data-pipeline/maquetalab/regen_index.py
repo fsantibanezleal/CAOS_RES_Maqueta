@@ -36,7 +36,7 @@ def _summary_from_manifest(slug: str, manifest: dict) -> dict:
         "country": p.country,
         "city": p.city,
         "note": p.note,
-        "n_layers": len(layers),
+        "n_layers": len([l for l in layers if l.get("name") != "buildings_lite"]),
         "total_triangles": int(total_tris),
         "total_bytes": int(total_bytes),
         "height_mix": manifest.get("stats", {}).get("height_mix", {}),
