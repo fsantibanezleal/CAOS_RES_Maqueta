@@ -149,6 +149,28 @@ export interface BuildingFeature {
   soil_soc?: number | null; // SoilGrids soil organic carbon 0-5cm, g/kg
 }
 
+// Aggregate statistics over the buildings whose footprint centroid falls inside a user-drawn area polygon
+// (or a whole place). This is the analytical payload of the area / sub-area stats tool.
+export interface AreaBin {
+  label: string;
+  count: number;
+  extra?: number; // optional secondary measure for the bin (e.g. summed area)
+}
+export interface AreaStats {
+  count: number;
+  polygonAreaM2: number; // area of the drawn polygon itself
+  footprintAreaM2: number; // summed building footprint area inside
+  coverageRatio: number; // footprintAreaM2 / polygonAreaM2 (0..1), the built fraction of the ground
+  densityPerKm2: number; // buildings per km2
+  builtVolumeM3: number; // summed footprint area * height, a proxy for built volume
+  height: { mean: number; median: number; p90: number; max: number } | null;
+  floors: { mean: number; max: number } | null;
+  functionMix: AreaBin[]; // by Overture use
+  landcoverMix: AreaBin[]; // by WorldCover class
+  provenanceMix: AreaBin[]; // by height source (measured / floors / raster / prior)
+  heightHist: AreaBin[]; // height distribution bins
+}
+
 // A fused topic modality's provenance (recorded in the manifest even though it rides as a building attribute).
 export interface ModalityInfo {
   key: string;

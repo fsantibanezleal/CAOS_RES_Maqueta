@@ -106,6 +106,38 @@
 .mq-mixbar span { height: 100%; }
 .mq-howto { line-height: 1.7; }
 
+/* ---- Area statistics floating panel (bottom-left, over the map) ---- */
+.mq-areastats {
+  position: absolute; left: 12px; bottom: 12px; z-index: 6;
+  width: min(430px, 60%); max-height: calc(100% - 24px); overflow-y: auto;
+  padding: 0.6rem 0.75rem;
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  border: 1px solid var(--color-accent); border-radius: 12px;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+.mq-as-head { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem; }
+.mq-as-head b { font-size: 0.95rem; }
+.mq-as-count { color: var(--color-accent); font-weight: 700; font-size: 0.9rem; }
+.mq-as-close { margin-left: auto; background: none; border: none; color: var(--color-fg-subtle); cursor: pointer; font-size: 0.9rem; padding: 0.1rem 0.3rem; border-radius: 6px; }
+.mq-as-close:hover { color: var(--color-fg); background: color-mix(in srgb, var(--color-fg) 10%, transparent); }
+.mq-as-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(78px, 1fr)); gap: 0.4rem; margin-bottom: 0.6rem; }
+.mq-as-stat { display: flex; flex-direction: column; gap: 0.05rem; padding: 0.35rem 0.4rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); }
+.mq-as-stat b { font-size: 1rem; color: var(--color-accent); line-height: 1.1; }
+.mq-as-stat span { font-size: 0.68rem; color: var(--color-fg-subtle); }
+.mq-as-block { margin: 0.5rem 0; }
+.mq-as-block .mq-sub { display: block; margin-bottom: 0.25rem; }
+.mq-as-hist { display: flex; align-items: flex-end; gap: 3px; height: 58px; }
+.mq-as-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.mq-as-bar > span { width: 100%; min-height: 2px; background: linear-gradient(180deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 45%, transparent)); border-radius: 3px 3px 0 0; }
+.mq-as-bar > em { font-style: normal; font-size: 0.6rem; color: var(--color-fg-subtle); margin-top: 2px; }
+.mq-as-mixbar { display: flex; height: 16px; border-radius: 5px; overflow: hidden; border: 1px solid var(--color-border); }
+.mq-as-mixbar span { height: 100%; }
+.mq-as-mixlbl { display: flex; flex-wrap: wrap; gap: 0.15rem 0.6rem; margin-top: 0.25rem; font-size: 0.72rem; color: var(--color-fg); }
+.mq-as-mixlbl i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 0.25rem; vertical-align: middle; }
+.mq-seg-wrap { flex-wrap: wrap; }
+.mq-seg button:disabled { opacity: 0.5; cursor: default; }
+
 .mq-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 .mq-table th, .mq-table td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--color-border); vertical-align: top; }
 .mq-table th { color: var(--color-fg-subtle); font-weight: 600; }

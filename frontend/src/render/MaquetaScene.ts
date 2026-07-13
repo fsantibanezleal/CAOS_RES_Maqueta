@@ -8,8 +8,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import type { BuildingFeature, BundleManifest } from '../lib/contract.types';
-import { WORLDCOVER_RGB } from '../lib/labels';
+import type { AreaStats, BuildingFeature, BundleManifest } from '../lib/contract.types';
+import { PROVENANCE, WORLDCOVER_LABELS, WORLDCOVER_RGB } from '../lib/labels';
+
+export type AreaPoint = { x: number; z: number };
 
 export type ColorMode = string; // an attribute key (see ATTRIBUTES)
 export interface PickInfo {
@@ -42,6 +44,29 @@ export const ATTRIBUTES: AttrSpec[] = [
   { key: 'soil', en: 'Soil carbon', es: 'Carbono suelo', kind: 'numeric', unit: 'g/kg', value: (f) => f.soil_soc ?? null, modality: true },
 ];
 export const attrSpec = (key: string) => ATTRIBUTES.find((a) => a.key === key) ?? ATTRIBUTES[0];
+
+// Shoelace area (m2) of a world-space polygon in the XZ ground plane.
+function polyArea(poly: { x: number; z: number }[]): number {
+  let a = 0;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    a += (poly[j].x + poly[i].x) * (poly[j].z - poly[i].z);
+  }
+  return Math.abs(a / 2);
+}
+const EMPTY_AREA_STATS: AreaStats = {
+  count: 0,
+  polygonAreaM2: 0,
+  footprintAreaM2: 0,
+  coverageRatio: 0,
+  densityPerKm2: 0,
+  builtVolumeM3: 0,
+  height: null,
+  floors: null,
+  functionMix: [],
+  landcoverMix: [],
+  provenanceMix: [],
+  heightHist: [],
+};
 
 // A stable categorical colour palette (distinct hues), plus the fixed provenance/land-cover maps.
 const CAT_PALETTE: [number, number, number][] = [
@@ -95,6 +120,8 @@ export class MaquetaScene {
   private featuresById = new Map<number, BuildingFeature>();
   private vFeature: Int32Array = new Int32Array(0); // per-vertex building id
   private vShade: Float32Array = new Float32Array(0); // per-vertex baked shade (base darker -> roof lighter)
+  private centById = new Map<number, { x: number; z: number }>(); // world-space footprint centroid per building
+  private areaGroup: THREE.Group | null = null; // the drawn area-of-interest polygon overlay
   private numRanges = new Map<string, [number, number]>(); // per numeric attr [min,max]
   private catValuesByKey = new Map<string, string[]>(); // per categorical attr distinct values
   private coverageByKey = new Map<string, number>(); // per attr: fraction of buildings carrying a value
@@ -116,6 +143,8 @@ export class MaquetaScene {
   private disposed = false;
   private ro: ResizeObserver;
   private onPick?: (p: PickInfo | null) => void;
+  private drawMode = false;
+  private onGroundClick?: (p: AreaPoint | null) => void;
 
   constructor(container: HTMLElement, dark: boolean) {
     this.container = container;
@@ -308,7 +337,8 @@ export class MaquetaScene {
           extras?: { features?: BuildingFeature[] };
         };
         this.features = ud.features ?? ud.extras?.features ?? [];
-        this.deriveBuildingArrays(m.geometry as THREE.BufferGeometry);
+        m.updateWorldMatrix(true, false);
+        this.deriveBuildingArrays(m.geometry as THREE.BufferGeometry, m.matrixWorld);
         // Auto-build edges for small/medium scenes; defer for very large ones (built on first enable).
         const geom = m.geometry as THREE.BufferGeometry;
         this.pendingEdgeGeom = geom;
@@ -329,7 +359,7 @@ export class MaquetaScene {
   }
 
   // Index features by id, precompute per-attribute ranges/categories, store per-vertex building id.
-  private deriveBuildingArrays(geom: THREE.BufferGeometry) {
+  private deriveBuildingArrays(geom: THREE.BufferGeometry, worldMatrix: THREE.Matrix4) {
     const fidAttr = (geom.getAttribute('_featureid') ||
       geom.getAttribute('_FEATUREID') ||
       geom.getAttribute('featureid')) as THREE.BufferAttribute | undefined;
@@ -345,6 +375,11 @@ export class MaquetaScene {
     this.vShade = new Float32Array(n);
     const loY = new Map<number, number>();
     const hiY = new Map<number, number>();
+    // Also accumulate each building's footprint centroid (local x,z) in the same pass, for the area tool's
+    // point-in-polygon test. Transformed to world space below once the mesh matrix is known.
+    const sumX = new Map<number, number>();
+    const sumZ = new Map<number, number>();
+    const cnt = new Map<number, number>();
     for (let i = 0; i < n; i++) {
       const id = this.vFeature[i];
       const y = posY.getY(i);
@@ -352,6 +387,9 @@ export class MaquetaScene {
       const hi = hiY.get(id);
       if (lo === undefined || y < lo) loY.set(id, y);
       if (hi === undefined || y > hi) hiY.set(id, y);
+      sumX.set(id, (sumX.get(id) ?? 0) + posY.getX(i));
+      sumZ.set(id, (sumZ.get(id) ?? 0) + posY.getZ(i));
+      cnt.set(id, (cnt.get(id) ?? 0) + 1);
     }
     for (let i = 0; i < n; i++) {
       const id = this.vFeature[i];
@@ -361,6 +399,12 @@ export class MaquetaScene {
       // frac 0 at base -> 1 at roof; ease so the darkening hugs the lower third (occlusion falls off fast).
       const frac = span > 1e-3 ? (posY.getY(i) - lo) / span : 1;
       this.vShade[i] = 0.62 + 0.38 * Math.pow(frac, 0.6);
+    }
+    this.centById.clear();
+    const cv = new THREE.Vector3();
+    for (const [id, c] of cnt) {
+      cv.set((sumX.get(id) ?? 0) / c, 0, (sumZ.get(id) ?? 0) / c).applyMatrix4(worldMatrix);
+      this.centById.set(id, { x: cv.x, z: cv.z });
     }
 
     this.featuresById = new Map(this.features.map((f) => [f.id, f]));
@@ -503,7 +547,22 @@ export class MaquetaScene {
   setOnPick(cb: (p: PickInfo | null) => void) {
     this.onPick = cb;
   }
+  setOnGroundClick(cb: (p: AreaPoint | null) => void) {
+    this.onGroundClick = cb;
+  }
+  // When drawing an area, clicks drop polygon vertices instead of picking buildings, and orbit-rotate is
+  // suppressed so a click stays a click (zoom + pan still work for framing).
+  setDrawMode(on: boolean) {
+    this.drawMode = on;
+    this.controls.enableRotate = !on;
+    this.renderer.domElement.style.cursor = on ? 'crosshair' : '';
+  }
   private onPointer = (ev: PointerEvent) => {
+    if (ev.button !== 0) return; // left button only; right/middle drive orbit pan
+    if (this.drawMode) {
+      if (this.onGroundClick) this.onGroundClick(this.groundPointAt(ev.clientX, ev.clientY));
+      return;
+    }
     if (!this.buildingMesh || !this.onPick) return;
     const rect = this.renderer.domElement.getBoundingClientRect();
     const ndc = new THREE.Vector2(
@@ -597,6 +656,187 @@ export class MaquetaScene {
       (this.highlight.geometry as THREE.BufferGeometry).dispose();
       this.highlight = null;
     }
+  }
+
+  // ---- area / sub-area statistics tool ----
+  // Raycast a screen point onto the ground plane (y=0) to get its world (x,z). Used to place the vertices
+  // of the area polygon the user draws over the map.
+  groundPointAt(clientX: number, clientY: number): AreaPoint | null {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    const ndc = new THREE.Vector2(
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      -((clientY - rect.top) / rect.height) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const hit = new THREE.Vector3();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
+  }
+
+  // Draw the area polygon: a bright boundary on the ground, a soft ground fill, and a low translucent
+  // vertical curtain so the selected region reads clearly even among tall buildings. `closed` draws the
+  // fill/curtain; while still drawing we show just the open boundary line.
+  showAreaPolygon(points: AreaPoint[], closed: boolean) {
+    this.clearArea();
+    if (points.length < 1) return;
+    const g = new THREE.Group();
+    g.name = 'area';
+    const accent = this.dark ? 0x6cc8ff : 0x1f6feb;
+    const pts3 = points.map((p) => new THREE.Vector3(p.x, 2, p.z));
+    if (closed && points.length >= 3) pts3.push(pts3[0].clone());
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts3),
+      new THREE.LineBasicMaterial({ color: accent, transparent: true, opacity: 0.95, depthTest: false }),
+    );
+    line.renderOrder = 998;
+    g.add(line);
+    // vertex dots so the user sees where they clicked
+    const dotGeo = new THREE.SphereGeometry(Math.max(3, this.sceneR * 0.004), 8, 6);
+    const dotMat = new THREE.MeshBasicMaterial({ color: accent, depthTest: false });
+    for (const p of points) {
+      const d = new THREE.Mesh(dotGeo, dotMat);
+      d.position.set(p.x, 2, p.z);
+      d.renderOrder = 999;
+      g.add(d);
+    }
+    if (closed && points.length >= 3) {
+      const H = Math.max(30, this.sceneR * 0.02);
+      const shape = new THREE.Shape(points.map((p) => new THREE.Vector2(p.x, p.z)));
+      const fill = new THREE.ShapeGeometry(shape);
+      const fp = fill.getAttribute('position') as THREE.BufferAttribute;
+      for (let i = 0; i < fp.count; i++) fp.setXYZ(i, fp.getX(i), 1.5, fp.getY(i)); // XY shape -> XZ ground
+      fp.needsUpdate = true;
+      fill.computeVertexNormals();
+      const fillMesh = new THREE.Mesh(
+        fill,
+        new THREE.MeshBasicMaterial({
+          color: accent,
+          transparent: true,
+          opacity: 0.1,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        }),
+      );
+      fillMesh.renderOrder = 996;
+      g.add(fillMesh);
+      const cv: number[] = [];
+      const N = points.length;
+      for (let i = 0; i < N; i++) {
+        const a = points[i];
+        const b = points[(i + 1) % N];
+        cv.push(a.x, 0, a.z, b.x, 0, b.z, b.x, H, b.z, a.x, 0, a.z, b.x, H, b.z, a.x, H, a.z);
+      }
+      const cg = new THREE.BufferGeometry();
+      cg.setAttribute('position', new THREE.Float32BufferAttribute(cv, 3));
+      const curtain = new THREE.Mesh(
+        cg,
+        new THREE.MeshBasicMaterial({
+          color: accent,
+          transparent: true,
+          opacity: 0.14,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        }),
+      );
+      curtain.renderOrder = 997;
+      g.add(curtain);
+    }
+    this.areaGroup = g;
+    this.scene.add(g);
+    this.needsRender = true;
+  }
+
+  clearArea() {
+    if (this.areaGroup) {
+      this.scene.remove(this.areaGroup);
+      this.areaGroup.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.geometry) m.geometry.dispose();
+      });
+      this.areaGroup = null;
+      this.needsRender = true;
+    }
+  }
+
+  private static pointInPoly(x: number, z: number, poly: AreaPoint[]): boolean {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i].x;
+      const zi = poly[i].z;
+      const xj = poly[j].x;
+      const zj = poly[j].z;
+      if (zi > z !== zj > z && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+
+  // Aggregate fused stats over every building whose footprint centroid falls inside `points` (world x,z).
+  // When `points` is null the whole place is summarized. `lang` selects EN/ES category labels.
+  computeAreaStats(points: AreaPoint[] | null, lang: 'en' | 'es' = 'en'): AreaStats | null {
+    if (!this.features.length) return null;
+    if (points && points.length < 3) return null;
+    const inside: BuildingFeature[] =
+      points == null
+        ? this.features
+        : this.features.filter((f) => {
+            const c = this.centById.get(f.id);
+            return c ? MaquetaScene.pointInPoly(c.x, c.z, points) : false;
+          });
+    if (!inside.length) return { ...EMPTY_AREA_STATS, polygonAreaM2: points ? polyArea(points) : 0 };
+
+    let footprint = 0;
+    let volume = 0;
+    const heights: number[] = [];
+    const floorsArr: number[] = [];
+    const fn = new Map<string, number>();
+    const lc = new Map<string, number>();
+    const pv = new Map<string, number>();
+    const histEdges = [0, 6, 12, 20, 35, 60, 100, Infinity];
+    const hist = new Array(histEdges.length - 1).fill(0);
+    for (const f of inside) {
+      const a = f.area_m2 ?? 0;
+      footprint += a;
+      if (Number.isFinite(f.height_m)) {
+        heights.push(f.height_m);
+        volume += a * f.height_m;
+        for (let b = 0; b < hist.length; b++) {
+          if (f.height_m >= histEdges[b] && f.height_m < histEdges[b + 1]) {
+            hist[b]++;
+            break;
+          }
+        }
+      }
+      if (f.num_floors != null && Number.isFinite(f.num_floors)) floorsArr.push(f.num_floors);
+      const use = f.use ?? (lang === 'es' ? 'Sin dato' : 'Unknown');
+      fn.set(use, (fn.get(use) ?? 0) + 1);
+      const lcl = f.class != null ? WORLDCOVER_LABELS[f.class]?.[lang] ?? String(f.class) : lang === 'es' ? 'Sin dato' : 'Unknown';
+      lc.set(lcl, (lc.get(lcl) ?? 0) + 1);
+      const pvl = PROVENANCE[f.height_source]?.[lang] ?? f.height_source;
+      pv.set(pvl, (pv.get(pvl) ?? 0) + 1);
+    }
+    heights.sort((a, b) => a - b);
+    const pct = (arr: number[], p: number) => (arr.length ? arr[Math.min(arr.length - 1, Math.floor(p * arr.length))] : 0);
+    const mean = (arr: number[]) => (arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0);
+    const toBins = (m: Map<string, number>): { label: string; count: number }[] =>
+      [...m.entries()].map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+    const histLabels = ['0-6', '6-12', '12-20', '20-35', '35-60', '60-100', '100+'];
+    const polygonAreaM2 = points ? polyArea(points) : footprint / Math.max(1e-6, 0.35); // whole-place: no polygon
+    return {
+      count: inside.length,
+      polygonAreaM2,
+      footprintAreaM2: footprint,
+      coverageRatio: points ? Math.min(1, footprint / Math.max(1, polygonAreaM2)) : 0,
+      densityPerKm2: points ? inside.length / Math.max(1e-6, polygonAreaM2 / 1e6) : 0,
+      builtVolumeM3: volume,
+      height: heights.length
+        ? { mean: mean(heights), median: pct(heights, 0.5), p90: pct(heights, 0.9), max: heights[heights.length - 1] }
+        : null,
+      floors: floorsArr.length ? { mean: mean(floorsArr), max: Math.max(...floorsArr) } : null,
+      functionMix: toBins(fn),
+      landcoverMix: toBins(lc),
+      provenanceMix: toBins(pv),
+      heightHist: hist.map((count, i) => ({ label: histLabels[i], count })),
+    };
   }
 
   // ---- scene controls ----

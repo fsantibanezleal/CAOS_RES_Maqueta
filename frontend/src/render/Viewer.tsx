@@ -6,8 +6,8 @@
 // panel. Scene dynamics: camera presets, neon intensity, pulse. Edges give each extrusion 3D shape.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { readTheme } from '@fasl-work/caos-app-shell';
-import { MaquetaScene, type AttrSpec, type PickInfo } from './MaquetaScene';
-import type { BundleManifest, BundleLayer } from '../lib/contract.types';
+import { MaquetaScene, type AttrSpec, type AreaPoint, type PickInfo } from './MaquetaScene';
+import type { AreaStats, BundleManifest, BundleLayer } from '../lib/contract.types';
 import { PROVENANCE, WORLDCOVER_LABELS, WORLDCOVER_RGB, rgbCss } from '../lib/labels';
 
 type Lang = 'en' | 'es';
@@ -32,12 +32,24 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   const [loading, setLoading] = useState(true);
   const [buildingsLoading, setBuildingsLoading] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
+  const areaPtsRef = useRef<AreaPoint[]>([]);
+  const [areaMode, setAreaMode] = useState(false);
+  const [areaCount, setAreaCount] = useState(0);
+  const [areaStats, setAreaStats] = useState<AreaStats | null>(null);
+  const [areaScope, setAreaScope] = useState<'polygon' | 'place'>('polygon');
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
 
   useEffect(() => {
     if (!mountRef.current) return;
     const s = new MaquetaScene(mountRef.current, readTheme() === 'dark');
     s.setOnPick(setPick);
+    // Area tool: each ground click drops a polygon vertex and re-draws the open outline.
+    s.setOnGroundClick((p) => {
+      if (!p) return;
+      areaPtsRef.current = [...areaPtsRef.current, p];
+      s.showAreaPolygon(areaPtsRef.current, false);
+      setAreaCount(areaPtsRef.current.length);
+    });
     sceneRef.current = s;
     const obs = new MutationObserver(() => s.setTheme(readTheme() === 'dark'));
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -72,6 +84,12 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     setLoading(true);
     setBuildingsLoading(false);
     setPick(null);
+    // A new place reloads the scene: reset the area tool.
+    areaPtsRef.current = [];
+    setAreaCount(0);
+    setAreaStats(null);
+    setAreaMode(false);
+    s.setDrawMode(false);
     // Layer visibility is known from the manifest up front (population off by default; the internal
     // buildings_lite proxy is not a user layer).
     const v: Record<string, boolean> = {};
@@ -123,6 +141,50 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     });
   };
 
+  const startArea = () => {
+    const s = sceneRef.current;
+    if (!s) return;
+    areaPtsRef.current = [];
+    setAreaCount(0);
+    setAreaStats(null);
+    setAreaScope('polygon');
+    s.clearArea();
+    s.setDrawMode(true);
+    setAreaMode(true);
+  };
+  const finishArea = () => {
+    const s = sceneRef.current;
+    if (!s) return;
+    const pts = areaPtsRef.current;
+    if (pts.length >= 3) {
+      s.showAreaPolygon(pts, true);
+      setAreaStats(s.computeAreaStats(pts, lang));
+      setAreaScope('polygon');
+    }
+    s.setDrawMode(false);
+    setAreaMode(false);
+  };
+  const clearArea = () => {
+    const s = sceneRef.current;
+    s?.clearArea();
+    s?.setDrawMode(false);
+    areaPtsRef.current = [];
+    setAreaCount(0);
+    setAreaStats(null);
+    setAreaMode(false);
+  };
+  const wholePlaceStats = () => {
+    const s = sceneRef.current;
+    if (!s) return;
+    s.clearArea();
+    s.setDrawMode(false);
+    areaPtsRef.current = [];
+    setAreaCount(0);
+    setAreaMode(false);
+    setAreaScope('place');
+    setAreaStats(s.computeAreaStats(null, lang));
+  };
+
   const colorAttrs = useMemo(() => attrs, [attrs]);
   const numericAttrs = attrs.filter((a) => a.kind === 'numeric');
   const categoricalAttrs = attrs.filter((a) => a.kind === 'categorical');
@@ -136,7 +198,11 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
         )}
         {!loading && <ColorLegend scene={sceneRef.current} attrKey={colorMode} lang={lang} />}
       </div>
-      <SelectionPanel pick={pick} lang={lang} />
+      {areaStats ? (
+        <AreaStatsPanel stats={areaStats} scope={areaScope} onClose={clearArea} lang={lang} />
+      ) : (
+        <SelectionPanel pick={pick} lang={lang} />
+      )}
       <button className="mq-panel-toggle" onClick={() => setPanelOpen((o) => !o)} title={t('Toggle controls', 'Alternar controles')}>
         {panelOpen ? '✕' : '☰'}
         <span>{panelOpen ? t('Hide', 'Ocultar') : t('Controls', 'Controles')}</span>
@@ -193,6 +259,34 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
               </div>
             );
           })}
+        </Section>
+
+        <Section title={t('Area statistics', 'Estadisticas de area')}>
+          <p className="mq-sub">
+            {t(
+              'Summarize the fused building attributes over any sub-area: draw a polygon (a barrio, a block, a corridor) or take the whole place.',
+              'Resume los atributos fusionados de los edificios en cualquier sub-area: dibuja un poligono (un barrio, una manzana, un corredor) o toma todo el lugar.',
+            )}
+          </p>
+          <div className="mq-seg">
+            {!areaMode ? (
+              <button onClick={startArea}>{t('Draw area', 'Dibujar area')}</button>
+            ) : (
+              <button className="on" onClick={finishArea} disabled={areaCount < 3}>
+                {t('Finish', 'Terminar')} ({areaCount})
+              </button>
+            )}
+            <button onClick={wholePlaceStats}>{t('Whole place', 'Todo el lugar')}</button>
+            <button onClick={clearArea}>{t('Clear', 'Limpiar')}</button>
+          </div>
+          {areaMode && (
+            <p className="mq-sub mq-warn">
+              {t(
+                'Click on the map to drop points around the area, then Finish (min 3 points). Zoom with the wheel.',
+                'Haz clic en el mapa para marcar puntos alrededor del area, luego Terminar (min 3 puntos). Zoom con la rueda.',
+              )}
+            </p>
+          )}
         </Section>
 
         <Section title={t('Scene', 'Escena')}>
@@ -271,6 +365,99 @@ function ColorLegend({ scene, attrKey, lang }: { scene: MaquetaScene | null; att
         </div>
       )}
       {t('', '')}
+    </div>
+  );
+}
+
+function fmtArea(m2: number): string {
+  if (m2 >= 1e6) return `${(m2 / 1e6).toFixed(2)} km2`;
+  if (m2 >= 1e4) return `${(m2 / 1e4).toFixed(1)} ha`;
+  return `${Math.round(m2).toLocaleString()} m2`;
+}
+function fmtInt(n: number): string {
+  return Math.round(n).toLocaleString();
+}
+function MixBar({ bins, total }: { bins: { label: string; count: number }[]; total: number }) {
+  const top = bins.slice(0, 6);
+  return (
+    <div className="mq-as-mix">
+      <div className="mq-as-mixbar">
+        {top.map((b, i) => (
+          <span key={b.label} style={{ width: `${(100 * b.count) / Math.max(1, total)}%`, background: MIX_COLORS[i % MIX_COLORS.length] }} title={`${b.label}: ${b.count}`} />
+        ))}
+      </div>
+      <div className="mq-as-mixlbl">
+        {top.map((b, i) => (
+          <span key={b.label}><i style={{ background: MIX_COLORS[i % MIX_COLORS.length] }} />{b.label} {Math.round((100 * b.count) / Math.max(1, total))}%</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+const MIX_COLORS = ['#2a6cff', '#1f9d64', '#d68215', '#d63d68', '#7b4cff', '#00acc1', '#9aa2ad'];
+
+function AreaStatsPanel({ stats, scope, onClose, lang }: { stats: AreaStats; scope: 'polygon' | 'place'; onClose: () => void; lang: Lang }) {
+  const t = (en: string, es: string) => (lang === 'es' ? es : en);
+  const maxHist = Math.max(1, ...stats.heightHist.map((b) => b.count));
+  return (
+    <div className="mq-areastats">
+      <div className="mq-as-head">
+        <b>{scope === 'place' ? t('Whole place', 'Todo el lugar') : t('Drawn area', 'Area dibujada')}</b>
+        <span className="mq-as-count">{fmtInt(stats.count)} {t('buildings', 'edificios')}</span>
+        <button className="mq-as-close" onClick={onClose} title={t('Clear', 'Limpiar')}>✕</button>
+      </div>
+      {stats.count === 0 ? (
+        <p className="mq-sub">{t('No buildings inside this area.', 'No hay edificios dentro de esta area.')}</p>
+      ) : (
+        <>
+          <div className="mq-as-grid">
+            {scope === 'polygon' && <Stat label={t('Area', 'Area')} value={fmtArea(stats.polygonAreaM2)} />}
+            <Stat label={t('Footprint', 'Huella')} value={fmtArea(stats.footprintAreaM2)} />
+            {scope === 'polygon' && <Stat label={t('Built cover', 'Cobertura')} value={`${Math.round(stats.coverageRatio * 100)}%`} />}
+            {scope === 'polygon' && <Stat label={t('Density', 'Densidad')} value={`${fmtInt(stats.densityPerKm2)}/km2`} />}
+            <Stat label={t('Built volume', 'Volumen')} value={`${fmtInt(stats.builtVolumeM3 / 1e6)} Mm3`} />
+            {stats.height && <Stat label={t('Mean height', 'Altura media')} value={`${stats.height.mean.toFixed(1)} m`} />}
+            {stats.height && <Stat label={t('Median h.', 'Mediana h.')} value={`${stats.height.median.toFixed(1)} m`} />}
+            {stats.height && <Stat label={t('Tallest', 'Mas alto')} value={`${stats.height.max.toFixed(0)} m`} />}
+            {stats.floors && <Stat label={t('Mean floors', 'Pisos medio')} value={stats.floors.mean.toFixed(1)} />}
+          </div>
+
+          {stats.height && (
+            <div className="mq-as-block">
+              <span className="mq-sub">{t('Height distribution (m)', 'Distribucion de altura (m)')}</span>
+              <div className="mq-as-hist">
+                {stats.heightHist.map((b) => (
+                  <div key={b.label} className="mq-as-bar" title={`${b.label} m: ${b.count}`}>
+                    <span style={{ height: `${(100 * b.count) / maxHist}%` }} />
+                    <em>{b.label}</em>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mq-as-block">
+            <span className="mq-sub">{t('Function', 'Funcion')}</span>
+            <MixBar bins={stats.functionMix} total={stats.count} />
+          </div>
+          <div className="mq-as-block">
+            <span className="mq-sub">{t('Land cover', 'Cobertura')}</span>
+            <MixBar bins={stats.landcoverMix} total={stats.count} />
+          </div>
+          <div className="mq-as-block">
+            <span className="mq-sub">{t('Height provenance (how we know)', 'Procedencia de altura')}</span>
+            <MixBar bins={stats.provenanceMix} total={stats.count} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="mq-as-stat">
+      <b>{value}</b>
+      <span>{label}</span>
     </div>
   );
 }
