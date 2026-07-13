@@ -82,7 +82,7 @@ export class MaquetaScene {
   private container: HTMLElement;
 
   private buildingMesh: THREE.Mesh | null = null;
-  private buildingMat: THREE.MeshLambertMaterial;
+  private buildingMat: THREE.MeshPhongMaterial;
   private edges: THREE.LineSegments | null = null;
   private edgeMat: THREE.LineBasicMaterial;
   // Wireframe edges give each extrusion a readable 3D shape. On very large scenes (e.g. full Santiago,
@@ -130,10 +130,17 @@ export class MaquetaScene {
     this.controls.maxPolarAngle = Math.PI * 0.495;
     this.controls.addEventListener('change', () => (this.needsRender = true));
 
-    this.buildingMat = new THREE.MeshLambertMaterial({
+    // Phong + flatShading gives each extrusion real depth: the baked glb carries NO normals, and Lambert
+    // then lights every face identically (flat blobs). flatShading derives a per-face normal in the shader
+    // from screen-space position derivatives, so roofs and the four walls each catch the light differently
+    // and the 3D form reads without needing a selection or the wireframe.
+    this.buildingMat = new THREE.MeshPhongMaterial({
       vertexColors: true,
+      flatShading: true,
+      shininess: 4,
+      specular: new THREE.Color(0x141a22),
       emissive: new THREE.Color(0xffffff),
-      emissiveIntensity: dark ? 0.22 : 0.1,
+      emissiveIntensity: dark ? 0.14 : 0.06,
     });
     this.installBuildingFilter(this.buildingMat);
     // Edge lines give each extrusion a readable 3D shape (not a flat colour blob).
@@ -154,7 +161,7 @@ export class MaquetaScene {
 
   // Inject a per-vertex "hidden" flag into the building material so height/provenance filters can
   // discard whole buildings without rebuilding geometry.
-  private installBuildingFilter(mat: THREE.MeshLambertMaterial) {
+  private installBuildingFilter(mat: THREE.Material) {
     mat.onBeforeCompile = (shader) => {
       shader.vertexShader =
         'attribute float aHidden;\nvarying float vHidden;\n' +
@@ -176,11 +183,20 @@ export class MaquetaScene {
     // fixed far-plane and the whole city washes out into the background. Only the far edge hazes.
     this.scene.fog = new THREE.Fog(bg, this.sceneR * 1.1, this.sceneR * 3.0);
     this.scene.clear();
-    this.scene.add(new THREE.AmbientLight(0xffffff, dark ? 0.6 : 0.95));
-    const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.7 : 0.9);
-    dir.position.set(1, 2, 1.4);
+    // Lower ambient + a dominant key light so flat-shaded faces get real contrast (lit roof vs shaded
+    // walls = depth). A hemisphere sky/ground fill keeps the shadowed sides from going dead-flat, and a
+    // weak back-fill from the opposite side stops silhouettes from crushing to black.
+    this.scene.add(new THREE.AmbientLight(0xffffff, dark ? 0.32 : 0.5));
+    this.scene.add(
+      new THREE.HemisphereLight(dark ? 0x6f86b0 : 0xbcd2f0, dark ? 0x0a0e14 : 0x9a8c78, dark ? 0.5 : 0.55),
+    );
+    const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.95 : 1.05);
+    dir.position.set(0.75, 1.3, 0.9);
     this.scene.add(dir);
-    this.buildingMat.emissiveIntensity = dark ? 0.22 : 0.1;
+    const fill = new THREE.DirectionalLight(0xffffff, dark ? 0.22 : 0.28);
+    fill.position.set(-0.8, 0.5, -0.7);
+    this.scene.add(fill);
+    this.buildingMat.emissiveIntensity = dark ? 0.14 : 0.06;
     this.edgeMat.color.set(dark ? 0x0a0f16 : 0x2a2f38);
     this.edgeMat.opacity = dark ? 0.5 : 0.35;
     for (const obj of this.layers.values()) this.scene.add(obj);
@@ -549,7 +565,8 @@ export class MaquetaScene {
         });
       }
     }
-    this.buildingMat.emissiveIntensity = 0.1 + v * 0.3;
+    // Keep a floor of face shading even at full neon so buildings never flatten back into glowing blobs.
+    this.buildingMat.emissiveIntensity = (this.dark ? 0.1 : 0.04) + v * 0.16;
     this.needsRender = true;
   }
   setAnimate(on: boolean) {
@@ -612,7 +629,7 @@ export class MaquetaScene {
     this.controls.update();
     if (this.animate && !document.hidden) {
       this.pulse += 0.03;
-      this.buildingMat.emissiveIntensity = 0.15 + 0.15 * Math.abs(Math.sin(this.pulse)) + this.neon * 0.1;
+      this.buildingMat.emissiveIntensity = 0.08 + 0.12 * Math.abs(Math.sin(this.pulse)) + this.neon * 0.08;
       this.needsRender = true;
     }
     if (this.needsRender) {
