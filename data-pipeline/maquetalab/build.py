@@ -9,6 +9,7 @@ the gap rather than failing.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from geoscena.aoi import AOI
@@ -40,7 +41,9 @@ def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict
         # terrain-first areas skip the building/road fetch (they have little/none)
         include_buildings=place.tier != "C",
         include_roads=place.tier != "C",
-        include_context=True,
+        # OSM context (water/green/rail) via Overpass can be slow; MAQUETA_NO_CONTEXT=1 skips it
+        # so a bake never blocks on the public Overpass queue (the context layers are optional).
+        include_context=os.environ.get("MAQUETA_NO_CONTEXT", "") != "1",
     )
     bundle = build_scene(aoi, cfg)
     out_dir = out_root / place.slug

@@ -1,0 +1,29 @@
+# Static nginx site for Maqueta on the ml/heavy box (hetzner-ml-fasl-work, 89.167.4.175).
+# Maqueta is a static product (ADR-0057 replay): no backend, no proxy. The built frontend/dist is
+# served from /var/www/maqueta.ml.fasl-work.com. certbot adds the 443 server + redirect.
+#
+# Install on the box:
+#   cp maqueta.ml.fasl-work.com.nginx /etc/nginx/sites-available/maqueta.ml.fasl-work.com
+#   ln -s /etc/nginx/sites-available/maqueta.ml.fasl-work.com /etc/nginx/sites-enabled/
+#   nginx -t && systemctl reload nginx
+#   certbot --nginx -d maqueta.ml.fasl-work.com
+server {
+    server_name maqueta.ml.fasl-work.com;
+    root /var/www/maqueta.ml.fasl-work.com;
+    index index.html;
+
+    # SPA: unknown routes fall back to index.html (react-router BrowserRouter deep links).
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # GLB bundles + data: long-cache the hashed JS/CSS, short-cache the versioned data JSON.
+    location ~* \.(glb)$ {
+        add_header Cache-Control "public, max-age=604800";
+    }
+    location /data/ {
+        add_header Cache-Control "public, max-age=3600";
+    }
+
+    listen 80;
+}

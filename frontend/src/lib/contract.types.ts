@@ -1,65 +1,112 @@
-// CONTRACT 2 mirror (frontend side). MUST stay in lock-step with the Python schemas in
-// data-pipeline/examplelab/core/{trace.py, manifest.py}. A drift here makes `tsc` fail -> the contract is
-// enforced at BUILD time (the web cannot ship reading a shape the pipeline does not produce).
+// TypeScript mirror of the geoscena SceneBundle manifest (CONTRACT 2, processing -> web).
+// If the Python manifest schema drifts from these types, the build (tsc) fails. See
+// CAOS_GeoScena/docs/contract.md and geoscena.bundle.SceneBundle.to_manifest.
 
-export interface TraceSummary {
-  peak_I: number;
-  t_peak: number;
-  attack_rate: number;
+export interface LayerProvenance {
+  source: string;
+  url: string;
+  license: string;
+  license_name: string;
+  license_url: string;
+  commercial_ok: boolean | null;
+  fetched: string;
+  method: string;
+  extra: Record<string, unknown>;
 }
 
-export interface Trace {
-  schema: string; // "example.trace/v1"
-  case_id: string;
-  t: number[];
-  S: number[];
-  I: number[];
-  R: number[];
-  summary: TraceSummary;
+export interface LayerStats {
+  kind: 'mesh' | 'points';
+  vertices?: number;
+  triangles?: number;
+  features?: number;
+  points?: number;
 }
 
-export interface ArtifactRef {
-  path: string;
-  format: string;
-  trace_schema: string;
-  bytes: number;
+export interface BundleLayer {
+  name: string;
+  file: string;
+  stats: LayerStats;
+  provenance: LayerProvenance;
 }
 
-export interface GateVerdict {
-  lane: string;
-  pure_python: boolean;
-  wheels: string[];
-  trace_bytes: number;
-  run_ms_budget: number;
-  trace_bytes_budget: number;
-  reasons: string[];
+export interface AoiInfo {
+  name: string;
+  bbox_wgs84: [number, number, number, number];
+  origin_wgs84: [number, number];
+  crs_local: string;
+  size_m: [number, number];
 }
 
-export interface CaseManifest {
-  schema: string; // "example.manifest/v2"
-  case_id: string;
+export interface HeightMix {
+  measured: number;
+  floors: number;
+  raster: number;
+  prior: number;
+}
+
+export interface BundleManifest {
+  schema_version: number;
+  aoi: AoiInfo;
+  layers: BundleLayer[];
+  stats: {
+    layers: string[];
+    height_mix: HeightMix;
+    budgets: Record<string, LayerStats>;
+    notes: string[];
+  };
+  any_noncommercial: boolean;
+  credits: string[];
+}
+
+// data/derived/index.json
+export interface PlaceIndexEntry {
+  slug: string;
+  name: string;
+  tier: 'A' | 'B' | 'C';
   category: string;
-  real_or_synthetic: string;
-  expected_band: string;
-  engine: { package: string; version: string; model: string };
-  params: Record<string, number>;
-  seed: number;
-  artifact: ArtifactRef;
-  lane: 'live' | 'precompute';
-  gate: GateVerdict;
-  flags: Array<Record<string, string>>;
-  metrics: Record<string, number>;
-}
-
-export interface CaseIndexEntry {
-  case_id: string;
-  category: string;
+  country: string;
+  n_layers: number;
+  total_bytes: number;
   manifest_path: string;
 }
 
-export interface CaseIndex {
-  schema: string; // "example.index/v1"
-  engine_version: string;
-  n_cases: number;
-  cases: CaseIndexEntry[];
+export interface PlaceIndex {
+  schema_version: number;
+  n_places: number;
+  tiers: Record<string, string[]>;
+  places: PlaceIndexEntry[];
+}
+
+// data/derived/benchmark.json
+export interface BenchmarkPlace {
+  slug: string;
+  name: string;
+  tier: string;
+  country: string;
+  n_layers: number;
+  total_triangles: number;
+  total_mb: number;
+  height_mix: HeightMix;
+  height_fraction: HeightMix;
+  measured_pct: number;
+  any_noncommercial: boolean;
+}
+
+export interface Benchmark {
+  schema_version: number;
+  n_places: number;
+  global_height_mix: HeightMix;
+  global_height_fraction: HeightMix;
+  tier_totals_mb: Record<string, number>;
+  tier_counts: Record<string, number>;
+  total_mb: number;
+  per_place: BenchmarkPlace[];
+}
+
+// Per-feature attributes carried in each building glTF node's `extras`.
+export interface BuildingFeature {
+  id: number;
+  height_m: number;
+  height_source: 'measured' | 'floors' | 'raster' | 'prior';
+  class: number | null;
 }
