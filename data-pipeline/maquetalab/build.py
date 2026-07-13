@@ -66,6 +66,7 @@ def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict
         "total_triangles": int(total_tris),
         "total_bytes": int(total_bytes),
         "height_mix": man["stats"].get("height_mix", {}),
+        "ground_truth": man["stats"].get("ground_truth"),
         "any_noncommercial": man["any_noncommercial"],
         "credits": man["credits"],
         "notes": man["stats"].get("notes", []),

@@ -78,6 +78,17 @@ export interface PlaceIndex {
 }
 
 // data/derived/benchmark.json
+export interface GroundTruth {
+  n_fused: number;
+  n_truth: number;
+  matched: number;
+  coverage_pct: number;
+  height_rmse_m: number;
+  height_mae_m: number;
+  height_bias_m: number;
+  truth_source: string;
+}
+
 export interface BenchmarkPlace {
   slug: string;
   name: string;
@@ -90,6 +101,7 @@ export interface BenchmarkPlace {
   height_fraction: HeightMix;
   measured_pct: number;
   any_noncommercial: boolean;
+  ground_truth?: GroundTruth | null;
 }
 
 export interface Benchmark {

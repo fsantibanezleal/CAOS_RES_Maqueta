@@ -102,11 +102,44 @@ export default function Benchmark() {
           <h3>{t('Ground-truth comparison (tier A)', 'Comparación con verdad de terreno (tier A)')}</h3>
           <p>
             {t(
-              'For places with an open LoD2/lidar model (3D BAG, PLATEAU, USGS 3DEP), the baked benchmark also carries the fused-vs-authoritative height RMSE and footprint IoU. These land as the tier-A ground-truth layer is wired per place.',
-              'Para lugares con un modelo LoD2/lidar abierto (3D BAG, PLATEAU, USGS 3DEP), el benchmark horneado lleva además el RMSE de altura y el IoU de huella de la fusión vs lo autoritativo. Se completan a medida que se conecta la capa de verdad de terreno por lugar.',
+              'For places with an open LoD2 model (currently 3D BAG for the Netherlands), the baked benchmark carries the fused-vs-authoritative height error: RMSE, MAE, bias and match coverage. This is the honest test of the fusion.',
+              'Para lugares con un modelo LoD2 abierto (actualmente 3D BAG para Países Bajos), el benchmark horneado lleva el error de altura fusión-vs-autoritativo: RMSE, MAE, sesgo y cobertura de emparejamiento. Es la prueba honesta de la fusión.',
             )}{' '}
             <Cite id="3dbag" /> <Cite id="usgs3dep" />
           </p>
+          {(() => {
+            const gt = bench.per_place.filter((p) => p.ground_truth);
+            return gt.length ? (
+              <div className="mq-tablewrap">
+                <table className="mq-table">
+                  <thead>
+                    <tr>
+                      <th>{t('Place', 'Lugar')}</th>
+                      <th>{t('Ground truth', 'Verdad de terreno')}</th>
+                      <th>{t('Height RMSE', 'RMSE altura')}</th>
+                      <th>MAE</th>
+                      <th>{t('Bias', 'Sesgo')}</th>
+                      <th>{t('Matched', 'Emparejados')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gt.map((p) => (
+                      <tr key={p.slug}>
+                        <td>{p.name}</td>
+                        <td className="mq-muted">{p.ground_truth!.truth_source}</td>
+                        <td><b>{p.ground_truth!.height_rmse_m} m</b></td>
+                        <td>{p.ground_truth!.height_mae_m} m</td>
+                        <td>{p.ground_truth!.height_bias_m > 0 ? '+' : ''}{p.ground_truth!.height_bias_m} m</td>
+                        <td>{p.ground_truth!.matched.toLocaleString()} / {p.ground_truth!.n_fused.toLocaleString()} ({p.ground_truth!.coverage_pct}%)</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="mq-muted">{t('(Ground-truth rows appear once the Netherlands tier-A places are baked with the 3D BAG comparison.)', '(Las filas de verdad de terreno aparecen cuando los lugares tier-A de Países Bajos se hornean con la comparación 3D BAG.)')}</p>
+            );
+          })()}
 
           <Refs ids={['overture', 'openbuildings25d', '3dbag', 'usgs3dep', 'demcompare']} label={t('References', 'Referencias')} />
         </>

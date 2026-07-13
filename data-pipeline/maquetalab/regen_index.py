@@ -38,6 +38,7 @@ def _summary_from_manifest(slug: str, manifest: dict) -> dict:
         "total_triangles": int(total_tris),
         "total_bytes": int(total_bytes),
         "height_mix": manifest.get("stats", {}).get("height_mix", {}),
+        "ground_truth": manifest.get("stats", {}).get("ground_truth"),
         "any_noncommercial": manifest.get("any_noncommercial", False),
         "credits": manifest.get("credits", []),
         "notes": manifest.get("stats", {}).get("notes", []),

@@ -38,6 +38,7 @@ def build_benchmark(summaries: list[dict]) -> dict:
                 "height_fraction": _mix_fraction(mix),
                 "measured_pct": round(100 * mix["measured"] / (sum(mix.values()) or 1), 1),
                 "any_noncommercial": s["any_noncommercial"],
+                "ground_truth": s.get("ground_truth"),
             }
         )
     return {
