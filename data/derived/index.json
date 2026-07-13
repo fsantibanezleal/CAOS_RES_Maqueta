@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "n_places": 1,
+  "n_places": 41,
   "tiers": {
     "A": [
       "berlin_mitte",
@@ -16,6 +16,7 @@
     ],
     "B": [
       "santiago_centro",
+      "santiago_full",
       "valparaiso",
       "concepcion",
       "london_city",
@@ -49,16 +50,911 @@
       "halong_bay"
     ]
   },
+  "hierarchy": [
+    {
+      "continent": "South America",
+      "countries": [
+        {
+          "country": "Argentina",
+          "cities": [
+            {
+              "city": "Buenos Aires",
+              "slugs": [
+                "buenos_aires_center"
+              ]
+            },
+            {
+              "city": "Iguazu",
+              "slugs": [
+                "iguazu"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Brazil",
+          "cities": [
+            {
+              "city": "Sao Paulo",
+              "slugs": [
+                "sao_paulo_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Chile",
+          "cities": [
+            {
+              "city": "Atacama",
+              "slugs": [
+                "valle_luna"
+              ]
+            },
+            {
+              "city": "Chuquicamata",
+              "slugs": [
+                "chuquicamata"
+              ]
+            },
+            {
+              "city": "Concepcion",
+              "slugs": [
+                "concepcion"
+              ]
+            },
+            {
+              "city": "Santiago",
+              "slugs": [
+                "santiago_centro",
+                "santiago_full"
+              ]
+            },
+            {
+              "city": "Torres del Paine",
+              "slugs": [
+                "torres_paine"
+              ]
+            },
+            {
+              "city": "Valparaiso",
+              "slugs": [
+                "valparaiso"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Colombia",
+          "cities": [
+            {
+              "city": "Bogota",
+              "slugs": [
+                "bogota_center"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "North America",
+      "countries": [
+        {
+          "country": "Canada",
+          "cities": [
+            {
+              "city": "Toronto",
+              "slugs": [
+                "toronto_downtown"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Mexico",
+          "cities": [
+            {
+              "city": "Mexico City",
+              "slugs": [
+                "mexico_city_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "USA",
+          "cities": [
+            {
+              "city": "Grand Canyon",
+              "slugs": [
+                "grand_canyon"
+              ]
+            },
+            {
+              "city": "New York",
+              "slugs": [
+                "manhattan_midtown"
+              ]
+            },
+            {
+              "city": "San Francisco",
+              "slugs": [
+                "san_francisco_downtown"
+              ]
+            },
+            {
+              "city": "Seattle",
+              "slugs": [
+                "seattle_downtown"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Europe",
+      "countries": [
+        {
+          "country": "Austria",
+          "cities": [
+            {
+              "city": "Vienna",
+              "slugs": [
+                "vienna_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Finland",
+          "cities": [
+            {
+              "city": "Helsinki",
+              "slugs": [
+                "helsinki_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "France",
+          "cities": [
+            {
+              "city": "Mont Blanc",
+              "slugs": [
+                "mont_blanc"
+              ]
+            },
+            {
+              "city": "Paris",
+              "slugs": [
+                "paris_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Germany",
+          "cities": [
+            {
+              "city": "Berlin",
+              "slugs": [
+                "berlin_mitte"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Italy",
+          "cities": [
+            {
+              "city": "Rome",
+              "slugs": [
+                "rome_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Netherlands",
+          "cities": [
+            {
+              "city": "Amsterdam",
+              "slugs": [
+                "amsterdam_center"
+              ]
+            },
+            {
+              "city": "Delft",
+              "slugs": [
+                "delft"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Portugal",
+          "cities": [
+            {
+              "city": "Lisbon",
+              "slugs": [
+                "lisbon_baixa"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Russia",
+          "cities": [
+            {
+              "city": "Moscow",
+              "slugs": [
+                "moscow_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Spain",
+          "cities": [
+            {
+              "city": "Barcelona",
+              "slugs": [
+                "barcelona_eixample"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Switzerland",
+          "cities": [
+            {
+              "city": "Zurich",
+              "slugs": [
+                "zurich_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Turkey",
+          "cities": [
+            {
+              "city": "Istanbul",
+              "slugs": [
+                "istanbul_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "UK",
+          "cities": [
+            {
+              "city": "London",
+              "slugs": [
+                "london_city"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Africa",
+      "countries": [
+        {
+          "country": "Egypt",
+          "cities": [
+            {
+              "city": "Cairo",
+              "slugs": [
+                "cairo_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Kenya",
+          "cities": [
+            {
+              "city": "Nairobi",
+              "slugs": [
+                "nairobi_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "South Africa",
+          "cities": [
+            {
+              "city": "Cape Town",
+              "slugs": [
+                "cape_town_center"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Asia",
+      "countries": [
+        {
+          "country": "India",
+          "cities": [
+            {
+              "city": "Mumbai",
+              "slugs": [
+                "mumbai_fort"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Japan",
+          "cities": [
+            {
+              "city": "Tokyo",
+              "slugs": [
+                "tokyo_shinjuku"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Singapore",
+          "cities": [
+            {
+              "city": "Singapore",
+              "slugs": [
+                "singapore_downtown"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "South Korea",
+          "cities": [
+            {
+              "city": "Seoul",
+              "slugs": [
+                "seoul_jongno"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Vietnam",
+          "cities": [
+            {
+              "city": "Ha Long",
+              "slugs": [
+                "halong_bay"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Oceania",
+      "countries": [
+        {
+          "country": "Australia",
+          "cities": [
+            {
+              "city": "Sydney",
+              "slugs": [
+                "sydney_cbd"
+              ]
+            },
+            {
+              "city": "Uluru",
+              "slugs": [
+                "uluru"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "places": [
+    {
+      "slug": "amsterdam_center",
+      "name": "Amsterdam Centrum",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Netherlands",
+      "city": "Amsterdam",
+      "n_layers": 7,
+      "total_bytes": 5997784,
+      "manifest_path": "amsterdam_center/manifest.json"
+    },
+    {
+      "slug": "barcelona_eixample",
+      "name": "Barcelona Eixample",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Spain",
+      "city": "Barcelona",
+      "n_layers": 4,
+      "total_bytes": 4591256,
+      "manifest_path": "barcelona_eixample/manifest.json"
+    },
     {
       "slug": "berlin_mitte",
       "name": "Berlin Mitte",
       "tier": "A",
       "category": "ground-truth",
+      "continent": "Europe",
       "country": "Germany",
-      "n_layers": 2,
-      "total_bytes": 3528924,
+      "city": "Berlin",
+      "n_layers": 7,
+      "total_bytes": 1923460,
       "manifest_path": "berlin_mitte/manifest.json"
+    },
+    {
+      "slug": "bogota_center",
+      "name": "Bogota Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Colombia",
+      "city": "Bogota",
+      "n_layers": 4,
+      "total_bytes": 6809176,
+      "manifest_path": "bogota_center/manifest.json"
+    },
+    {
+      "slug": "buenos_aires_center",
+      "name": "Buenos Aires Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Argentina",
+      "city": "Buenos Aires",
+      "n_layers": 4,
+      "total_bytes": 3146688,
+      "manifest_path": "buenos_aires_center/manifest.json"
+    },
+    {
+      "slug": "cairo_center",
+      "name": "Cairo Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Africa",
+      "country": "Egypt",
+      "city": "Cairo",
+      "n_layers": 4,
+      "total_bytes": 2654272,
+      "manifest_path": "cairo_center/manifest.json"
+    },
+    {
+      "slug": "cape_town_center",
+      "name": "Cape Town CBD",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Africa",
+      "country": "South Africa",
+      "city": "Cape Town",
+      "n_layers": 4,
+      "total_bytes": 2014680,
+      "manifest_path": "cape_town_center/manifest.json"
+    },
+    {
+      "slug": "chuquicamata",
+      "name": "Chuquicamata Mine",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Chuquicamata",
+      "n_layers": 2,
+      "total_bytes": 103164,
+      "manifest_path": "chuquicamata/manifest.json"
+    },
+    {
+      "slug": "concepcion",
+      "name": "Concepcion",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Concepcion",
+      "n_layers": 4,
+      "total_bytes": 2985116,
+      "manifest_path": "concepcion/manifest.json"
+    },
+    {
+      "slug": "delft",
+      "name": "Delft",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Netherlands",
+      "city": "Delft",
+      "n_layers": 7,
+      "total_bytes": 5807852,
+      "manifest_path": "delft/manifest.json"
+    },
+    {
+      "slug": "grand_canyon",
+      "name": "Grand Canyon (South Rim)",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Grand Canyon",
+      "n_layers": 2,
+      "total_bytes": 91468,
+      "manifest_path": "grand_canyon/manifest.json"
+    },
+    {
+      "slug": "halong_bay",
+      "name": "Ha Long Bay",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Asia",
+      "country": "Vietnam",
+      "city": "Ha Long",
+      "n_layers": 2,
+      "total_bytes": 10872,
+      "manifest_path": "halong_bay/manifest.json"
+    },
+    {
+      "slug": "helsinki_center",
+      "name": "Helsinki Centre",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Finland",
+      "city": "Helsinki",
+      "n_layers": 7,
+      "total_bytes": 1827300,
+      "manifest_path": "helsinki_center/manifest.json"
+    },
+    {
+      "slug": "iguazu",
+      "name": "Iguazu Falls",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Argentina",
+      "city": "Iguazu",
+      "n_layers": 2,
+      "total_bytes": 43232,
+      "manifest_path": "iguazu/manifest.json"
+    },
+    {
+      "slug": "istanbul_center",
+      "name": "Istanbul Fatih",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Turkey",
+      "city": "Istanbul",
+      "n_layers": 4,
+      "total_bytes": 3230628,
+      "manifest_path": "istanbul_center/manifest.json"
+    },
+    {
+      "slug": "lisbon_baixa",
+      "name": "Lisbon Baixa",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Portugal",
+      "city": "Lisbon",
+      "n_layers": 4,
+      "total_bytes": 2597120,
+      "manifest_path": "lisbon_baixa/manifest.json"
+    },
+    {
+      "slug": "london_city",
+      "name": "London City",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "UK",
+      "city": "London",
+      "n_layers": 4,
+      "total_bytes": 3254956,
+      "manifest_path": "london_city/manifest.json"
+    },
+    {
+      "slug": "manhattan_midtown",
+      "name": "Manhattan Midtown",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "North America",
+      "country": "USA",
+      "city": "New York",
+      "n_layers": 7,
+      "total_bytes": 2669028,
+      "manifest_path": "manhattan_midtown/manifest.json"
+    },
+    {
+      "slug": "mexico_city_center",
+      "name": "Mexico City Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "Mexico",
+      "city": "Mexico City",
+      "n_layers": 4,
+      "total_bytes": 2993816,
+      "manifest_path": "mexico_city_center/manifest.json"
+    },
+    {
+      "slug": "mont_blanc",
+      "name": "Mont Blanc",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Europe",
+      "country": "France",
+      "city": "Mont Blanc",
+      "n_layers": 1,
+      "total_bytes": 64584,
+      "manifest_path": "mont_blanc/manifest.json"
+    },
+    {
+      "slug": "moscow_center",
+      "name": "Moscow Center",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Russia",
+      "city": "Moscow",
+      "n_layers": 4,
+      "total_bytes": 2150864,
+      "manifest_path": "moscow_center/manifest.json"
+    },
+    {
+      "slug": "mumbai_fort",
+      "name": "Mumbai Fort",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "India",
+      "city": "Mumbai",
+      "n_layers": 4,
+      "total_bytes": 935900,
+      "manifest_path": "mumbai_fort/manifest.json"
+    },
+    {
+      "slug": "nairobi_center",
+      "name": "Nairobi CBD",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Africa",
+      "country": "Kenya",
+      "city": "Nairobi",
+      "n_layers": 4,
+      "total_bytes": 1804460,
+      "manifest_path": "nairobi_center/manifest.json"
+    },
+    {
+      "slug": "paris_center",
+      "name": "Paris Centre",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "France",
+      "city": "Paris",
+      "n_layers": 4,
+      "total_bytes": 4739088,
+      "manifest_path": "paris_center/manifest.json"
+    },
+    {
+      "slug": "rome_center",
+      "name": "Rome Centro Storico",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Italy",
+      "city": "Rome",
+      "n_layers": 4,
+      "total_bytes": 3079108,
+      "manifest_path": "rome_center/manifest.json"
+    },
+    {
+      "slug": "san_francisco_downtown",
+      "name": "San Francisco Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "USA",
+      "city": "San Francisco",
+      "n_layers": 4,
+      "total_bytes": 2295332,
+      "manifest_path": "san_francisco_downtown/manifest.json"
+    },
+    {
+      "slug": "santiago_centro",
+      "name": "Santiago Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 3526552,
+      "manifest_path": "santiago_centro/manifest.json"
+    },
+    {
+      "slug": "santiago_full",
+      "name": "Santiago (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 57267276,
+      "manifest_path": "santiago_full/manifest.json"
+    },
+    {
+      "slug": "sao_paulo_center",
+      "name": "Sao Paulo Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Brazil",
+      "city": "Sao Paulo",
+      "n_layers": 4,
+      "total_bytes": 5407092,
+      "manifest_path": "sao_paulo_center/manifest.json"
+    },
+    {
+      "slug": "seattle_downtown",
+      "name": "Seattle Downtown",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Seattle",
+      "n_layers": 4,
+      "total_bytes": 1329056,
+      "manifest_path": "seattle_downtown/manifest.json"
+    },
+    {
+      "slug": "seoul_jongno",
+      "name": "Seoul Jongno",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "South Korea",
+      "city": "Seoul",
+      "n_layers": 4,
+      "total_bytes": 2565732,
+      "manifest_path": "seoul_jongno/manifest.json"
+    },
+    {
+      "slug": "singapore_downtown",
+      "name": "Singapore Downtown",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Asia",
+      "country": "Singapore",
+      "city": "Singapore",
+      "n_layers": 4,
+      "total_bytes": 1387524,
+      "manifest_path": "singapore_downtown/manifest.json"
+    },
+    {
+      "slug": "sydney_cbd",
+      "name": "Sydney CBD",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Oceania",
+      "country": "Australia",
+      "city": "Sydney",
+      "n_layers": 4,
+      "total_bytes": 1603740,
+      "manifest_path": "sydney_cbd/manifest.json"
+    },
+    {
+      "slug": "tokyo_shinjuku",
+      "name": "Tokyo Shinjuku",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Asia",
+      "country": "Japan",
+      "city": "Tokyo",
+      "n_layers": 4,
+      "total_bytes": 4342120,
+      "manifest_path": "tokyo_shinjuku/manifest.json"
+    },
+    {
+      "slug": "toronto_downtown",
+      "name": "Toronto Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "Canada",
+      "city": "Toronto",
+      "n_layers": 4,
+      "total_bytes": 1389780,
+      "manifest_path": "toronto_downtown/manifest.json"
+    },
+    {
+      "slug": "torres_paine",
+      "name": "Torres del Paine",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Torres del Paine",
+      "n_layers": 1,
+      "total_bytes": 64216,
+      "manifest_path": "torres_paine/manifest.json"
+    },
+    {
+      "slug": "uluru",
+      "name": "Uluru",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Oceania",
+      "country": "Australia",
+      "city": "Uluru",
+      "n_layers": 2,
+      "total_bytes": 22936,
+      "manifest_path": "uluru/manifest.json"
+    },
+    {
+      "slug": "valle_luna",
+      "name": "Valle de la Luna (Atacama)",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Atacama",
+      "n_layers": 2,
+      "total_bytes": 64000,
+      "manifest_path": "valle_luna/manifest.json"
+    },
+    {
+      "slug": "valparaiso",
+      "name": "Valparaiso",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Valparaiso",
+      "n_layers": 4,
+      "total_bytes": 3557972,
+      "manifest_path": "valparaiso/manifest.json"
+    },
+    {
+      "slug": "vienna_center",
+      "name": "Vienna Innere Stadt",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Austria",
+      "city": "Vienna",
+      "n_layers": 7,
+      "total_bytes": 2728012,
+      "manifest_path": "vienna_center/manifest.json"
+    },
+    {
+      "slug": "zurich_center",
+      "name": "Zurich Altstadt",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Switzerland",
+      "city": "Zurich",
+      "n_layers": 7,
+      "total_bytes": 2416708,
+      "manifest_path": "zurich_center/manifest.json"
     }
   ]
 }

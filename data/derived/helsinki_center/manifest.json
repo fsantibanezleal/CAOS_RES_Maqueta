@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "aoi": {
+    "name": "Helsinki Centre",
+    "bbox_wgs84": [
+      24.91932913348641,
+      60.15912026590011,
+      24.962670866513587,
+      60.18067973409989
+    ],
+    "origin_wgs84": [
+      24.941,
+      60.1699
+    ],
+    "crs_local": "+proj=aeqd +lat_0=60.1699 +lon_0=24.941 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    "size_m": [
+      2399.9999999998818,
+      2399.9999999998245
+    ]
+  },
+  "layers": [
+    {
+      "name": "terrain",
+      "file": "terrain.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 4979,
+        "triangles": 9788,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Copernicus GLO-30 DSM",
+        "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
+        "license": "Copernicus-free",
+        "fetched": "2026-07-12",
+        "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
+        "extra": {
+          "tiles": [
+            "Copernicus_DSM_COG_10_N60_00_E024_00_DEM"
+          ],
+          "grid": [
+            85,
+            172
+          ]
+        },
+        "license_name": "Copernicus DEM free-of-charge license (ESA/DLR)",
+        "license_url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "buildings",
+      "file": "buildings.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 69518,
+        "triangles": 99627,
+        "features": 2324
+      },
+      "provenance": {
+        "source": "Overture Maps buildings",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-12",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_buildings": 2324
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "roads",
+      "file": "roads.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 178331,
+        "triangles": 156551,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Overture Maps transportation",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=transportation/type=segment",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-12",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_segments": 10877
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "water",
+      "file": "water.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 264,
+        "triangles": 218,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (water)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-12",
+        "method": "OSMnx features_from_bbox with tags {'natural': ['water'], 'water': True, 'waterway': ['riverbank', 'dock']}",
+        "extra": {
+          "n_features": 23
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "green",
+      "file": "green.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 18115,
+        "triangles": 15531,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (green)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-12",
+        "method": "OSMnx features_from_bbox with tags {'leisure': ['park', 'garden', 'pitch'], 'landuse': ['grass', 'forest', 'meadow'], 'natural': ['wood', 'scrub']}",
+        "extra": {
+          "n_features": 1286
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "rail",
+      "file": "rail.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 14305,
+        "triangles": 12561,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (rail)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-12",
+        "method": "OSMnx features_from_bbox with tags {'railway': ['rail', 'light_rail', 'subway', 'tram']}",
+        "extra": {
+          "n_features": 872
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "population",
+      "file": "population.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 9144,
+        "triangles": 11430,
+        "features": 0
+      },
+      "provenance": {
+        "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
+        "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
+        "license": "CC-BY-4.0",
+        "fetched": "2026-07-12",
+        "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
+        "extra": {
+          "grid": [
+            24,
+            48
+          ]
+        },
+        "license_name": "Creative Commons Attribution 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "commercial_ok": true
+      }
+    }
+  ],
+  "stats": {
+    "layers": [
+      "terrain",
+      "buildings",
+      "roads",
+      "water",
+      "green",
+      "rail",
+      "population"
+    ],
+    "height_mix": {
+      "measured": 301,
+      "floors": 1226,
+      "raster": 0,
+      "prior": 797
+    },
+    "budgets": {
+      "terrain": {
+        "kind": "mesh",
+        "vertices": 4979,
+        "triangles": 9788,
+        "features": 0
+      },
+      "buildings": {
+        "kind": "mesh",
+        "vertices": 69518,
+        "triangles": 99627,
+        "features": 2324
+      },
+      "roads": {
+        "kind": "mesh",
+        "vertices": 178331,
+        "triangles": 156551,
+        "features": 0
+      },
+      "water": {
+        "kind": "mesh",
+        "vertices": 264,
+        "triangles": 218,
+        "features": 0
+      },
+      "green": {
+        "kind": "mesh",
+        "vertices": 18115,
+        "triangles": 15531,
+        "features": 0
+      },
+      "rail": {
+        "kind": "mesh",
+        "vertices": 14305,
+        "triangles": 12561,
+        "features": 0
+      },
+      "population": {
+        "kind": "mesh",
+        "vertices": 9144,
+        "triangles": 11430,
+        "features": 0
+      }
+    },
+    "ground_truth": null,
+    "notes": [
+      "population total ~6273077"
+    ]
+  },
+  "any_noncommercial": false,
+  "credits": [
+    "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
+    "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
+    "OpenStreetMap (green) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (rail) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (water) (Open Data Commons Open Database License v1.0)",
+    "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
+    "Overture Maps transportation (Open Data Commons Open Database License v1.0)"
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "aoi": {
+    "name": "Mont Blanc",
+    "bbox_wgs84": [
+      6.819875066482358,
+      45.80155910887531,
+      6.9101249335176425,
+      45.86444089112469
+    ],
+    "origin_wgs84": [
+      6.865,
+      45.833
+    ],
+    "crs_local": "+proj=aeqd +lat_0=45.833 +lon_0=6.865 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    "size_m": [
+      7000.000000000008,
+      7000.000000000674
+    ]
+  },
+  "layers": [
+    {
+      "name": "terrain",
+      "file": "terrain.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 9000,
+        "triangles": 17737,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Copernicus GLO-30 DSM",
+        "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
+        "license": "Copernicus-free",
+        "fetched": "2026-07-12",
+        "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
+        "extra": {
+          "tiles": [
+            "Copernicus_DSM_COG_10_N45_00_E006_00_DEM"
+          ],
+          "grid": [
+            249,
+            357
+          ]
+        },
+        "license_name": "Copernicus DEM free-of-charge license (ESA/DLR)",
+        "license_url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+        "commercial_ok": true
+      }
+    }
+  ],
+  "stats": {
+    "layers": [
+      "terrain"
+    ],
+    "height_mix": {},
+    "budgets": {
+      "terrain": {
+        "kind": "mesh",
+        "vertices": 9000,
+        "triangles": 17737,
+        "features": 0
+      }
+    },
+    "ground_truth": null,
+    "notes": [
+      "no population in AOI"
+    ]
+  },
+  "any_noncommercial": false,
+  "credits": [
+    "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))"
+  ]
+}
