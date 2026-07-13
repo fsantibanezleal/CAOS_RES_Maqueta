@@ -1,12 +1,15 @@
 // The App: a real multi-modal fusion workbench. A place selector (grouped by continent) drives the 3D scene
 // + full control panel (in Viewer); below, deep tabbed context per place (Scene / Sources / Provenance /
 // How to use) with the honest fusion story. Not a card grid, not placeholder text.
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { SubTabs, useShellLang } from '@fasl-work/caos-app-shell';
 import { Viewer } from '../render/Viewer';
 import { loadIndex, loadManifest } from '../lib/data';
 import type { BundleManifest, PlaceIndex } from '../lib/contract.types';
 import { PROVENANCE, rgbCss } from '../lib/labels';
+
+const CONTINENT_ORDER = ['South America', 'North America', 'Europe', 'Africa', 'Asia', 'Oceania'];
+type PlaceEntry = PlaceIndex['places'][number];
 
 
 export default function AppPage() {
@@ -36,17 +39,6 @@ export default function AppPage() {
     loadManifest(slug).then(setData).catch((e) => setErr(String(e)));
   }, [slug]);
 
-  // Group places by continent (hierarchy), country then city inside; the option label carries
-  // country + city so the full continent > country > city hierarchy reads in a native select.
-  const CONTINENT_ORDER = ['South America', 'North America', 'Europe', 'Africa', 'Asia', 'Oceania'];
-  const byContinent = useMemo(() => {
-    const o: Record<string, PlaceIndex['places']> = {};
-    index?.places.forEach((p) => (o[p.continent || 'Other'] ??= []).push(p));
-    Object.values(o).forEach((ps) =>
-      ps.sort((a, b) => a.country.localeCompare(b.country) || a.city.localeCompare(b.city)),
-    );
-    return o;
-  }, [index]);
   const current = index?.places.find((p) => p.slug === slug);
 
   if (err)
@@ -59,21 +51,10 @@ export default function AppPage() {
   return (
     <div className="mq-page mq-app">
       <div className="mq-app-head">
-        <label className="mq-select-place">
+        <div className="mq-select-place">
           {t('Place', 'Lugar')}
-          <select value={slug} onChange={(e) => setSlug(e.target.value)}>
-            {CONTINENT_ORDER.filter((c) => byContinent[c]).map((cont) => (
-              <optgroup key={cont} label={cont}>
-                {byContinent[cont].map((p) => (
-                  <option key={p.slug} value={p.slug}>
-                    {p.country} · {p.city}
-                    {p.city !== p.name ? ` (${p.name})` : ''}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-        </label>
+          {index && <PlacePicker places={index.places} slug={slug} onSelect={setSlug} lang={lang} />}
+        </div>
         {current && index && (
           <span className="mq-app-meta">
             {index.n_places}/{index.places.length ? index.tiers.A.length + index.tiers.B.length + index.tiers.C.length : 40} {t('places baked', 'lugares horneados')} · {current.category} · {current.n_layers} {t('layers', 'capas')} · {(current.total_bytes / 1e6).toFixed(1)} MB
@@ -88,6 +69,79 @@ export default function AppPage() {
         </>
       ) : (
         <div className="mq-canvas mq-canvas-empty">{t('Loading...', 'Cargando...')}</div>
+      )}
+    </div>
+  );
+}
+
+// A searchable place picker that scales to 100+ places: type to filter by city / country / landmark name,
+// results grouped by continent then country. Replaces the native <select>, which is unusable at this size.
+function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; slug: string; onSelect: (s: string) => void; lang: 'en' | 'es' }) {
+  const t = (en: string, es: string) => (lang === 'es' ? es : en);
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const current = places.find((p) => p.slug === slug);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    const id = setTimeout(() => inputRef.current?.focus(), 0);
+    return () => { document.removeEventListener('mousedown', onDoc); document.removeEventListener('keydown', onKey); clearTimeout(id); };
+  }, [open]);
+
+  const ql = q.trim().toLowerCase();
+  const filtered = useMemo(
+    () => places.filter((p) => !ql || `${p.name} ${p.city} ${p.country} ${p.continent}`.toLowerCase().includes(ql)),
+    [places, ql],
+  );
+  const grouped = useMemo(() => {
+    const o: Record<string, PlaceEntry[]> = {};
+    filtered.forEach((p) => (o[p.continent || 'Other'] ??= []).push(p));
+    Object.values(o).forEach((ps) => ps.sort((a, b) => a.country.localeCompare(b.country) || a.city.localeCompare(b.city)));
+    return o;
+  }, [filtered]);
+  const conts = [
+    ...CONTINENT_ORDER.filter((c) => grouped[c]),
+    ...Object.keys(grouped).filter((c) => !CONTINENT_ORDER.includes(c)).sort(),
+  ];
+  const pick = (s: string) => { onSelect(s); setOpen(false); setQ(''); };
+
+  return (
+    <div className="mq-picker" ref={ref}>
+      <button className="mq-picker-btn" onClick={() => setOpen((o) => !o)} title={t('Change place', 'Cambiar lugar')}>
+        <span className="mq-picker-cur">{current ? `${current.country} · ${current.city}` : t('Select a place', 'Elige un lugar')}</span>
+        <span className="mq-picker-chev">{open ? '▲' : '▼'}</span>
+      </button>
+      {open && (
+        <div className="mq-picker-pop">
+          <input
+            ref={inputRef}
+            className="mq-picker-search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && filtered[0]) pick(filtered[0].slug); }}
+            placeholder={t(`Search ${places.length} places (city, country, landmark)`, `Buscar ${places.length} lugares (ciudad, pais, hito)`)}
+          />
+          <div className="mq-picker-list">
+            {conts.length === 0 && <p className="mq-picker-empty">{t('No match', 'Sin coincidencias')}</p>}
+            {conts.map((cont) => (
+              <div key={cont} className="mq-picker-group">
+                <div className="mq-picker-cont">{cont}</div>
+                {grouped[cont].map((p) => (
+                  <button key={p.slug} className={`mq-picker-item ${p.slug === slug ? 'on' : ''}`} onClick={() => pick(p.slug)}>
+                    <b>{p.city}</b>
+                    <span className="mq-muted">{p.country}{p.name !== p.city ? ` · ${p.name}` : ''}</span>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
