@@ -122,6 +122,8 @@ export class MaquetaScene {
   private vShade: Float32Array = new Float32Array(0); // per-vertex baked shade (base darker -> roof lighter)
   private centById = new Map<number, { x: number; z: number }>(); // world-space footprint centroid per building
   private areaGroup: THREE.Group | null = null; // the drawn area-of-interest polygon overlay
+  private groundY = 0; // mean scene elevation (m): meshes sit at absolute altitude, so high places (Atacama,
+  // Chuquicamata at ~2500 m) would otherwise float above the frame. Camera, ground-pick + area tool use this.
   private numRanges = new Map<string, [number, number]>(); // per numeric attr [min,max]
   private catValuesByKey = new Map<string, string[]>(); // per categorical attr distinct values
   private coverageByKey = new Map<string, number>(); // per attr: fraction of buildings carrying a value
@@ -669,7 +671,9 @@ export class MaquetaScene {
     );
     this.raycaster.setFromCamera(ndc, this.camera);
     const hit = new THREE.Vector3();
-    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    // Intersect the ground plane at the scene's actual elevation, not y=0 (else high-altitude scenes pick
+    // the wrong x,z through parallax).
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -this.groundY);
     return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
   }
 
@@ -682,7 +686,8 @@ export class MaquetaScene {
     const g = new THREE.Group();
     g.name = 'area';
     const accent = this.dark ? 0x6cc8ff : 0x1f6feb;
-    const pts3 = points.map((p) => new THREE.Vector3(p.x, 2, p.z));
+    const gy = this.groundY;
+    const pts3 = points.map((p) => new THREE.Vector3(p.x, gy + 2, p.z));
     if (closed && points.length >= 3) pts3.push(pts3[0].clone());
     const line = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(pts3),
@@ -695,7 +700,7 @@ export class MaquetaScene {
     const dotMat = new THREE.MeshBasicMaterial({ color: accent, depthTest: false });
     for (const p of points) {
       const d = new THREE.Mesh(dotGeo, dotMat);
-      d.position.set(p.x, 2, p.z);
+      d.position.set(p.x, gy + 2, p.z);
       d.renderOrder = 999;
       g.add(d);
     }
@@ -704,7 +709,7 @@ export class MaquetaScene {
       const shape = new THREE.Shape(points.map((p) => new THREE.Vector2(p.x, p.z)));
       const fill = new THREE.ShapeGeometry(shape);
       const fp = fill.getAttribute('position') as THREE.BufferAttribute;
-      for (let i = 0; i < fp.count; i++) fp.setXYZ(i, fp.getX(i), 1.5, fp.getY(i)); // XY shape -> XZ ground
+      for (let i = 0; i < fp.count; i++) fp.setXYZ(i, fp.getX(i), gy + 1.5, fp.getY(i)); // XY shape -> XZ ground
       fp.needsUpdate = true;
       fill.computeVertexNormals();
       const fillMesh = new THREE.Mesh(
@@ -720,11 +725,12 @@ export class MaquetaScene {
       fillMesh.renderOrder = 996;
       g.add(fillMesh);
       const cv: number[] = [];
+      const top = gy + H;
       const N = points.length;
       for (let i = 0; i < N; i++) {
         const a = points[i];
         const b = points[(i + 1) % N];
-        cv.push(a.x, 0, a.z, b.x, 0, b.z, b.x, H, b.z, a.x, 0, a.z, b.x, H, b.z, a.x, H, a.z);
+        cv.push(a.x, gy, a.z, b.x, gy, b.z, b.x, top, b.z, a.x, gy, a.z, b.x, top, b.z, a.x, top, a.z);
       }
       const cg = new THREE.BufferGeometry();
       cg.setAttribute('position', new THREE.Float32BufferAttribute(cv, 3));
@@ -926,22 +932,82 @@ export class MaquetaScene {
         na[i + 2] = 0;
       }
     }
+    // The baked TIN winding is inverted (its top faces point down), which both flips the normals and, on an
+    // overhead camera, back-face-culls the flat surface so only the ridges show. Detect via the mean normal
+    // and flip so the hillshade is correct; the material also renders DoubleSide so the surface never culls.
+    let sumNy = 0;
+    for (let i = 1; i < na.length; i += 3) sumNy += na[i];
+    if (sumNy < 0) for (let i = 0; i < na.length; i++) na[i] = -na[i];
     nrm.needsUpdate = true;
+
+    // Bake a hillshade + gentle hypsometric tint into the terrain vertex colours, so the relief reads as a
+    // coloured topographic surface rendered WITHOUT dynamic lighting. This fixes both failure modes of the
+    // old lit-Lambert terrain: the washed-out flat grey on terrain-first places (Chuquicamata, Atacama, the
+    // landscape landmarks), and the crushed-black far slopes on the city views. Terrain-first scenes now
+    // show real relief and colour; on cities the land-cover hue survives (blended) under the buildings.
+    const col = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
+    if (col && col.count === pos.count) {
+      let loY = Infinity;
+      let hiY = -Infinity;
+      for (let i = 0; i < pos.count; i++) {
+        const y = pos.getY(i);
+        if (y < loY) loY = y;
+        if (y > hiY) hiY = y;
+      }
+      const span = hiY - loY || 1;
+      const toLight = new THREE.Vector3(-0.4, 0.82, 0.42).normalize();
+      // Earthy hypsometric ramp (valley -> slope -> ridge -> peak). All kept well BELOW the pale sky
+      // background luminance so the surface always reads as a solid coloured terrain, never washing into
+      // the sky. A snow cap only kicks in on genuinely high, near-flat tops. Stored linear.
+      const c0 = [0.26, 0.38, 0.22].map(srgbToLinear); // low: vegetated green
+      const c1 = [0.5, 0.44, 0.29].map(srgbToLinear); // mid: khaki / tan
+      const c2 = [0.52, 0.46, 0.4].map(srgbToLinear); // high: rock tan
+      const snow = [0.86, 0.88, 0.92].map(srgbToLinear);
+      const MIX = 0.68; // hypsometric dominates; the baked land-cover hue still tints cities through it
+      for (let i = 0; i < pos.count; i++) {
+        const f = (pos.getY(i) - loY) / span; // 0 valley .. 1 ridge
+        const u = f < 0.5 ? f / 0.5 : (f - 0.5) / 0.5;
+        const lo = f < 0.5 ? c0 : c1;
+        const hi = f < 0.5 ? c1 : c2;
+        const nx = na[i * 3];
+        const ny = na[i * 3 + 1];
+        const nz = na[i * 3 + 2];
+        const d = Math.max(0, nx * toLight.x + ny * toLight.y + nz * toLight.z);
+        const shade = 0.58 + 0.46 * d; // 0.58 (shadow) .. ~1.0 (flat/lit): no wash-out, real relief
+        let hr = lo[0] + (hi[0] - lo[0]) * u;
+        let hg = lo[1] + (hi[1] - lo[1]) * u;
+        let hb = lo[2] + (hi[2] - lo[2]) * u;
+        // snow on the highest, flattest tops (bright normal.y) so alpine peaks read as snow, not just rock
+        const snowAmt = f > 0.82 ? Math.min(1, (f - 0.82) / 0.18) * Math.max(0, (ny - 0.7) / 0.3) : 0;
+        if (snowAmt > 0) {
+          hr = hr + (snow[0] - hr) * snowAmt;
+          hg = hg + (snow[1] - hg) * snowAmt;
+          hb = hb + (snow[2] - hb) * snowAmt;
+        }
+        const br = col.getX(i);
+        const bg = col.getY(i);
+        const bb = col.getZ(i);
+        col.setXYZ(
+          i,
+          Math.min(1, (br * (1 - MIX) + hr * MIX) * shade),
+          Math.min(1, (bg * (1 - MIX) + hg * MIX) * shade),
+          Math.min(1, (bb * (1 - MIX) + hb * MIX) * shade),
+        );
+      }
+      col.needsUpdate = true;
+    }
     if (dropped && import.meta.env.DEV) console.debug(`terrain: dropped ${dropped} degenerate triangle(s)`);
   }
 
   private layerMaterial(name: string): THREE.Material {
     switch (name) {
       case 'terrain':
-        // A grey self-illumination floor so steep relief that faces away from the sun (the Andes north of
-        // Santiago) reads as light grey rock hazing into the sky, never a crushed-black silhouette. The
-        // floor has to be this strong because those far slopes get almost no diffuse AND sit deep in the
-        // distance fog; a weaker floor collapsed to black there.
-        return new THREE.MeshLambertMaterial({
-          vertexColors: true,
-          emissive: new THREE.Color(0x6f757e),
-          emissiveIntensity: 1.0,
-        });
+        // Relief + colour are baked into the vertex colours (hillshade + hypsometric) in prepareTerrain, so
+        // the terrain renders lighting-independent: real topographic contrast and colour on terrain-first
+        // places, no washed-out grey, and no crushed-black far slopes on the city views. Fog still hazes the
+        // far edge into the sky. DoubleSide because the baked TIN winding is inverted (else the flat surface
+        // back-face-culls on an overhead camera and only the ridges show).
+        return new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
       case 'roads':
         return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
       case 'rail':
@@ -993,6 +1059,16 @@ export class MaquetaScene {
   private frameCamera([wm, hm]: [number, number]) {
     const r = Math.max(wm, hm);
     this.sceneR = r;
+    // Meshes carry their absolute altitude, so a high place (Atacama / Chuquicamata ~2500 m, Bogota
+    // ~2600 m) sits far above y=0. Read the loaded terrain's mean elevation and frame at THAT height,
+    // else the whole scene renders above the top of the view. Falls back to 0 for a flat/sea-level place.
+    const terrain = this.layers.get('terrain');
+    if (terrain) {
+      const bb = new THREE.Box3().setFromObject(terrain);
+      this.groundY = Number.isFinite(bb.min.y) && Number.isFinite(bb.max.y) ? (bb.min.y + bb.max.y) / 2 : 0;
+    } else {
+      this.groundY = 0;
+    }
     this.applyShadowCamera();
     // Re-fit the fog to this scene's extent (the theme set it for the previous scene's size).
     const bg = this.dark ? 0x0a0e14 : 0xdfe6ef;
@@ -1000,8 +1076,8 @@ export class MaquetaScene {
     // Open on the most cinematic framing: a low oblique that fills the frame with the built fabric and
     // lets it recede to the far relief hazing into the sky (the Andes on the Santiago default). Closer and
     // lower than a plain overview so the first impression is the 3D city, not a distant plan.
-    this.controls.target.set(0, r * 0.02, 0);
-    this.camera.position.set(r * 0.52, r * 0.4, r * 0.52);
+    this.controls.target.set(0, this.groundY + r * 0.02, 0);
+    this.camera.position.set(r * 0.52, this.groundY + r * 0.4, r * 0.52);
     this.camera.far = r * 10;
     this.camera.updateProjectionMatrix();
     this.controls.update();
