@@ -3,6 +3,36 @@
 All notable changes to Maqueta. Format: [Keep a Changelog](https://keepachangelog.com/); versions use
 `X.XX.XXX` (display). `0.x` while the place set and API stabilize. Tag every release.
 
+## [0.08.000] - 2026-07-14
+
+### Added
+- **Analytical layers (multi-modal fusion, the headline).** Satellite multispectral NDVI/NDWI/NDBI per
+  building (least-cloud Sentinel-2 L2A via the Earth Search STAC), a per-place environment block (solar PV
+  yield + GHI from PVGIS; temperature/wind/precipitation from Open-Meteo ERA5), and Chilean Data Observatory
+  indicators (health facilities, foreign-born residents, schools) joined per comuna.
+- **Aggregate-by-admin-area, everywhere.** `gen_admin` writes `admin.json` at the finest geoBoundaries level
+  that spans >=2 units (ADM3 comuna/ward/district -> ADM2 -> ADM1) for 67 places; the tool has three bands,
+  building averages, environment (solar/climate), and Data Observatory, each driving a choropleth + ranked
+  table. Each unit carries its own solar/climate + indicators, sampled at the unit centroid.
+- **11 world metro-core AOIs** (New York, London, Paris, Berlin, Barcelona, Tokyo, Seoul, Delhi, Mexico City,
+  Buenos Aires, Sao Paulo), sized to span official boroughs/wards/arrondissements/districts/comunas so the
+  sub-area aggregation works globally, not only for Santiago.
+- **Environment readout panel** per place, and **selected-building metric readout**: clicking a building
+  shows the active metric's value, its own for per-building attributes, or its comuna's value for
+  solar/climate/Data-Observatory layers (labelled with the area name).
+
+### Changed
+- **Content pages rebuilt to ADR-0016** (SubTabs/Tabs per topic + KaTeX + theme-aware bilingual SVG figures
+  + assumptions Callouts + per-section DOI Refs). Methodology is 8 method-family sub-tabs; Introduction,
+  Implementation and Experiments gain figures and tab structure. 8 new real citations.
+- **UX**: default UI language is English; the controls panel and every section start collapsed; the place
+  picker sorts each category alphabetically in the selected language and lists the metro cores first; the
+  footer provenance names every fused source.
+
+### Fixed
+- A single place's manifest load failure used to replace the whole page with an error (removing the place
+  picker); it now shows inline and the picker stays.
+
 ## [0.07.000] - 2026-07-13
 
 ### Added
