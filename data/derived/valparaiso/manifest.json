@@ -164,6 +164,7 @@
     },
     "ground_truth": null,
     "notes": [
+      "environment: precip_annual, solar_ghi, solar_pvout, temp_max, temp_mean, temp_min, wind_max_mean",
       "open-buildings 2.5D raster used (32719)",
       "modality soil_soc: 1045/12249 sampled",
       "modality solar_ghi skipped: FileNotFoundError",
@@ -243,6 +244,77 @@
       "unit": "index"
     }
   ],
+  "environment": {
+    "values": {
+      "solar_pvout": 1681.0,
+      "solar_ghi": 2100.0,
+      "temp_mean": 15.0,
+      "temp_min": 8.4,
+      "temp_max": 20.9,
+      "wind_max_mean": 22.2,
+      "precip_annual": 550.0
+    },
+    "meta": {
+      "solar_pvout": {
+        "label": "Solar PV yield",
+        "unit": "kWh/kWp/yr"
+      },
+      "solar_ghi": {
+        "label": "Solar irradiation (GHI)",
+        "unit": "kWh/m2/yr"
+      },
+      "temp_mean": {
+        "label": "Air temperature (mean)",
+        "unit": "degC"
+      },
+      "temp_min": {
+        "label": "Air temperature (coldest day)",
+        "unit": "degC"
+      },
+      "temp_max": {
+        "label": "Air temperature (warmest day)",
+        "unit": "degC"
+      },
+      "wind_max_mean": {
+        "label": "Wind (mean daily max)",
+        "unit": "km/h"
+      },
+      "precip_annual": {
+        "label": "Precipitation (annual)",
+        "unit": "mm/yr"
+      }
+    },
+    "sources": [
+      {
+        "source": "PVGIS v5.3 PV yield + irradiation (PVGIS-ERA5)",
+        "url": "https://re.jrc.ec.europa.eu/api/v5_3/PVcalc (European Commission JRC)",
+        "license": "proprietary",
+        "fetched": "2026-07-14",
+        "method": "grid-connected 1 kWp fixed-mount PVcalc, 14% system loss; yearly E_y + annual GHI at the AOI centre",
+        "extra": {
+          "radiation_db": "PVGIS-ERA5",
+          "loss_pct": 14.0
+        },
+        "license_name": "proprietary",
+        "license_url": "",
+        "commercial_ok": null
+      },
+      {
+        "source": "Open-Meteo ERA5 archive (2023 daily normals)",
+        "url": "https://archive-api.open-meteo.com/v1/archive (ERA5 reanalysis, ~25 km)",
+        "license": "cc-by-4.0",
+        "fetched": "2026-07-14",
+        "method": "2023 daily 2 m mean temp / 10 m max wind / precip sum, reduced to annual mean+extremes at the AOI centre",
+        "extra": {
+          "year": 2023,
+          "days": 365
+        },
+        "license_name": "cc-by-4.0",
+        "license_url": "",
+        "commercial_ok": null
+      }
+    ]
+  },
   "any_noncommercial": false,
   "credits": [
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
