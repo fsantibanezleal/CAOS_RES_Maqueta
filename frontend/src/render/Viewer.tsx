@@ -38,6 +38,9 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   const [areaCount, setAreaCount] = useState(0);
   const [areaStats, setAreaStats] = useState<AreaStats | null>(null);
   const [areaScope, setAreaScope] = useState<'polygon' | 'place'>('polygon');
+  const [adminUnits, setAdminUnits] = useState<{ name: string; count: number }[]>([]);
+  const [adminAttr, setAdminAttr] = useState<string | null>(null);
+  const [adminTable, setAdminTable] = useState<{ name: string; value: number; count: number }[]>([]);
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
 
   useEffect(() => {
@@ -94,6 +97,9 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     setAreaStats(null);
     setAreaMode(false);
     s.setDrawMode(false);
+    setAdminUnits([]);
+    setAdminAttr(null);
+    setAdminTable([]);
     // Layer visibility is known from the manifest up front (population off by default; the internal
     // buildings_lite proxy is not a user layer).
     const v: Record<string, boolean> = {};
@@ -124,6 +130,8 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
       syncFromScene(s, true);
       setLoading(false);
       setBuildingsLoading(false);
+      // Admin sub-areas (comunas/districts): load + assign buildings so they can be aggregated by unit.
+      s.loadAdmin(baseUrl).then(setAdminUnits).catch(() => setAdminUnits([]));
     });
   }, [baseUrl, manifest]);
 
@@ -131,7 +139,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     setVisible((p) => ({ ...p, [name]: on }));
     sceneRef.current?.setLayerVisible(name, on);
   };
-  const changeColor = (k: string) => { setColorMode(k); sceneRef.current?.setColorMode(k); };
+  const changeColor = (k: string) => { setColorMode(k); sceneRef.current?.setColorMode(k); if (adminAttr) { setAdminAttr(null); setAdminTable([]); sceneRef.current?.setAdminChoropleth(null); } };
   const changeNum = (key: string, lo: number, hi: number) => {
     setNumFilters((p) => ({ ...p, [key]: [lo, hi] }));
     sceneRef.current?.setNumericFilter(key, lo, hi);
@@ -189,6 +197,14 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     setAreaStats(s.computeAreaStats(null, lang));
   };
 
+  const chooseAdmin = (key: string | null) => {
+    const s = sceneRef.current;
+    if (!s) return;
+    setAdminAttr(key);
+    s.setAdminChoropleth(key);
+    setAdminTable(key ? s.adminStats(key).filter((u) => u.count > 0).sort((a, b) => b.value - a.value) : []);
+  };
+
   const colorAttrs = useMemo(() => attrs, [attrs]);
   const numericAttrs = attrs.filter((a) => a.kind === 'numeric');
   const categoricalAttrs = attrs.filter((a) => a.kind === 'categorical');
@@ -231,7 +247,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
           </div>
         </Section>
 
-        <Section title={t('Filter buildings', 'Filtrar edificios')}>
+        <Section title={t('Filter buildings', 'Filtrar edificios')} defaultOpen={false}>
           {numericAttrs.map((a) => {
             const [rlo, rhi] = sceneRef.current?.numericRange(a.key) ?? [0, 1];
             const [lo, hi] = numFilters[a.key] ?? [rlo, rhi];
@@ -265,7 +281,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
           })}
         </Section>
 
-        <Section title={t('Area statistics', 'Estadisticas de area')}>
+        <Section title={t('Area statistics', 'Estadisticas de area')} defaultOpen={false}>
           <p className="mq-sub">
             {t(
               'Summarize the fused building attributes over any sub-area: draw a polygon (a barrio, a block, a corridor) or take the whole place.',
@@ -293,7 +309,48 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
           )}
         </Section>
 
-        <Section title={t('Scene', 'Escena')}>
+        {adminUnits.length > 0 && (
+          <Section title={t('Aggregate by admin area', 'Agregar por area administrativa')} defaultOpen={false}>
+            <p className="mq-sub">
+              {t(
+                `${adminUnits.length} sub-areas (comunas / districts). Colour every building by its area's average, and read the ranked table.`,
+                `${adminUnits.length} sub-areas (comunas / distritos). Colorea cada edificio por el promedio de su area, y lee la tabla ordenada.`,
+              )}
+            </p>
+            <div className="mq-seg mq-seg-wrap">
+              {numericAttrs.map((a) => (
+                <button key={a.key} className={adminAttr === a.key ? 'on' : ''} onClick={() => chooseAdmin(a.key)}>
+                  {a[lang]}
+                </button>
+              ))}
+              {adminAttr && <button onClick={() => chooseAdmin(null)}>{t('Clear', 'Limpiar')}</button>}
+            </div>
+            {adminTable.length > 0 && (
+              <div className="mq-admin-tablewrap">
+                <table className="mq-admin-table">
+                  <thead>
+                    <tr>
+                      <th>{t('Area', 'Area')}</th>
+                      <th>{numericAttrs.find((a) => a.key === adminAttr)?.[lang]} {numericAttrs.find((a) => a.key === adminAttr)?.unit}</th>
+                      <th>n</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminTable.map((u) => (
+                      <tr key={u.name}>
+                        <td>{u.name}</td>
+                        <td><b>{Number.isFinite(u.value) ? u.value.toFixed(u.value < 10 ? 2 : 0) : '-'}</b></td>
+                        <td className="mq-muted">{u.count.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Section>
+        )}
+
+        <Section title={t('Scene', 'Escena')} defaultOpen={false}>
           <div className="mq-seg">
             <button onClick={() => sceneRef.current?.cameraPreset('aerial')}>{t('Aerial', 'Cenital')}</button>
             <button onClick={() => sceneRef.current?.cameraPreset('oblique')}>{t('Oblique', 'Oblicua')}</button>
@@ -316,8 +373,18 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return <div className="mq-section"><h4>{title}</h4>{children}</div>;
+function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className={`mq-section ${open ? '' : 'mq-section-closed'}`}>
+      <h4 className="mq-section-h" role="button" tabIndex={0}
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen((o) => !o); } }}>
+        <span className="mq-section-chev">{open ? '▾' : '▸'}</span>{title}
+      </h4>
+      {open && <div className="mq-section-body">{children}</div>}
+    </div>
+  );
 }
 
 const CAT_PALETTE = [[66,133,244],[219,68,55],[244,180,0],[15,157,88],[171,71,188],[0,172,193],[255,112,67],[158,157,36],[94,53,177],[3,155,229],[124,179,66],[216,27,96],[141,110,99],[84,110,122]] as [number,number,number][];

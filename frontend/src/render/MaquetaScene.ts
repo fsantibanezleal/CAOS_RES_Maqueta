@@ -125,6 +125,10 @@ export class MaquetaScene {
   private vShade: Float32Array = new Float32Array(0); // per-vertex baked shade (base darker -> roof lighter)
   private centById = new Map<number, { x: number; z: number }>(); // world-space footprint centroid per building
   private areaGroup: THREE.Group | null = null; // the drawn area-of-interest polygon overlay
+  // Admin sub-areas (comunas/districts) for aggregate-by-unit + choropleth.
+  private adminUnits: { name: string; rings: AreaPoint[][]; bbox: [number, number, number, number] }[] = [];
+  private buildingUnit = new Map<number, number>(); // building id -> admin unit index (-1 = none)
+  private adminGroup: THREE.Group | null = null; // drawn admin-boundary overlay
   private groundY = 0; // mean scene elevation (m): meshes sit at absolute altitude, so high places (Atacama,
   // Chuquicamata at ~2500 m) would otherwise float above the frame. Camera, ground-pick + area tool use this.
   private terrainMesh: THREE.Mesh | null = null;
@@ -773,6 +777,137 @@ export class MaquetaScene {
         if (m.geometry) m.geometry.dispose();
       });
       this.areaGroup = null;
+      this.needsRender = true;
+    }
+  }
+
+  // ---- aggregate by admin sub-area (comuna / district) ----
+  // Load the baked admin boundaries for this place and assign every building to its unit (point-in-polygon
+  // over the footprint centroids, bbox-culled). Returns the units with their building counts.
+  async loadAdmin(baseUrl: string): Promise<{ name: string; count: number }[]> {
+    this.adminUnits = [];
+    this.buildingUnit.clear();
+    try {
+      const res = await fetch(`${baseUrl}/admin.json`);
+      if (!res.ok) return [];
+      const data = (await res.json()) as { units?: { name: string; rings: number[][][] }[] };
+      this.adminUnits = (data.units ?? []).map((u) => {
+        const rings = u.rings.map((r) => r.map(([x, z]) => ({ x, z })));
+        let xmin = Infinity;
+        let xmax = -Infinity;
+        let zmin = Infinity;
+        let zmax = -Infinity;
+        for (const r of rings)
+          for (const p of r) {
+            if (p.x < xmin) xmin = p.x;
+            if (p.x > xmax) xmax = p.x;
+            if (p.z < zmin) zmin = p.z;
+            if (p.z > zmax) zmax = p.z;
+          }
+        return { name: u.name, rings, bbox: [xmin, zmin, xmax, zmax] as [number, number, number, number] };
+      });
+      const counts = new Array(this.adminUnits.length).fill(0);
+      for (const [id, c] of this.centById) {
+        let ui = -1;
+        for (let u = 0; u < this.adminUnits.length; u++) {
+          const bb = this.adminUnits[u].bbox;
+          if (c.x < bb[0] || c.x > bb[2] || c.z < bb[1] || c.z > bb[3]) continue;
+          if (this.adminUnits[u].rings.some((r) => MaquetaScene.pointInPoly(c.x, c.z, r))) {
+            ui = u;
+            break;
+          }
+        }
+        this.buildingUnit.set(id, ui);
+        if (ui >= 0) counts[ui]++;
+      }
+      return this.adminUnits.map((u, i) => ({ name: u.name, count: counts[i] }));
+    } catch {
+      return [];
+    }
+  }
+
+  hasAdmin(): boolean {
+    return this.adminUnits.length > 0;
+  }
+
+  // Per-unit aggregate of one attribute (mean over the buildings in each unit).
+  adminStats(attrKey: string): { name: string; value: number; count: number }[] {
+    const spec = attrSpec(attrKey);
+    const n = this.adminUnits.length;
+    const sums = new Array(n).fill(0);
+    const counts = new Array(n).fill(0);
+    for (const [id, ui] of this.buildingUnit) {
+      if (ui < 0) continue;
+      const f = this.featuresById.get(id);
+      const v = f ? spec.value(f) : null;
+      if (v != null && Number.isFinite(v as number)) {
+        sums[ui] += v as number;
+        counts[ui]++;
+      }
+    }
+    return this.adminUnits.map((u, i) => ({ name: u.name, value: counts[i] ? sums[i] / counts[i] : NaN, count: counts[i] }));
+  }
+
+  // Colour every building by its admin unit's mean of `attrKey` (a choropleth), and draw the unit outlines.
+  // Pass null to turn the choropleth off and restore the normal attribute colouring.
+  setAdminChoropleth(attrKey: string | null) {
+    if (!attrKey) {
+      this.clearAdminOverlay();
+      this.applyColor();
+      return;
+    }
+    const stats = this.adminStats(attrKey);
+    const vals = stats.map((s) => s.value).filter((v) => Number.isFinite(v));
+    const lo = vals.length ? Math.min(...vals) : 0;
+    const hi = vals.length ? Math.max(...vals) : 1;
+    const span = hi - lo || 1;
+    if (this.buildingMesh) {
+      const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+      const nverts = this.vFeature.length;
+      const arr = new Float32Array(nverts * 3);
+      for (let i = 0; i < nverts; i++) {
+        const ui = this.buildingUnit.get(this.vFeature[i]) ?? -1;
+        let rgb: [number, number, number] = [150, 150, 150];
+        if (ui >= 0 && Number.isFinite(stats[ui].value)) rgb = heightRamp((stats[ui].value - lo) / span);
+        const s = this.vShade.length === nverts ? this.vShade[i] : 1;
+        arr[i * 3] = srgbToLinear(rgb[0] / 255) * s;
+        arr[i * 3 + 1] = srgbToLinear(rgb[1] / 255) * s;
+        arr[i * 3 + 2] = srgbToLinear(rgb[2] / 255) * s;
+      }
+      geom.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+    }
+    this.drawAdminBoundaries();
+    this.needsRender = true;
+  }
+
+  private drawAdminBoundaries() {
+    this.clearAdminOverlay();
+    const g = new THREE.Group();
+    g.name = 'admin';
+    const accent = this.dark ? 0x9fe0ff : 0x0a3a5a;
+    const mat = new THREE.LineBasicMaterial({ color: accent, transparent: true, opacity: 0.85, depthTest: false });
+    for (const u of this.adminUnits) {
+      for (const r of u.rings) {
+        const pts = r.map((p) => new THREE.Vector3(p.x, this.groundY + 4, p.z));
+        if (pts.length >= 2) {
+          const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat);
+          line.renderOrder = 995;
+          g.add(line);
+        }
+      }
+    }
+    this.adminGroup = g;
+    this.scene.add(g);
+  }
+
+  private clearAdminOverlay() {
+    if (this.adminGroup) {
+      this.scene.remove(this.adminGroup);
+      this.adminGroup.traverse((o) => {
+        const m = o as THREE.Line;
+        if (m.geometry) m.geometry.dispose();
+      });
+      this.adminGroup = null;
       this.needsRender = true;
     }
   }
