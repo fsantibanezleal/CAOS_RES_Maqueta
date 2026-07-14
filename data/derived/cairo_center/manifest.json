@@ -32,7 +32,7 @@
         "source": "Copernicus GLO-30 DSM",
         "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
         "license": "Copernicus-free",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
         "extra": {
           "tiles": [
@@ -61,7 +61,7 @@
         "source": "Overture Maps buildings",
         "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
         "license": "ODbL-1.0",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
@@ -85,11 +85,80 @@
         "source": "Overture Maps transportation",
         "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=transportation/type=segment",
         "license": "ODbL-1.0",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
           "n_segments": 5760
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "water",
+      "file": "water.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 7482,
+        "triangles": 7442,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (water)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "OSMnx features_from_bbox with tags {'natural': ['water'], 'water': True, 'waterway': ['riverbank', 'dock']}",
+        "extra": {
+          "n_features": 6
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "green",
+      "file": "green.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 1819,
+        "triangles": 1541,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (green)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "OSMnx features_from_bbox with tags {'leisure': ['park', 'garden', 'pitch'], 'landuse': ['grass', 'forest', 'meadow'], 'natural': ['wood', 'scrub']}",
+        "extra": {
+          "n_features": 140
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "rail",
+      "file": "rail.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 1092,
+        "triangles": 1066,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (rail)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "OSMnx features_from_bbox with tags {'railway': ['rail', 'light_rail', 'subway', 'tram']}",
+        "extra": {
+          "n_features": 13
         },
         "license_name": "Open Data Commons Open Database License v1.0",
         "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
@@ -109,7 +178,7 @@
         "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
         "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
         "license": "CC-BY-4.0",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
         "extra": {
           "grid": [
@@ -128,6 +197,9 @@
       "terrain",
       "buildings",
       "roads",
+      "water",
+      "green",
+      "rail",
       "population"
     ],
     "height_mix": {
@@ -155,6 +227,24 @@
         "triangles": 55592,
         "features": 0
       },
+      "water": {
+        "kind": "mesh",
+        "vertices": 7482,
+        "triangles": 7442,
+        "features": 0
+      },
+      "green": {
+        "kind": "mesh",
+        "vertices": 1819,
+        "triangles": 1541,
+        "features": 0
+      },
+      "rail": {
+        "kind": "mesh",
+        "vertices": 1092,
+        "triangles": 1066,
+        "features": 0
+      },
       "population": {
         "kind": "mesh",
         "vertices": 6240,
@@ -166,15 +256,74 @@
     "notes": [
       "open-buildings 2.5D raster used (32636)",
       "modality solar_ghi skipped: FileNotFoundError",
+      "s2 ndvi: 7822/7879 sampled",
+      "s2 ndwi: 7822/7879 sampled",
+      "s2 ndbi: 7822/7879 sampled",
       "population total ~20576384"
     ]
   },
-  "modalities": [],
+  "modalities": [
+    {
+      "source": "Sentinel-2 L2A (S2A_36RUU_20240815_0_L2A, 2024-08-15, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2A_36RUU_20240815_0_L2A",
+        "date": "2024-08-15"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndvi",
+      "label": "NDVI (vegetation)",
+      "unit": "index"
+    },
+    {
+      "source": "Sentinel-2 L2A (S2A_36RUU_20240815_0_L2A, 2024-08-15, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2A_36RUU_20240815_0_L2A",
+        "date": "2024-08-15"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndwi",
+      "label": "NDWI (water)",
+      "unit": "index"
+    },
+    {
+      "source": "Sentinel-2 L2A (S2A_36RUU_20240815_0_L2A, 2024-08-15, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2A_36RUU_20240815_0_L2A",
+        "date": "2024-08-15"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndbi",
+      "label": "NDBI (built-up)",
+      "unit": "index"
+    }
+  ],
   "any_noncommercial": false,
   "credits": [
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
     "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
+    "OpenStreetMap (green) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (rail) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (water) (Open Data Commons Open Database License v1.0)",
     "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
-    "Overture Maps transportation (Open Data Commons Open Database License v1.0)"
+    "Overture Maps transportation (Open Data Commons Open Database License v1.0)",
+    "Sentinel-2 L2A (S2A_36RUU_20240815_0_L2A, 2024-08-15, 0% cloud) (proprietary)"
   ]
 }

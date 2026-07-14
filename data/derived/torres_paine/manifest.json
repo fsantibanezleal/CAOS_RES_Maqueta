@@ -32,7 +32,7 @@
         "source": "Copernicus GLO-30 DSM",
         "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
         "license": "Copernicus-free",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
         "extra": {
           "tiles": [

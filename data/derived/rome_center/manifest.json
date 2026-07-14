@@ -32,7 +32,7 @@
         "source": "Copernicus GLO-30 DSM",
         "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
         "license": "Copernicus-free",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
         "extra": {
           "tiles": [
@@ -61,7 +61,7 @@
         "source": "Overture Maps buildings",
         "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
         "license": "ODbL-1.0",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
@@ -85,7 +85,7 @@
         "source": "Overture Maps transportation",
         "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=transportation/type=segment",
         "license": "ODbL-1.0",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
@@ -109,7 +109,7 @@
         "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
         "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
         "license": "CC-BY-4.0",
-        "fetched": "2026-07-13",
+        "fetched": "2026-07-14",
         "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
         "extra": {
           "grid": [
@@ -165,15 +165,71 @@
     "ground_truth": null,
     "notes": [
       "modality solar_ghi skipped: FileNotFoundError",
+      "s2 ndvi: 6545/6591 sampled",
+      "s2 ndwi: 6545/6591 sampled",
+      "s2 ndbi: 6545/6591 sampled",
       "population total ~3870276"
     ]
   },
-  "modalities": [],
+  "modalities": [
+    {
+      "source": "Sentinel-2 L2A (S2B_33TTG_20230823_0_L2A, 2023-08-23, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2B_33TTG_20230823_0_L2A",
+        "date": "2023-08-23"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndvi",
+      "label": "NDVI (vegetation)",
+      "unit": "index"
+    },
+    {
+      "source": "Sentinel-2 L2A (S2B_33TTG_20230823_0_L2A, 2023-08-23, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2B_33TTG_20230823_0_L2A",
+        "date": "2023-08-23"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndwi",
+      "label": "NDWI (water)",
+      "unit": "index"
+    },
+    {
+      "source": "Sentinel-2 L2A (S2B_33TTG_20230823_0_L2A, 2023-08-23, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2B_33TTG_20230823_0_L2A",
+        "date": "2023-08-23"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndbi",
+      "label": "NDBI (built-up)",
+      "unit": "index"
+    }
+  ],
   "any_noncommercial": false,
   "credits": [
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
     "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
     "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
-    "Overture Maps transportation (Open Data Commons Open Database License v1.0)"
+    "Overture Maps transportation (Open Data Commons Open Database License v1.0)",
+    "Sentinel-2 L2A (S2B_33TTG_20230823_0_L2A, 2023-08-23, 0% cloud) (proprietary)"
   ]
 }
