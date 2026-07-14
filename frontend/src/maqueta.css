@@ -179,6 +179,19 @@
 .mq-admin-table td b { color: var(--color-accent); font-variant-numeric: tabular-nums; }
 .mq-admin-table tr:last-child td { border-bottom: none; }
 
+/* ---- Theme-aware inline SVG figures for the content pages (ADR-0016 §7.4) ---- */
+.mq-fig-svg { width: 100%; height: auto; display: block; font-family: inherit; }
+.mq-fig-svg .f-bx { fill: var(--color-surface); stroke: var(--color-border); stroke-width: 1.4; }
+.mq-fig-svg .f-bx-a { fill: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface)); stroke: var(--color-accent); stroke-width: 1.6; }
+.mq-fig-svg .f-tx { fill: var(--color-fg); font-size: 13px; }
+.mq-fig-svg .f-tx-b { fill: var(--color-fg); font-size: 13px; font-weight: 700; }
+.mq-fig-svg .f-mu { fill: var(--color-fg-subtle); font-size: 11px; }
+.mq-fig-svg .f-ac { fill: var(--color-accent); font-size: 12px; font-weight: 600; }
+.mq-fig-svg .f-ln { stroke: var(--color-border); stroke-width: 1.4; fill: none; }
+.mq-fig-svg .f-ln-a { stroke: var(--color-accent); stroke-width: 1.8; fill: none; }
+.mq-fig-svg .f-fill-a { fill: var(--color-accent); }
+.mq-fig-svg .f-grid { stroke: color-mix(in srgb, var(--color-border) 60%, transparent); stroke-width: 0.8; fill: none; }
+
 /* group label above each band of aggregation buttons (building averages / environment / indicators) */
 .mq-agg-group { display: block; margin: 0.55rem 0 0.25rem; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.62rem; font-weight: 700; color: var(--color-fg-subtle); }
 
