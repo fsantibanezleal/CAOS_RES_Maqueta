@@ -17,14 +17,18 @@ const MINING = new Set(['calama', 'sierra_gorda']); // built mining towns (Chuqu
 const CITY = new Set(['valparaiso', 'concepcion', 'valdivia', 'chiloe_castro', 'antofagasta', 'venice', 'santorini']);
 function placeKind(p: PlaceEntry): string {
   const s = p.slug;
-  if (s === 'santiago_full' || s === 'santiago_centro' || s.startsWith('stgo_')) return 'santiago';
+  // Metro cores: the large AOIs that span many official sub-areas (boroughs/wards/comunas) for the
+  // aggregate-by-admin-area tool. Their own category, listed FIRST. santiago_full is one of them.
+  if (s.endsWith('_full')) return 'metrocore';
+  if (s === 'santiago_centro' || s.startsWith('stgo_')) return 'santiago';
   if (p.tier === 'C') return 'landscape'; // ALL terrain-only places, their own category
   if (MINING.has(s)) return 'mining';
   if (CITY.has(s)) return 'city';
   return 'metro'; // tier A + the big world cities (incl. Agra, Rio)
 }
-const KIND_ORDER = ['santiago', 'metro', 'city', 'mining', 'landscape'];
+const KIND_ORDER = ['metrocore', 'santiago', 'metro', 'city', 'mining', 'landscape'];
 const KIND_LABEL: Record<string, [string, string]> = {
+  metrocore: ['Metro cores (aggregate by sub-area)', 'Nucleos metro (agregar por sub-area)'],
   santiago: ['Santiago (comunas)', 'Santiago (comunas)'],
   metro: ['Major cities', 'Grandes ciudades'],
   city: ['Cities', 'Ciudades'],
