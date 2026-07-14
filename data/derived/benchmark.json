@@ -1,29 +1,29 @@
 {
   "schema_version": 1,
-  "n_places": 78,
+  "n_places": 107,
   "global_height_mix": {
-    "measured": 39709,
-    "floors": 83350,
-    "raster": 2346615,
-    "prior": 109994
+    "measured": 61600,
+    "floors": 91924,
+    "raster": 2503529,
+    "prior": 130274
   },
   "global_height_fraction": {
-    "measured": 0.015,
-    "floors": 0.032,
-    "raster": 0.91,
-    "prior": 0.043
+    "measured": 0.022,
+    "floors": 0.033,
+    "raster": 0.898,
+    "prior": 0.047
   },
   "tier_totals_mb": {
+    "B": 1046.74,
     "A": 30.58,
-    "B": 946.49,
-    "C": 0.46
+    "C": 4.17
   },
   "tier_counts": {
+    "B": 79,
     "A": 10,
-    "B": 60,
-    "C": 8
+    "C": 18
   },
-  "total_mb": 977.54,
+  "total_mb": 1081.5,
   "per_place": [
     {
       "slug": "amsterdam_center",
@@ -284,6 +284,78 @@
       "ground_truth": null
     },
     {
+      "slug": "agra_taj",
+      "name": "Agra (Taj Mahal)",
+      "tier": "B",
+      "country": "India",
+      "n_layers": 4,
+      "total_triangles": 114893,
+      "total_mb": 4.607,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 6362,
+        "prior": 193
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.971,
+        "prior": 0.029
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "antofagasta",
+      "name": "Antofagasta",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 358230,
+      "total_mb": 7.157,
+      "height_mix": {
+        "measured": 7,
+        "floors": 163,
+        "raster": 23144,
+        "prior": 274
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.007,
+        "raster": 0.981,
+        "prior": 0.012
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "bangkok_center",
+      "name": "Bangkok Center",
+      "tier": "B",
+      "country": "Thailand",
+      "n_layers": 4,
+      "total_triangles": 250462,
+      "total_mb": 4.285,
+      "height_mix": {
+        "measured": 1,
+        "floors": 1882,
+        "raster": 11621,
+        "prior": 158
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.138,
+        "raster": 0.851,
+        "prior": 0.012
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "barcelona_eixample",
       "name": "Barcelona Eixample",
       "tier": "B",
@@ -304,6 +376,30 @@
         "prior": 0.377
       },
       "measured_pct": 11.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "beijing_center",
+      "name": "Beijing Center",
+      "tier": "B",
+      "country": "China",
+      "n_layers": 4,
+      "total_triangles": 134794,
+      "total_mb": 1.929,
+      "height_mix": {
+        "measured": 249,
+        "floors": 263,
+        "raster": 0,
+        "prior": 6078
+      },
+      "height_fraction": {
+        "measured": 0.038,
+        "floors": 0.04,
+        "raster": 0.0,
+        "prior": 0.922
+      },
+      "measured_pct": 3.8,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -380,6 +476,30 @@
       "ground_truth": null
     },
     {
+      "slug": "calama",
+      "name": "Calama",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 7,
+      "total_triangles": 647306,
+      "total_mb": 14.624,
+      "height_mix": {
+        "measured": 0,
+        "floors": 21,
+        "raster": 49839,
+        "prior": 192
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.996,
+        "prior": 0.004
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "cape_town_center",
       "name": "Cape Town CBD",
       "tier": "B",
@@ -400,6 +520,54 @@
         "prior": 0.03
       },
       "measured_pct": 1.6,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "chicago_loop",
+      "name": "Chicago Loop",
+      "tier": "B",
+      "country": "USA",
+      "n_layers": 4,
+      "total_triangles": 218249,
+      "total_mb": 1.46,
+      "height_mix": {
+        "measured": 1421,
+        "floors": 107,
+        "raster": 0,
+        "prior": 585
+      },
+      "height_fraction": {
+        "measured": 0.673,
+        "floors": 0.051,
+        "raster": 0.0,
+        "prior": 0.277
+      },
+      "measured_pct": 67.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "chiloe_castro",
+      "name": "Chiloe (Castro)",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 142990,
+      "total_mb": 2.66,
+      "height_mix": {
+        "measured": 0,
+        "floors": 15,
+        "raster": 8775,
+        "prior": 50
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.002,
+        "raster": 0.993,
+        "prior": 0.006
+      },
+      "measured_pct": 0.0,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -428,6 +596,78 @@
       "ground_truth": null
     },
     {
+      "slug": "delhi_center",
+      "name": "Delhi (Connaught Place)",
+      "tier": "B",
+      "country": "India",
+      "n_layers": 4,
+      "total_triangles": 163653,
+      "total_mb": 2.152,
+      "height_mix": {
+        "measured": 4,
+        "floors": 248,
+        "raster": 5640,
+        "prior": 224
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.041,
+        "raster": 0.922,
+        "prior": 0.037
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "dubai_downtown",
+      "name": "Dubai Downtown",
+      "tier": "B",
+      "country": "UAE",
+      "n_layers": 4,
+      "total_triangles": 130607,
+      "total_mb": 0.961,
+      "height_mix": {
+        "measured": 314,
+        "floors": 58,
+        "raster": 0,
+        "prior": 1364
+      },
+      "height_fraction": {
+        "measured": 0.181,
+        "floors": 0.033,
+        "raster": 0.0,
+        "prior": 0.786
+      },
+      "measured_pct": 18.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "hong_kong_central",
+      "name": "Hong Kong Central",
+      "tier": "B",
+      "country": "China",
+      "n_layers": 4,
+      "total_triangles": 218139,
+      "total_mb": 1.631,
+      "height_mix": {
+        "measured": 86,
+        "floors": 1166,
+        "raster": 0,
+        "prior": 1690
+      },
+      "height_fraction": {
+        "measured": 0.029,
+        "floors": 0.396,
+        "raster": 0.0,
+        "prior": 0.574
+      },
+      "measured_pct": 2.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "istanbul_center",
       "name": "Istanbul Fatih",
       "tier": "B",
@@ -446,6 +686,54 @@
         "floors": 0.013,
         "raster": 0.0,
         "prior": 0.983
+      },
+      "measured_pct": 0.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "jakarta_center",
+      "name": "Jakarta Center",
+      "tier": "B",
+      "country": "Indonesia",
+      "n_layers": 4,
+      "total_triangles": 201665,
+      "total_mb": 3.407,
+      "height_mix": {
+        "measured": 7,
+        "floors": 477,
+        "raster": 11134,
+        "prior": 135
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.041,
+        "raster": 0.947,
+        "prior": 0.011
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "lagos_island",
+      "name": "Lagos Island",
+      "tier": "B",
+      "country": "Nigeria",
+      "n_layers": 4,
+      "total_triangles": 122152,
+      "total_mb": 2.119,
+      "height_mix": {
+        "measured": 24,
+        "floors": 1423,
+        "raster": 5915,
+        "prior": 98
+      },
+      "height_fraction": {
+        "measured": 0.003,
+        "floors": 0.191,
+        "raster": 0.793,
+        "prior": 0.013
       },
       "measured_pct": 0.3,
       "any_noncommercial": false,
@@ -496,6 +784,30 @@
         "prior": 0.448
       },
       "measured_pct": 14.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "los_angeles_downtown",
+      "name": "Los Angeles Downtown",
+      "tier": "B",
+      "country": "USA",
+      "n_layers": 4,
+      "total_triangles": 200766,
+      "total_mb": 1.493,
+      "height_mix": {
+        "measured": 2236,
+        "floors": 19,
+        "raster": 0,
+        "prior": 54
+      },
+      "height_fraction": {
+        "measured": 0.968,
+        "floors": 0.008,
+        "raster": 0.0,
+        "prior": 0.023
+      },
+      "measured_pct": 96.8,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -620,6 +932,30 @@
       "ground_truth": null
     },
     {
+      "slug": "rio_de_janeiro",
+      "name": "Rio de Janeiro",
+      "tier": "B",
+      "country": "Brazil",
+      "n_layers": 4,
+      "total_triangles": 767636,
+      "total_mb": 29.416,
+      "height_mix": {
+        "measured": 15953,
+        "floors": 180,
+        "raster": 17349,
+        "prior": 193
+      },
+      "height_fraction": {
+        "measured": 0.474,
+        "floors": 0.005,
+        "raster": 0.515,
+        "prior": 0.006
+      },
+      "measured_pct": 47.4,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "rome_center",
       "name": "Rome Centro Storico",
       "tier": "B",
@@ -716,6 +1052,30 @@
       "ground_truth": null
     },
     {
+      "slug": "santorini",
+      "name": "Santorini (Thera)",
+      "tier": "B",
+      "country": "Greece",
+      "n_layers": 4,
+      "total_triangles": 132755,
+      "total_mb": 4.45,
+      "height_mix": {
+        "measured": 0,
+        "floors": 14,
+        "raster": 0,
+        "prior": 3771
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.004,
+        "raster": 0.0,
+        "prior": 0.996
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "sao_paulo_center",
       "name": "Sao Paulo Centro",
       "tier": "B",
@@ -760,6 +1120,54 @@
         "prior": 0.903
       },
       "measured_pct": 4.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "shanghai_bund",
+      "name": "Shanghai (The Bund)",
+      "tier": "B",
+      "country": "China",
+      "n_layers": 6,
+      "total_triangles": 122483,
+      "total_mb": 1.008,
+      "height_mix": {
+        "measured": 35,
+        "floors": 546,
+        "raster": 0,
+        "prior": 2054
+      },
+      "height_fraction": {
+        "measured": 0.013,
+        "floors": 0.207,
+        "raster": 0.0,
+        "prior": 0.78
+      },
+      "measured_pct": 1.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "sierra_gorda",
+      "name": "Sierra Gorda",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 16101,
+      "total_mb": 0.216,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 599,
+        "prior": 46
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.929,
+        "prior": 0.071
+      },
+      "measured_pct": 0.0,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -1700,6 +2108,30 @@
       "ground_truth": null
     },
     {
+      "slug": "valdivia",
+      "name": "Valdivia",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 289811,
+      "total_mb": 5.366,
+      "height_mix": {
+        "measured": 18,
+        "floors": 429,
+        "raster": 16536,
+        "prior": 237
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.025,
+        "raster": 0.96,
+        "prior": 0.014
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "valparaiso",
       "name": "Valparaiso",
       "tier": "B",
@@ -1720,6 +2152,54 @@
         "prior": 0.014
       },
       "measured_pct": 2.6,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "venice",
+      "name": "Venice",
+      "tier": "B",
+      "country": "Italy",
+      "n_layers": 4,
+      "total_triangles": 353810,
+      "total_mb": 11.311,
+      "height_mix": {
+        "measured": 1536,
+        "floors": 1563,
+        "raster": 0,
+        "prior": 2884
+      },
+      "height_fraction": {
+        "measured": 0.257,
+        "floors": 0.261,
+        "raster": 0.0,
+        "prior": 0.482
+      },
+      "measured_pct": 25.7,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "angkor_wat",
+      "name": "Angkor Wat",
+      "tier": "C",
+      "country": "Cambodia",
+      "n_layers": 2,
+      "total_triangles": 12606,
+      "total_mb": 0.292,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -1748,6 +2228,30 @@
       "ground_truth": null
     },
     {
+      "slug": "giza_pyramids",
+      "name": "Giza Pyramids",
+      "tier": "C",
+      "country": "Egypt",
+      "n_layers": 2,
+      "total_triangles": 9882,
+      "total_mb": 0.235,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "grand_canyon",
       "name": "Grand Canyon (South Rim)",
       "tier": "C",
@@ -1755,6 +2259,30 @@
       "n_layers": 2,
       "total_triangles": 23151,
       "total_mb": 0.091,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "great_wall",
+      "name": "Great Wall (Badaling)",
+      "tier": "C",
+      "country": "China",
+      "n_layers": 2,
+      "total_triangles": 25448,
+      "total_mb": 0.55,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -1820,6 +2348,54 @@
       "ground_truth": null
     },
     {
+      "slug": "machu_picchu",
+      "name": "Machu Picchu",
+      "tier": "C",
+      "country": "Peru",
+      "n_layers": 2,
+      "total_triangles": 13943,
+      "total_mb": 0.292,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "matterhorn",
+      "name": "Matterhorn (Zermatt)",
+      "tier": "C",
+      "country": "Switzerland",
+      "n_layers": 2,
+      "total_triangles": 18693,
+      "total_mb": 0.383,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
       "slug": "mont_blanc",
       "name": "Mont Blanc",
       "tier": "C",
@@ -1827,6 +2403,78 @@
       "n_layers": 1,
       "total_triangles": 17737,
       "total_mb": 0.064,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "monument_valley",
+      "name": "Monument Valley",
+      "tier": "C",
+      "country": "USA",
+      "n_layers": 2,
+      "total_triangles": 19452,
+      "total_mb": 0.41,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "mount_fuji",
+      "name": "Mount Fuji",
+      "tier": "C",
+      "country": "Japan",
+      "n_layers": 2,
+      "total_triangles": 20558,
+      "total_mb": 0.429,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "petra",
+      "name": "Petra",
+      "tier": "C",
+      "country": "Jordan",
+      "n_layers": 2,
+      "total_triangles": 15632,
+      "total_mb": 0.326,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -1899,6 +2547,54 @@
       "n_layers": 2,
       "total_triangles": 17616,
       "total_mb": 0.064,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "victoria_falls",
+      "name": "Victoria Falls",
+      "tier": "C",
+      "country": "Zimbabwe",
+      "n_layers": 2,
+      "total_triangles": 16347,
+      "total_mb": 0.367,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "yosemite_valley",
+      "name": "Yosemite Valley",
+      "tier": "C",
+      "country": "USA",
+      "n_layers": 2,
+      "total_triangles": 20456,
+      "total_mb": 0.426,
       "height_mix": {
         "measured": 0,
         "floors": 0,

@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "aoi": {
+    "name": "Yosemite Valley",
+    "bbox_wgs84": [
+      -119.59725958929958,
+      37.71055910887531,
+      -119.51774041070043,
+      37.773440891124686
+    ],
+    "origin_wgs84": [
+      -119.5575,
+      37.742
+    ],
+    "crs_local": "+proj=aeqd +lat_0=37.742 +lon_0=-119.5575 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    "size_m": [
+      6999.999999998763,
+      7000.000000000674
+    ]
+  },
+  "layers": [
+    {
+      "name": "terrain",
+      "file": "terrain.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 9000,
+        "triangles": 17776,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Copernicus GLO-30 DSM",
+        "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
+        "license": "Copernicus-free",
+        "fetched": "2026-07-13",
+        "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
+        "extra": {
+          "tiles": [
+            "Copernicus_DSM_COG_10_N37_00_W120_00_DEM"
+          ],
+          "grid": [
+            249,
+            315
+          ]
+        },
+        "license_name": "Copernicus DEM free-of-charge license (ESA/DLR)",
+        "license_url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "population",
+      "file": "population.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 2144,
+        "triangles": 2680,
+        "features": 0
+      },
+      "provenance": {
+        "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
+        "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
+        "license": "CC-BY-4.0",
+        "fetched": "2026-07-13",
+        "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
+        "extra": {
+          "grid": [
+            70,
+            89
+          ]
+        },
+        "license_name": "Creative Commons Attribution 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "commercial_ok": true
+      }
+    }
+  ],
+  "stats": {
+    "layers": [
+      "terrain",
+      "population"
+    ],
+    "height_mix": {},
+    "budgets": {
+      "terrain": {
+        "kind": "mesh",
+        "vertices": 9000,
+        "triangles": 17776,
+        "features": 0
+      },
+      "population": {
+        "kind": "mesh",
+        "vertices": 2144,
+        "triangles": 2680,
+        "features": 0
+      }
+    },
+    "ground_truth": null,
+    "notes": [
+      "population total ~95855"
+    ]
+  },
+  "modalities": [],
+  "any_noncommercial": false,
+  "credits": [
+    "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
+    "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)"
+  ]
+}
