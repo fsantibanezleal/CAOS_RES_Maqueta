@@ -55,8 +55,18 @@ export interface BundleManifest {
     notes: string[];
   };
   modalities?: ModalityInfo[];
+  environment?: EnvironmentBlock;
   any_noncommercial: boolean;
   credits: string[];
+}
+
+// Per-place scalar environment: solar-energy potential + climate normals (near-constant across the AOI, so
+// recorded once per place rather than per building). Keys: solar_pvout, solar_ghi, temp_mean/min/max,
+// wind_max_mean, precip_annual. See geoscena.fetch.environment.ENV_META.
+export interface EnvironmentBlock {
+  values: Record<string, number>;
+  meta: Record<string, { label: string; unit: string }>;
+  sources: LayerProvenance[];
 }
 
 // data/derived/index.json

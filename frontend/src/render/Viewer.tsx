@@ -41,6 +41,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   const [adminUnits, setAdminUnits] = useState<{ name: string; count: number }[]>([]);
   const [adminAttr, setAdminAttr] = useState<string | null>(null);
   const [adminTable, setAdminTable] = useState<{ name: string; value: number; count: number }[]>([]);
+  const [adminUnitAttrs, setAdminUnitAttrs] = useState<{ key: string; label: string; unit: string; group: 'environment' | 'indicator' }[]>([]);
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
 
   useEffect(() => {
@@ -131,7 +132,15 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
       setLoading(false);
       setBuildingsLoading(false);
       // Admin sub-areas (comunas/districts): load + assign buildings so they can be aggregated by unit.
-      s.loadAdmin(baseUrl).then(setAdminUnits).catch(() => setAdminUnits([]));
+      s.loadAdmin(baseUrl)
+        .then((u) => {
+          setAdminUnits(u);
+          setAdminUnitAttrs(s.adminUnitAttributes());
+        })
+        .catch(() => {
+          setAdminUnits([]);
+          setAdminUnitAttrs([]);
+        });
     });
   }, [baseUrl, manifest]);
 
@@ -202,7 +211,26 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     if (!s) return;
     setAdminAttr(key);
     s.setAdminChoropleth(key);
-    setAdminTable(key ? s.adminStats(key).filter((u) => u.count > 0).sort((a, b) => b.value - a.value) : []);
+    if (!key) {
+      setAdminTable([]);
+      return;
+    }
+    // Unit-level layers (solar/climate env, DO indicators) are keyed to the unit itself, so a unit with no
+    // buildings can still carry a value; building-derived means need at least one building.
+    const unitLevel = key.startsWith('env:') || key.startsWith('ind:');
+    setAdminTable(
+      s
+        .adminStats(key)
+        .filter((u) => (unitLevel ? Number.isFinite(u.value) : u.count > 0))
+        .sort((a, b) => b.value - a.value),
+    );
+  };
+  const adminAttrMeta = (key: string | null): { label: string; unit: string } => {
+    if (!key) return { label: '', unit: '' };
+    const ul = adminUnitAttrs.find((a) => a.key === key);
+    if (ul) return { label: ul.label, unit: ul.unit };
+    const na = attrs.find((a) => a.key === key);
+    return { label: (na?.[lang] as string) ?? key, unit: na?.unit ?? '' };
   };
 
   const colorAttrs = useMemo(() => attrs, [attrs]);
@@ -236,6 +264,36 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
               onToggle={(v) => setLayer(l.name, v)} lang={lang} />
           ))}
         </Section>
+
+        {manifest.environment?.values && Object.keys(manifest.environment.values).length > 0 && (
+          <Section title={t('Environment (solar / climate)', 'Ambiente (solar / clima)')} defaultOpen={false}>
+            <p className="mq-sub">
+              {t(
+                'Solar-energy potential and climate normals sampled at this place. These are near-constant across the area; aggregate them by sub-area below to compare comunas.',
+                'Potencial de energia solar y normales climaticas muestreadas en este lugar. Son casi constantes en el area; agregalas por sub-area mas abajo para comparar comunas.',
+              )}
+            </p>
+            <div className="mq-envgrid">
+              {Object.entries(manifest.environment.values).map(([k, v]) => {
+                const m = manifest.environment!.meta[k];
+                const val = Math.abs(v) >= 1000 ? v.toLocaleString() : Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(1);
+                return (
+                  <div className="mq-envrow" key={k}>
+                    <span className="mq-envlabel">{m?.label ?? k}</span>
+                    <span className="mq-envval">
+                      <b>{val}</b> <i>{m?.unit ?? ''}</i>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            {manifest.environment.sources?.length > 0 && (
+              <p className="mq-sub mq-muted">
+                {t('Sources', 'Fuentes')}: {manifest.environment.sources.map((s) => s.source).join(' · ')}
+              </p>
+            )}
+          </Section>
+        )}
 
         <Section title={t('Colour buildings by', 'Colorear edificios por')}>
           <div className="mq-seg mq-seg-wrap">
@@ -313,25 +371,54 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
           <Section title={t('Aggregate by admin area', 'Agregar por area administrativa')} defaultOpen={false}>
             <p className="mq-sub">
               {t(
-                `${adminUnits.length} sub-areas (comunas / districts). Colour every building by its area's average, and read the ranked table.`,
-                `${adminUnits.length} sub-areas (comunas / distritos). Colorea cada edificio por el promedio de su area, y lee la tabla ordenada.`,
+                `${adminUnits.length} sub-areas (comunas / districts). Choose a layer to colour every unit and read the ranked table: building averages, geophysical environment (solar / climate), or socio-economic indicators.`,
+                `${adminUnits.length} sub-areas (comunas / distritos). Elige una capa para colorear cada unidad y leer la tabla ordenada: promedios de edificios, ambiente geofisico (solar / clima), o indicadores socioeconomicos.`,
               )}
             </p>
+            <span className="mq-sub mq-agg-group">{t('Building averages', 'Promedios de edificios')}</span>
             <div className="mq-seg mq-seg-wrap">
               {numericAttrs.map((a) => (
                 <button key={a.key} className={adminAttr === a.key ? 'on' : ''} onClick={() => chooseAdmin(a.key)}>
                   {a[lang]}
                 </button>
               ))}
-              {adminAttr && <button onClick={() => chooseAdmin(null)}>{t('Clear', 'Limpiar')}</button>}
             </div>
+            {adminUnitAttrs.some((a) => a.group === 'environment') && (
+              <>
+                <span className="mq-sub mq-agg-group">{t('Environment (solar / climate)', 'Ambiente (solar / clima)')}</span>
+                <div className="mq-seg mq-seg-wrap">
+                  {adminUnitAttrs.filter((a) => a.group === 'environment').map((a) => (
+                    <button key={a.key} className={adminAttr === a.key ? 'on' : ''} onClick={() => chooseAdmin(a.key)}>
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {adminUnitAttrs.some((a) => a.group === 'indicator') && (
+              <>
+                <span className="mq-sub mq-agg-group">{t('Data Observatory (Chile)', 'Observatorio de Datos (Chile)')}</span>
+                <div className="mq-seg mq-seg-wrap">
+                  {adminUnitAttrs.filter((a) => a.group === 'indicator').map((a) => (
+                    <button key={a.key} className={adminAttr === a.key ? 'on' : ''} onClick={() => chooseAdmin(a.key)}>
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {adminAttr && (
+              <div className="mq-seg">
+                <button onClick={() => chooseAdmin(null)}>{t('Clear', 'Limpiar')}</button>
+              </div>
+            )}
             {adminTable.length > 0 && (
               <div className="mq-admin-tablewrap">
                 <table className="mq-admin-table">
                   <thead>
                     <tr>
                       <th>{t('Area', 'Area')}</th>
-                      <th>{numericAttrs.find((a) => a.key === adminAttr)?.[lang]} {numericAttrs.find((a) => a.key === adminAttr)?.unit}</th>
+                      <th>{adminAttrMeta(adminAttr).label} {adminAttrMeta(adminAttr).unit}</th>
                       <th>n</th>
                     </tr>
                   </thead>
@@ -339,7 +426,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
                     {adminTable.map((u) => (
                       <tr key={u.name}>
                         <td>{u.name}</td>
-                        <td><b>{Number.isFinite(u.value) ? u.value.toFixed(u.value < 10 ? 2 : 0) : '-'}</b></td>
+                        <td><b>{Number.isFinite(u.value) ? u.value.toFixed(Math.abs(u.value) < 10 ? 2 : Math.abs(u.value) < 100 ? 1 : 0) : '-'}</b></td>
                         <td className="mq-muted">{u.count.toLocaleString()}</td>
                       </tr>
                     ))}

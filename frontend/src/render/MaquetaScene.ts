@@ -125,8 +125,19 @@ export class MaquetaScene {
   private vShade: Float32Array = new Float32Array(0); // per-vertex baked shade (base darker -> roof lighter)
   private centById = new Map<number, { x: number; z: number }>(); // world-space footprint centroid per building
   private areaGroup: THREE.Group | null = null; // the drawn area-of-interest polygon overlay
-  // Admin sub-areas (comunas/districts) for aggregate-by-unit + choropleth.
-  private adminUnits: { name: string; rings: AreaPoint[][]; bbox: [number, number, number, number] }[] = [];
+  // Admin sub-areas (comunas/districts) for aggregate-by-unit + choropleth. A unit also carries its own
+  // scalar layers: env (solar/climate sampled at the unit centroid) + indicators (Data Observatory, Chile),
+  // so the choropleth spans geophysical + socio-economic values, not only building-derived means.
+  private adminUnits: {
+    name: string;
+    rings: AreaPoint[][];
+    bbox: [number, number, number, number];
+    count: number;
+    env?: Record<string, number>;
+    indicators?: Record<string, number>;
+  }[] = [];
+  private adminEnvMeta: Record<string, { label: string; unit: string }> = {};
+  private adminIndMeta: Record<string, { label: string; unit: string }> = {};
   private buildingUnit = new Map<number, number>(); // building id -> admin unit index (-1 = none)
   private adminGroup: THREE.Group | null = null; // drawn admin-boundary overlay
   private groundY = 0; // mean scene elevation (m): meshes sit at absolute altitude, so high places (Atacama,
@@ -790,7 +801,13 @@ export class MaquetaScene {
     try {
       const res = await fetch(`${baseUrl}/admin.json`);
       if (!res.ok) return [];
-      const data = (await res.json()) as { units?: { name: string; rings: number[][][] }[] };
+      const data = (await res.json()) as {
+        units?: { name: string; rings: number[][][]; env?: Record<string, number>; indicators?: Record<string, number> }[];
+        env_meta?: Record<string, { label: string; unit: string }>;
+        indicator_meta?: Record<string, { label: string; unit: string }>;
+      };
+      this.adminEnvMeta = data.env_meta ?? {};
+      this.adminIndMeta = data.indicator_meta ?? {};
       this.adminUnits = (data.units ?? []).map((u) => {
         const rings = u.rings.map((r) => r.map(([x, z]) => ({ x, z })));
         let xmin = Infinity;
@@ -804,9 +821,15 @@ export class MaquetaScene {
             if (p.z < zmin) zmin = p.z;
             if (p.z > zmax) zmax = p.z;
           }
-        return { name: u.name, rings, bbox: [xmin, zmin, xmax, zmax] as [number, number, number, number] };
+        return {
+          name: u.name,
+          rings,
+          bbox: [xmin, zmin, xmax, zmax] as [number, number, number, number],
+          count: 0,
+          env: u.env,
+          indicators: u.indicators,
+        };
       });
-      const counts = new Array(this.adminUnits.length).fill(0);
       for (const [id, c] of this.centById) {
         let ui = -1;
         for (let u = 0; u < this.adminUnits.length; u++) {
@@ -818,9 +841,9 @@ export class MaquetaScene {
           }
         }
         this.buildingUnit.set(id, ui);
-        if (ui >= 0) counts[ui]++;
+        if (ui >= 0) this.adminUnits[ui].count++;
       }
-      return this.adminUnits.map((u, i) => ({ name: u.name, count: counts[i] }));
+      return this.adminUnits.map((u) => ({ name: u.name, count: u.count }));
     } catch {
       return [];
     }
@@ -830,8 +853,40 @@ export class MaquetaScene {
     return this.adminUnits.length > 0;
   }
 
-  // Per-unit aggregate of one attribute (mean over the buildings in each unit).
+  // The unit-level scalar layers available for this place (solar/climate env + Data Observatory indicators),
+  // as aggregation attributes the UI can offer alongside the building-derived ones. Keys are namespaced
+  // (env:<k> / ind:<k>) so adminStats can tell them from building attributes.
+  adminUnitAttributes(): { key: string; label: string; unit: string; group: 'environment' | 'indicator' }[] {
+    const out: { key: string; label: string; unit: string; group: 'environment' | 'indicator' }[] = [];
+    const seenEnv = new Set<string>();
+    const seenInd = new Set<string>();
+    for (const u of this.adminUnits) {
+      for (const k of Object.keys(u.env ?? {})) seenEnv.add(k);
+      for (const k of Object.keys(u.indicators ?? {})) seenInd.add(k);
+    }
+    for (const k of seenEnv) {
+      const m = this.adminEnvMeta[k];
+      out.push({ key: `env:${k}`, label: m?.label ?? k, unit: m?.unit ?? '', group: 'environment' });
+    }
+    for (const k of seenInd) {
+      const m = this.adminIndMeta[k];
+      out.push({ key: `ind:${k}`, label: m?.label ?? k, unit: m?.unit ?? '', group: 'indicator' });
+    }
+    return out;
+  }
+
+  // Per-unit aggregate of one attribute. Building attributes are averaged over the buildings in each unit;
+  // unit-level layers (env:<k> / ind:<k>) are the scalar baked at the unit itself (solar/climate/DO indicator).
   adminStats(attrKey: string): { name: string; value: number; count: number }[] {
+    if (attrKey.startsWith('env:') || attrKey.startsWith('ind:')) {
+      const isEnv = attrKey.startsWith('env:');
+      const k = attrKey.slice(4);
+      return this.adminUnits.map((u) => {
+        const src = isEnv ? u.env : u.indicators;
+        const v = src && src[k] != null ? src[k] : NaN;
+        return { name: u.name, value: v, count: u.count };
+      });
+    }
     const spec = attrSpec(attrKey);
     const n = this.adminUnits.length;
     const sums = new Array(n).fill(0);
