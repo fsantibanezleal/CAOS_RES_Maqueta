@@ -349,7 +349,10 @@ export class MaquetaScene {
         if (this.edgesOn) this.buildEdges(geom, root);
       } else {
         m.material = this.layerMaterial(layer.name);
-        if (layer.name === 'terrain') this.prepareTerrain(m.geometry as THREE.BufferGeometry);
+        if (layer.name === 'terrain') {
+          m.updateWorldMatrix(true, false);
+          this.prepareTerrain(m.geometry as THREE.BufferGeometry, m.matrixWorld);
+        }
         else if (layer.name === 'lod2') {
           m.castShadow = true;
           m.receiveShadow = true;
@@ -891,7 +894,7 @@ export class MaquetaScene {
   // into ZERO-AREA triangles. Any normal built from a zero-area face is a zero/NaN vector, and normalize()
   // of that in the shader yields NaN which renders as pure black (swallowing even the emissive floor) over
   // the whole steep region. So: drop the degenerate triangles from the index first, THEN compute normals.
-  private prepareTerrain(geom: THREE.BufferGeometry) {
+  private prepareTerrain(geom: THREE.BufferGeometry, worldMatrix: THREE.Matrix4) {
     const pos = geom.getAttribute('position') as THREE.BufferAttribute | undefined;
     if (!pos) return;
     const idx = geom.getIndex();
@@ -956,6 +959,7 @@ export class MaquetaScene {
       }
       const span = hiY - loY || 1;
       const toLight = new THREE.Vector3(-0.4, 0.82, 0.42).normalize();
+      const wm = worldMatrix.elements; // to read each vertex's ABSOLUTE altitude (for the snow line)
       // Earthy hypsometric ramp (valley -> slope -> ridge -> peak). All kept well BELOW the pale sky
       // background luminance so the surface always reads as a solid coloured terrain, never washing into
       // the sky. A snow cap only kicks in on genuinely high, near-flat tops. Stored linear.
@@ -977,8 +981,12 @@ export class MaquetaScene {
         let hr = lo[0] + (hi[0] - lo[0]) * u;
         let hg = lo[1] + (hi[1] - lo[1]) * u;
         let hb = lo[2] + (hi[2] - lo[2]) * u;
-        // snow on the highest, flattest tops (bright normal.y) so alpine peaks read as snow, not just rock
-        const snowAmt = f > 0.82 ? Math.min(1, (f - 0.82) / 0.18) * Math.max(0, (ny - 0.7) / 0.3) : 0;
+        // Snow keyed to ABSOLUTE altitude (not relative elevation within the AOI), else desert plateaus
+        // (Giza) get false snow. Ramp 2900 m -> 3600 m, only on the flatter, sun-facing tops. This lights
+        // up genuine alpine peaks (Matterhorn, Fuji) and leaves low/mid places earthy.
+        const worldY = wm[1] * pos.getX(i) + wm[5] * pos.getY(i) + wm[9] * pos.getZ(i) + wm[13];
+        const highAlt = Math.max(0, Math.min(1, (worldY - 2900) / 700));
+        const snowAmt = highAlt * Math.max(0, (ny - 0.5) / 0.5);
         if (snowAmt > 0) {
           hr = hr + (snow[0] - hr) * snowAmt;
           hg = hg + (snow[1] - hg) * snowAmt;

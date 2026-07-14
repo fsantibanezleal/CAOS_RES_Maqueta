@@ -3,6 +3,33 @@
 All notable changes to Maqueta. Format: [Keep a Changelog](https://keepachangelog.com/); versions use
 `X.XX.XXX` (display). `0.x` while the place set and API stabilize. Tag every release.
 
+## [0.07.000] - 2026-07-13
+
+### Added
+- **29 new places (107 total).** Chile: Calama, Antofagasta, Sierra Gorda, Valdivia, Chiloe (Castro).
+  World metros: Shanghai, Beijing, Hong Kong, Delhi, Bangkok, Jakarta, Dubai, Los Angeles, Chicago, Lagos.
+  Iconic landmarks + landscapes: Giza Pyramids, Machu Picchu, Taj Mahal (Agra), Great Wall, Petra, Angkor
+  Wat, Mount Fuji, Rio de Janeiro, Venice, Matterhorn, Yosemite, Victoria Falls, Santorini, Monument Valley.
+- **Searchable place picker.** Replaces the native select (unusable at 100+ places): type to filter by
+  city / country / landmark, results grouped by continent with sticky headers.
+
+### Changed
+- **Cinematic default view.** The app opens on a low oblique that fills the frame with the built fabric and
+  lets it recede to the far relief hazing into the sky.
+- **Terrain rendering overhaul** (fixes terrain-first places rendering off-screen and as a transparent/grey
+  surface): frame at the terrain's true altitude so high places (Atacama, Chuquicamata ~2500 m) are in
+  view; render the terrain DoubleSide with flipped normals (the baked TIN winding was inverted, back-face-
+  culling the flat surface); bake a hillshade + earthy hypsometric ramp with altitude-gated snow caps into
+  the vertex colours (lighting-independent). Terrain-first places now read as solid coloured 3D landscapes;
+  cities sit on visible coloured ground with the Andes as earthy relief.
+
+### Fixed
+- Open Buildings 2.5D fetcher (`geoscena`): a `/vsicurl` COG open on GCS triggered a full bucket directory
+  listing; added `GDAL_DISABLE_READDIR_ON_OPEN` + HTTP timeout/retries (mirrors `rastermod.py`), cutting
+  each Global-South height fetch from minutes to seconds.
+
+[0.07.000]: https://github.com/fsantibanezleal/CAOS_RES_Maqueta/releases/tag/v0.07.000
+
 ## [0.06.000] - 2026-07-13
 
 ### Added
