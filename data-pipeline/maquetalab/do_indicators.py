@@ -10,6 +10,7 @@ Indicators (each a real DO dataset, honestly labelled, no fabrication):
 
   * ``health_facilities``  count of currently-operating health establishments (MINSAL, 2025 snapshot).
   * ``foreign_pop``        estimated foreign-born residents (INE/DEM registry estimate, latest year).
+  * ``schools``            count of official education establishments (MINEDUC directory, 2012 snapshot).
 
 The join is by comuna NAME, accent- and case-normalised (geoBoundaries carries the name, not the CUT code);
 comunas that do not match are simply absent for that indicator. If the Atalaya mirror is not present (e.g. a
@@ -27,6 +28,7 @@ ATALAYA = Path(r"E:\_Datos\atalaya\derived")
 INDICATOR_META: dict[str, tuple[str, str]] = {
     "health_facilities": ("Health facilities", "count"),
     "foreign_pop": ("Foreign-born residents", "people"),
+    "schools": ("Schools", "count"),
 }
 
 
@@ -67,13 +69,33 @@ def _load_foreign_pop() -> dict[str, float]:
         return {}
 
 
+def _load_schools() -> dict[str, float]:
+    import glob
+
+    fs = sorted(glob.glob(str(ATALAYA / "establecimientos-educacionales" / "Directorio_oficial_EE_*.parquet")))
+    if not fs:
+        return {}
+    try:
+        import pandas as pd
+
+        df = pd.read_parquet(fs[-1], columns=["nom_com_rbd"])  # latest available directory year
+        counts = df["nom_com_rbd"].map(_norm).value_counts()
+        return {k: float(v) for k, v in counts.items() if k and k != "NAN"}
+    except Exception:
+        return {}
+
+
 _MAPS: dict[str, dict[str, float]] | None = None
 
 
 def _maps() -> dict[str, dict[str, float]]:
     global _MAPS
     if _MAPS is None:
-        _MAPS = {"health_facilities": _load_health(), "foreign_pop": _load_foreign_pop()}
+        _MAPS = {
+            "health_facilities": _load_health(),
+            "foreign_pop": _load_foreign_pop(),
+            "schools": _load_schools(),
+        }
     return _MAPS
 
 
