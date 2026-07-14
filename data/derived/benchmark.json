@@ -2,19 +2,19 @@
   "schema_version": 1,
   "n_places": 118,
   "global_height_mix": {
-    "measured": 543512,
-    "floors": 329880,
-    "raster": 3207611,
-    "prior": 688939
+    "measured": 357732,
+    "floors": 259616,
+    "raster": 2965164,
+    "prior": 470826
   },
   "global_height_fraction": {
-    "measured": 0.114,
-    "floors": 0.069,
-    "raster": 0.672,
-    "prior": 0.144
+    "measured": 0.088,
+    "floors": 0.064,
+    "raster": 0.732,
+    "prior": 0.116
   },
   "tier_totals_mb": {
-    "B": 2058.27,
+    "B": 1749.22,
     "A": 33.14,
     "C": 1.16
   },
@@ -23,7 +23,7 @@
     "A": 10,
     "C": 18
   },
-  "total_mb": 2092.57,
+  "total_mb": 1783.52,
   "per_place": [
     {
       "slug": "amsterdam_center",
@@ -384,9 +384,9 @@
       "name": "Barcelona (metro core)",
       "tier": "B",
       "country": "Spain",
-      "n_layers": 4,
-      "total_triangles": 4295844,
-      "total_mb": 46.152,
+      "n_layers": 7,
+      "total_triangles": 4384332,
+      "total_mb": 46.616,
       "height_mix": {
         "measured": 12911,
         "floors": 30476,
@@ -432,22 +432,22 @@
       "name": "Berlin (metro core)",
       "tier": "B",
       "country": "Germany",
-      "n_layers": 4,
-      "total_triangles": 6859252,
-      "total_mb": 76.88,
+      "n_layers": 7,
+      "total_triangles": 3165051,
+      "total_mb": 31.968,
       "height_mix": {
-        "measured": 32436,
-        "floors": 55329,
+        "measured": 11172,
+        "floors": 31823,
         "raster": 0,
-        "prior": 29978
+        "prior": 11005
       },
       "height_fraction": {
-        "measured": 0.275,
-        "floors": 0.47,
+        "measured": 0.207,
+        "floors": 0.589,
         "raster": 0.0,
-        "prior": 0.255
+        "prior": 0.204
       },
-      "measured_pct": 27.5,
+      "measured_pct": 20.7,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -505,17 +505,17 @@
       "tier": "B",
       "country": "Argentina",
       "n_layers": 7,
-      "total_triangles": 3677527,
-      "total_mb": 87.945,
+      "total_triangles": 3539780,
+      "total_mb": 84.717,
       "height_mix": {
-        "measured": 314,
-        "floors": 2151,
-        "raster": 229046,
-        "prior": 576
+        "measured": 313,
+        "floors": 2122,
+        "raster": 219903,
+        "prior": 538
       },
       "height_fraction": {
         "measured": 0.001,
-        "floors": 0.009,
+        "floors": 0.01,
         "raster": 0.987,
         "prior": 0.002
       },
@@ -696,22 +696,22 @@
       "name": "Delhi (metro core)",
       "tier": "B",
       "country": "India",
-      "n_layers": 4,
-      "total_triangles": 3761409,
-      "total_mb": 76.593,
+      "n_layers": 7,
+      "total_triangles": 1863546,
+      "total_mb": 37.711,
       "height_mix": {
-        "measured": 76,
-        "floors": 1781,
-        "raster": 187816,
-        "prior": 6025
+        "measured": 55,
+        "floors": 639,
+        "raster": 83919,
+        "prior": 2100
       },
       "height_fraction": {
-        "measured": 0.0,
-        "floors": 0.009,
-        "raster": 0.96,
-        "prior": 0.031
+        "measured": 0.001,
+        "floors": 0.007,
+        "raster": 0.968,
+        "prior": 0.024
       },
-      "measured_pct": 0.0,
+      "measured_pct": 0.1,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -888,22 +888,22 @@
       "name": "London (metro core)",
       "tier": "B",
       "country": "UK",
-      "n_layers": 4,
-      "total_triangles": 7655619,
-      "total_mb": 105.379,
+      "n_layers": 7,
+      "total_triangles": 4386441,
+      "total_mb": 53.929,
       "height_mix": {
-        "measured": 37652,
-        "floors": 62433,
+        "measured": 16300,
+        "floors": 28315,
         "raster": 0,
-        "prior": 120585
+        "prior": 51612
       },
       "height_fraction": {
-        "measured": 0.171,
-        "floors": 0.283,
+        "measured": 0.169,
+        "floors": 0.294,
         "raster": 0.0,
-        "prior": 0.546
+        "prior": 0.536
       },
-      "measured_pct": 17.1,
+      "measured_pct": 16.9,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -960,19 +960,19 @@
       "name": "Mexico City (metro core)",
       "tier": "B",
       "country": "Mexico",
-      "n_layers": 4,
-      "total_triangles": 5492795,
-      "total_mb": 111.131,
+      "n_layers": 7,
+      "total_triangles": 3041059,
+      "total_mb": 60.783,
       "height_mix": {
-        "measured": 464,
-        "floors": 2706,
-        "raster": 271793,
-        "prior": 1427
+        "measured": 239,
+        "floors": 1893,
+        "raster": 138080,
+        "prior": 645
       },
       "height_fraction": {
         "measured": 0.002,
-        "floors": 0.01,
-        "raster": 0.983,
+        "floors": 0.013,
+        "raster": 0.98,
         "prior": 0.005
       },
       "measured_pct": 0.2,
@@ -1056,22 +1056,22 @@
       "name": "New York (metro core)",
       "tier": "B",
       "country": "USA",
-      "n_layers": 4,
-      "total_triangles": 7164100,
-      "total_mb": 109.357,
+      "n_layers": 7,
+      "total_triangles": 3557805,
+      "total_mb": 50.875,
       "height_mix": {
-        "measured": 239731,
-        "floors": 214,
+        "measured": 97730,
+        "floors": 108,
         "raster": 0,
-        "prior": 2154
+        "prior": 597
       },
       "height_fraction": {
-        "measured": 0.99,
+        "measured": 0.993,
         "floors": 0.001,
         "raster": 0.0,
-        "prior": 0.009
+        "prior": 0.006
       },
-      "measured_pct": 99.0,
+      "measured_pct": 99.3,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -1104,22 +1104,22 @@
       "name": "Paris (metro core)",
       "tier": "B",
       "country": "France",
-      "n_layers": 4,
-      "total_triangles": 8933056,
-      "total_mb": 102.258,
+      "n_layers": 7,
+      "total_triangles": 7045818,
+      "total_mb": 73.82,
       "height_mix": {
-        "measured": 10865,
-        "floors": 65467,
+        "measured": 4842,
+        "floors": 57901,
         "raster": 0,
-        "prior": 86364
+        "prior": 44299
       },
       "height_fraction": {
-        "measured": 0.067,
-        "floors": 0.402,
+        "measured": 0.045,
+        "floors": 0.541,
         "raster": 0.0,
-        "prior": 0.531
+        "prior": 0.414
       },
-      "measured_pct": 6.7,
+      "measured_pct": 4.5,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -1297,21 +1297,21 @@
       "tier": "B",
       "country": "Brazil",
       "n_layers": 7,
-      "total_triangles": 5300603,
-      "total_mb": 78.572,
+      "total_triangles": 5841249,
+      "total_mb": 87.178,
       "height_mix": {
-        "measured": 130289,
-        "floors": 475,
-        "raster": 15427,
-        "prior": 426
+        "measured": 144919,
+        "floors": 524,
+        "raster": 19733,
+        "prior": 536
       },
       "height_fraction": {
-        "measured": 0.889,
+        "measured": 0.875,
         "floors": 0.003,
-        "raster": 0.105,
+        "raster": 0.119,
         "prior": 0.003
       },
-      "measured_pct": 88.9,
+      "measured_pct": 87.5,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -1320,22 +1320,22 @@
       "name": "Seoul (metro core)",
       "tier": "B",
       "country": "South Korea",
-      "n_layers": 4,
-      "total_triangles": 3006559,
-      "total_mb": 48.702,
+      "n_layers": 7,
+      "total_triangles": 1535112,
+      "total_mb": 22.407,
       "height_mix": {
-        "measured": 9171,
-        "floors": 4483,
+        "measured": 4142,
+        "floors": 2596,
         "raster": 0,
-        "prior": 94152
+        "prior": 52173
       },
       "height_fraction": {
-        "measured": 0.085,
-        "floors": 0.042,
+        "measured": 0.07,
+        "floors": 0.044,
         "raster": 0.0,
-        "prior": 0.873
+        "prior": 0.886
       },
-      "measured_pct": 8.5,
+      "measured_pct": 7.0,
       "any_noncommercial": false,
       "ground_truth": null
     },
@@ -2329,21 +2329,21 @@
       "tier": "B",
       "country": "Japan",
       "n_layers": 7,
-      "total_triangles": 4747045,
-      "total_mb": 84.789,
+      "total_triangles": 3884947,
+      "total_mb": 68.699,
       "height_mix": {
-        "measured": 8003,
-        "floors": 12441,
+        "measured": 3509,
+        "floors": 11295,
         "raster": 0,
-        "prior": 198778
+        "prior": 158847
       },
       "height_fraction": {
-        "measured": 0.037,
-        "floors": 0.057,
+        "measured": 0.02,
+        "floors": 0.065,
         "raster": 0.0,
-        "prior": 0.907
+        "prior": 0.915
       },
-      "measured_pct": 3.7,
+      "measured_pct": 2.0,
       "any_noncommercial": false,
       "ground_truth": null
     },

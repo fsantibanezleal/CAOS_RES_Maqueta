@@ -3,10 +3,10 @@
   "aoi": {
     "name": "Berlin (metro core)",
     "bbox_wgs84": [
-      13.308039905250736,
-      52.46160977362559,
-      13.499960094749264,
-      52.57839022637442
+      13.33756608825051,
+      52.47957599712541,
+      13.47043391174949,
+      52.5604240028746
     ],
     "origin_wgs84": [
       13.404,
@@ -14,8 +14,8 @@
     ],
     "crs_local": "+proj=aeqd +lat_0=52.52 +lon_0=13.404 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
     "size_m": [
-      12999.99999999998,
-      12999.999999999443
+      8999.999999999913,
+      8999.999999999736
     ]
   },
   "layers": [
@@ -25,7 +25,7 @@
       "stats": {
         "kind": "mesh",
         "vertices": 6000,
-        "triangles": 11881,
+        "triangles": 11854,
         "features": 0
       },
       "provenance": {
@@ -39,8 +39,8 @@
             "Copernicus_DSM_COG_10_N52_00_E013_00_DEM"
           ],
           "grid": [
-            462,
-            760
+            320,
+            526
           ]
         },
         "license_name": "Copernicus DEM free-of-charge license (ESA/DLR)",
@@ -53,9 +53,9 @@
       "file": "buildings.glb",
       "stats": {
         "kind": "mesh",
-        "vertices": 2338350,
-        "triangles": 3272013,
-        "features": 117743
+        "vertices": 1224024,
+        "triangles": 1728020,
+        "features": 54000
       },
       "provenance": {
         "source": "Overture Maps buildings",
@@ -65,31 +65,7 @@
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
-          "n_buildings": 117743
-        },
-        "license_name": "Open Data Commons Open Database License v1.0",
-        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
-        "commercial_ok": true
-      }
-    },
-    {
-      "name": "buildings_lite",
-      "file": "buildings_lite.glb",
-      "stats": {
-        "kind": "mesh",
-        "vertices": 903274,
-        "triangles": 1310895,
-        "features": 22000
-      },
-      "provenance": {
-        "source": "Overture Maps buildings",
-        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
-        "license": "ODbL-1.0",
-        "fetched": "2026-07-14",
-        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
-        "extra": {
-          "release": "2026-06-17.0",
-          "n_buildings": 117743
+          "n_buildings": 54000
         },
         "license_name": "Open Data Commons Open Database License v1.0",
         "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
@@ -101,8 +77,8 @@
       "file": "roads.glb",
       "stats": {
         "kind": "mesh",
-        "vertices": 2208433,
-        "triangles": 1991003,
+        "vertices": 1223547,
+        "triangles": 1102157,
         "features": 0
       },
       "provenance": {
@@ -113,7 +89,76 @@
         "method": "overturemaps CLI bbox extract of GeoParquet on S3",
         "extra": {
           "release": "2026-06-17.0",
-          "n_segments": 108699
+          "n_segments": 60683
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "water",
+      "file": "water.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 9247,
+        "triangles": 8815,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (water)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "OSMnx features_from_bbox with tags {'natural': ['water'], 'water': True, 'waterway': ['riverbank', 'dock']}",
+        "extra": {
+          "n_features": 216
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "green",
+      "file": "green.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 139042,
+        "triangles": 119016,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (green)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "OSMnx features_from_bbox with tags {'leisure': ['park', 'garden', 'pitch'], 'landuse': ['grass', 'forest', 'meadow'], 'natural': ['wood', 'scrub']}",
+        "extra": {
+          "n_features": 10753
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "rail",
+      "file": "rail.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 68755,
+        "triangles": 62559,
+        "features": 0
+      },
+      "provenance": {
+        "source": "OpenStreetMap (rail)",
+        "url": "https://www.openstreetmap.org/ (Overpass via OSMnx)",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "OSMnx features_from_bbox with tags {'railway': ['rail', 'light_rail', 'subway', 'tram']}",
+        "extra": {
+          "n_features": 3098
         },
         "license_name": "Open Data Commons Open Database License v1.0",
         "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
@@ -125,8 +170,8 @@
       "file": "population.glb",
       "stats": {
         "kind": "mesh",
-        "vertices": 218768,
-        "triangles": 273460,
+        "vertices": 106104,
+        "triangles": 132630,
         "features": 0
       },
       "provenance": {
@@ -137,8 +182,8 @@
         "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
         "extra": {
           "grid": [
-            130,
-            214
+            90,
+            148
           ]
         },
         "license_name": "Creative Commons Attribution 4.0",
@@ -151,58 +196,71 @@
     "layers": [
       "terrain",
       "buildings",
-      "buildings_lite",
       "roads",
+      "water",
+      "green",
+      "rail",
       "population"
     ],
     "height_mix": {
-      "measured": 32436,
-      "floors": 55329,
+      "measured": 11172,
+      "floors": 31823,
       "raster": 0,
-      "prior": 29978
+      "prior": 11005
     },
     "budgets": {
       "terrain": {
         "kind": "mesh",
         "vertices": 6000,
-        "triangles": 11881,
+        "triangles": 11854,
         "features": 0
       },
       "buildings": {
         "kind": "mesh",
-        "vertices": 2338350,
-        "triangles": 3272013,
-        "features": 117743
-      },
-      "buildings_lite": {
-        "kind": "mesh",
-        "vertices": 903274,
-        "triangles": 1310895,
-        "features": 22000
+        "vertices": 1224024,
+        "triangles": 1728020,
+        "features": 54000
       },
       "roads": {
         "kind": "mesh",
-        "vertices": 2208433,
-        "triangles": 1991003,
+        "vertices": 1223547,
+        "triangles": 1102157,
+        "features": 0
+      },
+      "water": {
+        "kind": "mesh",
+        "vertices": 9247,
+        "triangles": 8815,
+        "features": 0
+      },
+      "green": {
+        "kind": "mesh",
+        "vertices": 139042,
+        "triangles": 119016,
+        "features": 0
+      },
+      "rail": {
+        "kind": "mesh",
+        "vertices": 68755,
+        "triangles": 62559,
         "features": 0
       },
       "population": {
         "kind": "mesh",
-        "vertices": 218768,
-        "triangles": 273460,
+        "vertices": 106104,
+        "triangles": 132630,
         "features": 0
       }
     },
     "ground_truth": null,
     "notes": [
       "environment: precip_annual, solar_ghi, solar_pvout, temp_max, temp_mean, temp_min, wind_max_mean",
-      "modality soil_soc: 6571/117743 sampled",
+      "modality soil_soc: 1392/54000 sampled",
       "modality solar_ghi skipped: FileNotFoundError",
-      "s2 ndvi: 117538/117743 sampled",
-      "s2 ndwi: 117538/117743 sampled",
-      "s2 ndbi: 117538/117743 sampled",
-      "lite LoD proxy: 22000/117743 buildings",
-      "population total ~116632816"
+      "s2 ndvi: 53829/54000 sampled",
+      "s2 ndwi: 53829/54000 sampled",
+      "s2 ndbi: 53836/54000 sampled",
+      "population total ~68106056"
     ]
   },
   "modalities": [
@@ -351,6 +409,9 @@
     "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
     "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
     "ISRIC SoilGrids 2.0 (Creative Commons Attribution 4.0)",
+    "OpenStreetMap (green) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (rail) (Open Data Commons Open Database License v1.0)",
+    "OpenStreetMap (water) (Open Data Commons Open Database License v1.0)",
     "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
     "Overture Maps transportation (Open Data Commons Open Database License v1.0)",
     "Sentinel-2 L2A (S2A_33UUU_20230910_1_L2A, 2023-09-10, 0% cloud) (proprietary)"

@@ -893,8 +893,8 @@
       "continent": "Europe",
       "country": "Spain",
       "city": "Barcelona",
-      "n_layers": 4,
-      "total_bytes": 46152248,
+      "n_layers": 7,
+      "total_bytes": 46615628,
       "manifest_path": "barcelona_full/manifest.json"
     },
     {
@@ -917,8 +917,8 @@
       "continent": "Europe",
       "country": "Germany",
       "city": "Berlin",
-      "n_layers": 4,
-      "total_bytes": 76880164,
+      "n_layers": 7,
+      "total_bytes": 31968388,
       "manifest_path": "berlin_full/manifest.json"
     },
     {
@@ -966,7 +966,7 @@
       "country": "Argentina",
       "city": "Buenos Aires",
       "n_layers": 7,
-      "total_bytes": 87944952,
+      "total_bytes": 84717088,
       "manifest_path": "buenos_aires_full/manifest.json"
     },
     {
@@ -1085,8 +1085,8 @@
       "continent": "Asia",
       "country": "India",
       "city": "Delhi",
-      "n_layers": 4,
-      "total_bytes": 76593160,
+      "n_layers": 7,
+      "total_bytes": 37711096,
       "manifest_path": "delhi_full/manifest.json"
     },
     {
@@ -1253,8 +1253,8 @@
       "continent": "Europe",
       "country": "UK",
       "city": "London",
-      "n_layers": 4,
-      "total_bytes": 105378600,
+      "n_layers": 7,
+      "total_bytes": 53928580,
       "manifest_path": "london_full/manifest.json"
     },
     {
@@ -1325,8 +1325,8 @@
       "continent": "North America",
       "country": "Mexico",
       "city": "Mexico City",
-      "n_layers": 4,
-      "total_bytes": 111131180,
+      "n_layers": 7,
+      "total_bytes": 60782668,
       "manifest_path": "mexico_city_full/manifest.json"
     },
     {
@@ -1409,8 +1409,8 @@
       "continent": "North America",
       "country": "USA",
       "city": "New York",
-      "n_layers": 4,
-      "total_bytes": 109356916,
+      "n_layers": 7,
+      "total_bytes": 50874660,
       "manifest_path": "nyc_full/manifest.json"
     },
     {
@@ -1433,8 +1433,8 @@
       "continent": "Europe",
       "country": "France",
       "city": "Paris",
-      "n_layers": 4,
-      "total_bytes": 102257920,
+      "n_layers": 7,
+      "total_bytes": 73819772,
       "manifest_path": "paris_full/manifest.json"
     },
     {
@@ -1542,7 +1542,7 @@
       "country": "Brazil",
       "city": "Sao Paulo",
       "n_layers": 7,
-      "total_bytes": 78572276,
+      "total_bytes": 87178352,
       "manifest_path": "sao_paulo_full/manifest.json"
     },
     {
@@ -1565,8 +1565,8 @@
       "continent": "Asia",
       "country": "South Korea",
       "city": "Seoul",
-      "n_layers": 4,
-      "total_bytes": 48701924,
+      "n_layers": 7,
+      "total_bytes": 22407244,
       "manifest_path": "seoul_full/manifest.json"
     },
     {
@@ -2082,7 +2082,7 @@
       "country": "Japan",
       "city": "Tokyo",
       "n_layers": 7,
-      "total_bytes": 84788784,
+      "total_bytes": 68699208,
       "manifest_path": "tokyo_full/manifest.json"
     },
     {

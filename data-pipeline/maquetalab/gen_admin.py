@@ -39,7 +39,10 @@ ISO3 = {
     "UAE": "ARE", "Nigeria": "NGA", "Peru": "PER", "Jordan": "JOR", "Cambodia": "KHM",
     "Greece": "GRC", "Zimbabwe": "ZWE", "Vietnam": "VNM", "Hong Kong": "HKG",
 }
-LEVELS = ["ADM3", "ADM2", "ADM1"]
+LEVELS = ["ADM4", "ADM3", "ADM2", "ADM1"]  # finest first (ADM4 = e.g. Berlin bezirke, Paris communes)
+# Pick the finest level whose unit count is in this range; a level with too many tiny units (e.g. Seoul at
+# ADM3 = 154 dongs, or France ADM4 = communes) makes a cluttered choropleth, so fall back to a coarser level.
+MAX_UNITS = 40
 
 _cache: dict[str, gpd.GeoDataFrame | None] = {}
 
@@ -95,18 +98,24 @@ def gen_for_place(p) -> int:
     if not iso3:
         return -1
     aoi = AOI.from_center(p.slug, p.lon, p.lat, p.half_size_m)
+    # Prefer the finest level whose unit count is in [2, MAX_UNITS]; if none is in range, fall back to the
+    # finest level with >=2 units (even if over the cap), so a place is never denied aggregation entirely.
     best: list[dict] = []
     best_lvl = ""
+    fallback: list[dict] = []
+    fallback_lvl = ""
     for adm in LEVELS:
         gdf = _load_country(iso3, adm)
         if gdf is None or gdf.empty:
             continue
         units = _units_for(aoi, gdf)
-        if len(units) >= 2:
+        if 2 <= len(units) <= MAX_UNITS:
             best, best_lvl = units, adm
             break
-        if len(units) > len(best):
-            best, best_lvl = units, adm
+        if len(units) >= 2 and not fallback:  # first (finest) level over the cap, kept as a fallback
+            fallback, fallback_lvl = units, adm
+    if not best:  # nothing in the sweet spot; use the finest level with >=2 units
+        best, best_lvl = fallback, fallback_lvl
     if len(best) < 2:  # a single enclosing unit is not a sub-area aggregation; skip
         return 0
     # Sample solar + climate at each unit centroid so the sub-area aggregation offers real per-comuna
