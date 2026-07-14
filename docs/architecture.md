@@ -8,5 +8,6 @@
 - [06, model evaluation](architecture/06_model-evaluation.md)
 - [07, deploy](architecture/07_deploy.md)
 - [08, the two data contracts](architecture/08_data-contracts.md)
+- [09, the analytical layers (satellite, environment, socio-economic)](architecture/09_analytical-layers.md)
 
 Binding decision: [ADR-0057](../../conventions/architecture/0-archetype/ADR-0057-product-repo-archetype.md).
