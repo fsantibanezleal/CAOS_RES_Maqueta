@@ -207,6 +207,31 @@ PLACES: list[Place] = [
     Place("lagos_island", "Lagos Island", "B", 3.3900, 6.4530, 1300, "Africa", "Nigeria", "Lagos",
           "Africa's largest metro; 2.5D heights"),
 
+    # --- World metro cores: large AOIs that span many official sub-areas (boroughs / wards / arrondissements /
+    #     districts / comunas), so the Aggregate-by-admin-area tool works globally, not only for Santiago.
+    Place("nyc_full", "New York (metro core)", "B", -73.9600, 40.7150, 7000, "North America", "USA", "New York",
+          "the five boroughs core (Manhattan/Brooklyn/Queens/Bronx); aggregate by borough"),
+    Place("london_full", "London (metro core)", "B", -0.1100, 51.5070, 6500, "Europe", "UK", "London",
+          "central London boroughs; aggregate by borough"),
+    Place("paris_full", "Paris (metro core)", "B", 2.3480, 48.8560, 5500, "Europe", "France", "Paris",
+          "arrondissements + petite couronne; aggregate by arrondissement/commune"),
+    Place("berlin_full", "Berlin (metro core)", "B", 13.4040, 52.5200, 6500, "Europe", "Germany", "Berlin",
+          "central Bezirke; aggregate by Bezirk"),
+    Place("barcelona_full", "Barcelona (metro core)", "B", 2.1650, 41.3900, 4500, "Europe", "Spain", "Barcelona",
+          "the city districtes; aggregate by districte"),
+    Place("tokyo_full", "Tokyo (metro core)", "B", 139.7520, 35.6850, 6500, "Asia", "Japan", "Tokyo",
+          "the central special wards; aggregate by ward (ku)"),
+    Place("seoul_full", "Seoul (metro core)", "B", 126.9860, 37.5520, 6000, "Asia", "South Korea", "Seoul",
+          "central gu districts; aggregate by gu"),
+    Place("delhi_full", "Delhi (metro core)", "B", 77.2100, 28.6300, 7000, "Asia", "India", "Delhi",
+          "central Delhi districts; aggregate by district"),
+    Place("mexico_city_full", "Mexico City (metro core)", "B", -99.1400, 19.4120, 6500, "North America", "Mexico", "Mexico City",
+          "the central alcaldias; aggregate by alcaldia"),
+    Place("buenos_aires_full", "Buenos Aires (metro core)", "B", -58.4400, -34.6100, 5500, "South America", "Argentina", "Buenos Aires",
+          "the CABA comunas; aggregate by comuna"),
+    Place("sao_paulo_full", "Sao Paulo (metro core)", "B", -46.6400, -23.5500, 6500, "South America", "Brazil", "Sao Paulo",
+          "central distritos/subprefeituras; aggregate by distrito"),
+
     # --- Tier C: terrain-first areas (little/no built-up) ---
     Place("chuquicamata", "Chuquicamata Mine", "C", -68.9020, -22.3020, 2500, "South America", "Chile", "Chuquicamata",
           "Chile; open-pit copper mine, terrain-dominated"),
