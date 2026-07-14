@@ -75,6 +75,11 @@
 .mq-select { padding: 0.55rem 0.8rem; border: 1px solid var(--color-accent); border-radius: 10px; background: color-mix(in srgb, var(--color-surface) 88%, transparent); }
 .mq-select-h { display: flex; align-items: baseline; gap: 0.8rem; }
 .mq-select-height { margin-left: auto; font-size: 1.6rem; font-weight: 700; color: var(--color-accent); }
+/* the active metric (colour-by attribute, or the aggregate-by-area layer) resolved for the selected building */
+.mq-select-metric { display: flex; align-items: baseline; justify-content: space-between; gap: 0.7rem; margin-top: 0.4rem; padding: 0.32rem 0.55rem; border-radius: 8px; background: color-mix(in srgb, var(--color-accent) 14%, transparent); }
+.mq-select-metric-label { font-size: 0.8rem; color: var(--color-fg); }
+.mq-select-metric-label i { font-style: normal; color: var(--color-fg-subtle); }
+.mq-select-metric-val { color: var(--color-accent); font-weight: 700; font-size: 1.05rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mq-select-attrs { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-top: 0.3rem; font-size: 0.85rem; }
 .mq-src { color: #fff; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; }
 .mq-tag { font-size: 0.8rem; padding: 0.1rem 0.5rem; border-radius: 6px; border: 1px solid var(--color-border); color: var(--color-fg); }

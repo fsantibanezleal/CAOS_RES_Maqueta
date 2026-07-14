@@ -903,6 +903,34 @@ export class MaquetaScene {
     return this.adminUnits.map((u, i) => ({ name: u.name, value: counts[i] ? sums[i] / counts[i] : NaN, count: counts[i] }));
   }
 
+  // The value of the currently-active metric FOR a specific selected building, for the read-out panel.
+  // Per-building attributes (height, NDVI, area, ...) return the building's own value; unit-level layers
+  // (env:<k> solar/climate, ind:<k> Data Observatory) return the value of the admin unit that contains the
+  // building (solar/wind/temperature are per-area, so "the value for the building" is its comuna's value).
+  metricForBuilding(id: number, attrKey: string, lang: 'en' | 'es'): { label: string; text: string; area?: string } | null {
+    const fmt = (v: number) => (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(1));
+    if (attrKey.startsWith('env:') || attrKey.startsWith('ind:')) {
+      const isEnv = attrKey.startsWith('env:');
+      const k = attrKey.slice(4);
+      const ui = this.buildingUnit.get(id) ?? -1;
+      if (ui < 0) return null;
+      const unit = this.adminUnits[ui];
+      const src = isEnv ? unit.env : unit.indicators;
+      const v = src?.[k];
+      if (v == null || !Number.isFinite(v)) return null;
+      const meta = (isEnv ? this.adminEnvMeta : this.adminIndMeta)[k];
+      return { label: meta?.label ?? k, text: `${fmt(v)}${meta?.unit ? ' ' + meta.unit : ''}`, area: unit.name };
+    }
+    const spec = attrSpec(attrKey);
+    const f = this.featuresById.get(id);
+    if (!f) return null;
+    const v = spec.value(f);
+    if (v == null) return null;
+    const label = lang === 'es' ? spec.es : spec.en;
+    const text = typeof v === 'number' ? `${fmt(v)}${spec.unit ? ' ' + spec.unit : ''}` : String(v);
+    return { label, text };
+  }
+
   // Colour every building by its admin unit's mean of `attrKey` (a choropleth), and draw the unit outlines.
   // Pass null to turn the choropleth off and restore the normal attribute colouring.
   setAdminChoropleth(attrKey: string | null) {

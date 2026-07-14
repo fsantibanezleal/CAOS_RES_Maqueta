@@ -249,7 +249,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
       {areaStats ? (
         <AreaStatsPanel stats={areaStats} scope={areaScope} onClose={clearArea} lang={lang} />
       ) : (
-        <SelectionPanel pick={pick} lang={lang} />
+        <SelectionPanel pick={pick} lang={lang} scene={sceneRef.current} colorMode={colorMode} adminAttr={adminAttr} />
       )}
       <button className="mq-panel-toggle" onClick={() => setPanelOpen((o) => !o)} title={t('Toggle controls', 'Alternar controles')}>
         {panelOpen ? '✕' : '☰'}
@@ -624,18 +624,31 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SelectionPanel({ pick, lang }: { pick: PickInfo | null; lang: Lang }) {
+function SelectionPanel({ pick, lang, scene, colorMode, adminAttr }: { pick: PickInfo | null; lang: Lang; scene: MaquetaScene | null; colorMode: string; adminAttr: string | null }) {
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
   if (!pick)
     return <div className="mq-select-hint">{t('Click any building to select it (it highlights in 3D) and read all its fused attributes.', 'Haz clic en un edificio para seleccionarlo (se resalta en 3D) y ver todos sus atributos fusionados.')}</div>;
   const f = pick.feature;
   const p = PROVENANCE[f.height_source];
+  // The value of whatever metric is currently active (the aggregate-by-area layer wins over the colour-by
+  // attribute), resolved for THIS building: its own value, or its comuna's value for solar/climate/indicators.
+  const activeKey = adminAttr ?? colorMode;
+  const metric = scene?.metricForBuilding(f.id, activeKey, lang) ?? null;
   return (
     <div className="mq-select">
       <div className="mq-select-h">
         <b>{t('Building', 'Edificio')} #{f.id}</b>
         <span className="mq-select-height">{f.height_m.toFixed(1)} m</span>
       </div>
+      {metric && (
+        <div className="mq-select-metric">
+          <span className="mq-select-metric-label">
+            {metric.label}
+            {metric.area && <i> · {metric.area}</i>}
+          </span>
+          <b className="mq-select-metric-val">{metric.text}</b>
+        </div>
+      )}
       <div className="mq-select-attrs">
         <span className="mq-src" style={{ background: rgbCss(p.rgb) }}>{t('height', 'altura')}: {p[lang]}</span>
         {f.num_floors != null && <span className="mq-tag">{f.num_floors} {t('floors', 'pisos')}</span>}

@@ -219,7 +219,7 @@ PLACES: list[Place] = [
           "central Bezirke; aggregate by Bezirk"),
     Place("barcelona_full", "Barcelona (metro core)", "B", 2.1650, 41.3900, 4500, "Europe", "Spain", "Barcelona",
           "the city districtes; aggregate by districte"),
-    Place("tokyo_full", "Tokyo (metro core)", "B", 139.7520, 35.6850, 6500, "Asia", "Japan", "Tokyo",
+    Place("tokyo_full", "Tokyo (metro core)", "B", 139.7520, 35.6850, 5000, "Asia", "Japan", "Tokyo",
           "the central special wards; aggregate by ward (ku)"),
     Place("seoul_full", "Seoul (metro core)", "B", 126.9860, 37.5520, 6000, "Asia", "South Korea", "Seoul",
           "central gu districts; aggregate by gu"),
@@ -227,9 +227,9 @@ PLACES: list[Place] = [
           "central Delhi districts; aggregate by district"),
     Place("mexico_city_full", "Mexico City (metro core)", "B", -99.1400, 19.4120, 6500, "North America", "Mexico", "Mexico City",
           "the central alcaldias; aggregate by alcaldia"),
-    Place("buenos_aires_full", "Buenos Aires (metro core)", "B", -58.4400, -34.6100, 5500, "South America", "Argentina", "Buenos Aires",
+    Place("buenos_aires_full", "Buenos Aires (metro core)", "B", -58.4400, -34.6100, 4600, "South America", "Argentina", "Buenos Aires",
           "the CABA comunas; aggregate by comuna"),
-    Place("sao_paulo_full", "Sao Paulo (metro core)", "B", -46.6400, -23.5500, 6500, "South America", "Brazil", "Sao Paulo",
+    Place("sao_paulo_full", "Sao Paulo (metro core)", "B", -46.6400, -23.5500, 4200, "South America", "Brazil", "Sao Paulo",
           "central distritos/subprefeituras; aggregate by distrito"),
 
     # --- Tier C: terrain-first areas (little/no built-up) ---
