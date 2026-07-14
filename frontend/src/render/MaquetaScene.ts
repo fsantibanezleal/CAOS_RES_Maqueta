@@ -42,6 +42,9 @@ export const ATTRIBUTES: AttrSpec[] = [
   // Fused topic modalities (shown only where the source covers the place - attributes() filters no-data specs).
   { key: 'solar', en: 'Solar (GHI)', es: 'Solar (GHI)', kind: 'numeric', unit: 'kWh/m2/d', value: (f) => f.solar_ghi ?? null, modality: true },
   { key: 'soil', en: 'Soil carbon', es: 'Carbono suelo', kind: 'numeric', unit: 'g/kg', value: (f) => f.soil_soc ?? null, modality: true },
+  { key: 'ndvi', en: 'Vegetation (NDVI)', es: 'Vegetacion (NDVI)', kind: 'numeric', unit: '', value: (f) => f.ndvi ?? null, modality: true },
+  { key: 'ndwi', en: 'Water (NDWI)', es: 'Agua (NDWI)', kind: 'numeric', unit: '', value: (f) => f.ndwi ?? null, modality: true },
+  { key: 'ndbi', en: 'Built-up (NDBI)', es: 'Construido (NDBI)', kind: 'numeric', unit: '', value: (f) => f.ndbi ?? null, modality: true },
 ];
 export const attrSpec = (key: string) => ATTRIBUTES.find((a) => a.key === key) ?? ATTRIBUTES[0];
 

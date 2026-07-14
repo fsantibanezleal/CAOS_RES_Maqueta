@@ -147,6 +147,9 @@ export interface BuildingFeature {
   // Fused topic modalities sampled at the footprint centroid (present only where the source covers the AOI).
   solar_ghi?: number | null; // Global Solar Atlas GHI, kWh/m2/day
   soil_soc?: number | null; // SoilGrids soil organic carbon 0-5cm, g/kg
+  ndvi?: number | null; // Sentinel-2 vegetation index (NIR-Red)/(NIR+Red)
+  ndwi?: number | null; // Sentinel-2 water index (Green-NIR)/(Green+NIR)
+  ndbi?: number | null; // Sentinel-2 built-up index (SWIR-NIR)/(SWIR+NIR)
 }
 
 // Aggregate statistics over the buildings whose footprint centroid falls inside a user-drawn area polygon
