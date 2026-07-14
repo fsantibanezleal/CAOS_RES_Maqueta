@@ -39,7 +39,8 @@ export default function AppPage() {
   const [index, setIndex] = useState<PlaceIndex | null>(null);
   const [slug, setSlug] = useState('');
   const [data, setData] = useState<{ base: string; manifest: BundleManifest } | null>(null);
-  const [err, setErr] = useState('');
+  const [err, setErr] = useState(''); // fatal: the place INDEX could not be loaded (nothing can render)
+  const [manifestErr, setManifestErr] = useState(''); // one place failed to load; keep the picker so you can pick another
 
   useEffect(() => {
     loadIndex()
@@ -57,7 +58,8 @@ export default function AppPage() {
   useEffect(() => {
     if (!slug) return;
     setData(null);
-    loadManifest(slug).then(setData).catch((e) => setErr(String(e)));
+    setManifestErr('');
+    loadManifest(slug).then(setData).catch((e) => setManifestErr(String(e)));
   }, [slug]);
 
   const current = index?.places.find((p) => p.slug === slug);
@@ -88,6 +90,13 @@ export default function AppPage() {
           <Viewer baseUrl={data.base} manifest={data.manifest} lang={lang} />
           <PlaceContext manifest={data.manifest} lang={lang} />
         </>
+      ) : manifestErr ? (
+        <div className="mq-canvas mq-canvas-empty">
+          <p className="mq-error">
+            {t('Could not load this place.', 'No se pudo cargar este lugar.')} <code>{manifestErr}</code>
+          </p>
+          <p className="mq-sub">{t('Pick another place from the selector above.', 'Elige otro lugar en el selector de arriba.')}</p>
+        </div>
       ) : (
         <div className="mq-canvas mq-canvas-empty">{t('Loading...', 'Cargando...')}</div>
       )}
@@ -122,13 +131,17 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
     [places, ql],
   );
   // Places are grouped by TOPIC (Santiago comunas, Major cities, Cities, Mining, Landmarks, Landscapes),
-  // sorted by country then name inside each - so you scan by what you're looking for, not one long list.
+  // sorted alphabetically inside each by the label the user actually reads (city, or the place name for
+  // the landscape group), in the selected language's collation - so the list scans A->Z as displayed.
+  const label = (k: string, p: PlaceEntry) => (k === 'landscape' ? p.name : p.city);
   const grouped = useMemo(() => {
     const o: Record<string, PlaceEntry[]> = {};
     filtered.forEach((p) => (o[placeKind(p)] ??= []).push(p));
-    Object.values(o).forEach((ps) => ps.sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name)));
+    Object.entries(o).forEach(([k, ps]) =>
+      ps.sort((a, b) => label(k, a).localeCompare(label(k, b), lang) || a.name.localeCompare(b.name, lang)),
+    );
     return o;
-  }, [filtered]);
+  }, [filtered, lang]);
   const conts = [
     ...KIND_ORDER.filter((k) => grouped[k]),
     ...Object.keys(grouped).filter((k) => !KIND_ORDER.includes(k)).sort(),

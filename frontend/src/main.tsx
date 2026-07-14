@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Boxes } from 'lucide-react';
-import { AppShell, applyTheme, readTheme, CitationsProvider, type ShellConfig } from '@fasl-work/caos-app-shell';
+import { AppShell, applyTheme, readTheme, CitationsProvider, useLangStore, type ShellConfig } from '@fasl-work/caos-app-shell';
 import '@fasl-work/caos-app-shell/styles.css';
 import './maqueta.css';
 import { CITATIONS } from './data/citations';
@@ -24,6 +24,12 @@ const displayVersion = pkg.version
   .join('.');
 
 applyTheme(readTheme());
+
+// English is the default UI language. Only force it when the visitor has no stored choice yet, so the
+// language toggle still sticks for anyone who switches to Spanish (the shell persists under "caos.lang").
+if (typeof localStorage !== 'undefined' && !localStorage.getItem('caos.lang')) {
+  useLangStore.getState().setLang('en');
+}
 
 const config: ShellConfig = {
   product: { name: 'Maqueta', mark: <Boxes size={18} aria-hidden="true" /> },

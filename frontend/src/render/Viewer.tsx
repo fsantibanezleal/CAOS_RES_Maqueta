@@ -32,7 +32,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   const [imagery, setImagery] = useState(false);
   const [loading, setLoading] = useState(true);
   const [buildingsLoading, setBuildingsLoading] = useState(false);
-  const [panelOpen, setPanelOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(false); // controls collapsed by default; the map leads, open via the toggle
   const areaPtsRef = useRef<AreaPoint[]>([]);
   const [areaMode, setAreaMode] = useState(false);
   const [areaCount, setAreaCount] = useState(0);
@@ -460,7 +460,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   );
 }
 
-function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+function Section({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className={`mq-section ${open ? '' : 'mq-section-closed'}`}>
