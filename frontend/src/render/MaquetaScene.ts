@@ -124,6 +124,10 @@ export class MaquetaScene {
   private areaGroup: THREE.Group | null = null; // the drawn area-of-interest polygon overlay
   private groundY = 0; // mean scene elevation (m): meshes sit at absolute altitude, so high places (Atacama,
   // Chuquicamata at ~2500 m) would otherwise float above the frame. Camera, ground-pick + area tool use this.
+  private terrainMesh: THREE.Mesh | null = null;
+  private terrainThematicMat: THREE.Material | null = null; // the baked hillshade/hypsometric material
+  private aoiBBox: [number, number, number, number] | null = null; // [w,s,e,n] WGS84, for the imagery request
+  private imageryOn = false; // drape real Sentinel-2 cloudless imagery over the terrain instead of thematic colour
   private numRanges = new Map<string, [number, number]>(); // per numeric attr [min,max]
   private catValuesByKey = new Map<string, string[]>(); // per categorical attr distinct values
   private coverageByKey = new Map<string, number>(); // per attr: fraction of buildings carrying a value
@@ -286,6 +290,7 @@ export class MaquetaScene {
     // Phase 1: base modalities + frame the camera. Fire onBaseReady NOW so the app hides its overlay the
     // moment terrain + roads are on screen (a couple of MB), the fastest possible first paint.
     for (const layer of base) await this.loadOneLayer(baseUrl, layer);
+    this.aoiBBox = manifest.aoi.bbox_wgs84;
     this.frameCamera(manifest.aoi.size_m);
     this.needsRender = true;
     onBaseReady?.();
@@ -352,8 +357,10 @@ export class MaquetaScene {
         if (layer.name === 'terrain') {
           m.updateWorldMatrix(true, false);
           this.prepareTerrain(m.geometry as THREE.BufferGeometry, m.matrixWorld);
-        }
-        else if (layer.name === 'lod2') {
+          this.terrainMesh = m;
+          this.terrainThematicMat = m.material as THREE.Material;
+          if (this.imageryOn) this.applyImagery(true);
+        } else if (layer.name === 'lod2') {
           m.castShadow = true;
           m.receiveShadow = true;
         }
@@ -1004,7 +1011,67 @@ export class MaquetaScene {
       }
       col.needsUpdate = true;
     }
+
+    // Planar UVs so real satellite imagery (fetched for the AOI bbox) can be draped on the terrain: u along
+    // east (x), v along north. north = -z in this frame, and loaded textures flip Y, so v = (z - zmin)/range
+    // puts min-z (max-north) at the top of the image. Verified against the vector streets.
+    let uxLo = Infinity, uxHi = -Infinity, uzLo = Infinity, uzHi = -Infinity;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      if (x < uxLo) uxLo = x;
+      if (x > uxHi) uxHi = x;
+      if (z < uzLo) uzLo = z;
+      if (z > uzHi) uzHi = z;
+    }
+    const rx = uxHi - uxLo || 1;
+    const rz = uzHi - uzLo || 1;
+    const uv = new Float32Array(pos.count * 2);
+    for (let i = 0; i < pos.count; i++) {
+      uv[i * 2] = (pos.getX(i) - uxLo) / rx;
+      uv[i * 2 + 1] = (pos.getZ(i) - uzLo) / rz;
+    }
+    geom.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+
     if (dropped && import.meta.env.DEV) console.debug(`terrain: dropped ${dropped} degenerate triangle(s)`);
+  }
+
+  // Drape real Sentinel-2 cloudless satellite imagery (EOX, CC-BY) over the terrain, fetched for the AOI
+  // bbox at runtime (CORS-open, no re-bake). Toggling off restores the thematic hillshade/hypsometric look.
+  setTerrainImagery(on: boolean) {
+    this.imageryOn = on;
+    this.applyImagery(on);
+  }
+  private applyImagery(on: boolean) {
+    const mesh = this.terrainMesh;
+    if (!mesh) return;
+    if (!on) {
+      if (this.terrainThematicMat) mesh.material = this.terrainThematicMat;
+      this.needsRender = true;
+      return;
+    }
+    if (!this.aoiBBox) return;
+    const [w, s, e, n] = this.aoiBBox;
+    const midlat = (((s + n) / 2) * Math.PI) / 180;
+    const geoW = (e - w) * Math.cos(midlat);
+    const geoH = n - s;
+    const maxpx = 1536;
+    const width = geoW >= geoH ? maxpx : Math.max(64, Math.round((maxpx * geoW) / geoH));
+    const height = geoW >= geoH ? Math.max(64, Math.round((maxpx * geoH) / geoW)) : maxpx;
+    // EOX Sentinel-2 cloudless, WMS 1.3.0 / EPSG:4326 => bbox order is minLat,minLon,maxLat,maxLon.
+    const url =
+      `https://tiles.maps.eox.at/wms?service=WMS&version=1.3.0&request=GetMap&layers=s2cloudless-2024` +
+      `&crs=EPSG:4326&bbox=${s},${w},${n},${e}&width=${width}&height=${height}&format=image/jpeg&styles=`;
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin('anonymous');
+    loader.load(url, (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+      if (this.imageryOn && this.terrainMesh) {
+        this.terrainMesh.material = new THREE.MeshBasicMaterial({ map: tex });
+        this.needsRender = true;
+      }
+    });
   }
 
   private layerMaterial(name: string): THREE.Material {

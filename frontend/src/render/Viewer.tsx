@@ -29,6 +29,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
   const [animate, setAnimate] = useState(false);
   const [edges, setEdgesState] = useState(true);
   const [edgesLarge, setEdgesLarge] = useState(false);
+  const [imagery, setImagery] = useState(false);
   const [loading, setLoading] = useState(true);
   const [buildingsLoading, setBuildingsLoading] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
@@ -298,6 +299,10 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
             <button onClick={() => sceneRef.current?.cameraPreset('oblique')}>{t('Oblique', 'Oblicua')}</button>
             <button onClick={() => sceneRef.current?.cameraPreset('street')}>{t('Street', 'Calle')}</button>
           </div>
+          <label className="mq-chip mq-chip-hl">
+            <input type="checkbox" checked={imagery} onChange={(e) => { setImagery(e.target.checked); sceneRef.current?.setTerrainImagery(e.target.checked); }} />
+            {t('Satellite imagery (Sentinel-2)', 'Imagen satelital (Sentinel-2)')}
+          </label>
           <label className="mq-slider">{t('Neon / glow', 'Neon / brillo')}
             <input type="range" min={0} max={2} step={0.05} value={neon} onChange={(e) => { setNeon(+e.target.value); sceneRef.current?.setNeon(+e.target.value); }} />
           </label>
