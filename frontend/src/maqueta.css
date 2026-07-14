@@ -178,3 +178,13 @@
 .mq-admin-table td:nth-child(2), .mq-admin-table td:nth-child(3), .mq-admin-table th:nth-child(2), .mq-admin-table th:nth-child(3) { text-align: right; }
 .mq-admin-table td b { color: var(--color-accent); font-variant-numeric: tabular-nums; }
 .mq-admin-table tr:last-child td { border-bottom: none; }
+
+/* ---- Place picker: collapsible topic categories (accordion) ---- */
+.mq-picker-cat { display: flex; align-items: center; gap: 0.4rem; width: 100%; text-align: left; font: inherit; font-weight: 600; font-size: 0.85rem; padding: 0.45rem 0.5rem; border: none; background: none; color: var(--color-fg); cursor: pointer; border-radius: 7px; }
+.mq-picker-cat:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.mq-picker-cat.on { color: var(--color-accent); }
+.mq-picker-catchev { width: 0.8rem; font-size: 0.7rem; color: var(--color-fg-subtle); }
+.mq-picker-catname { flex: 1; }
+.mq-picker-catcount { font-size: 0.72rem; font-weight: 600; color: var(--color-fg-subtle); background: color-mix(in srgb, var(--color-fg) 8%, transparent); padding: 0.05rem 0.45rem; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.mq-picker-group + .mq-picker-group { border-top: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent); }
+.mq-picker-item { padding-left: 1.3rem; }

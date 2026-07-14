@@ -8,9 +8,29 @@ import { loadIndex, loadManifest } from '../lib/data';
 import type { BundleManifest, PlaceIndex } from '../lib/contract.types';
 import { PROVENANCE, rgbCss } from '../lib/labels';
 
-const CONTINENT_ORDER = ['South America', 'North America', 'Europe', 'Africa', 'Asia', 'Oceania'];
-const TERRAIN_KEY = '__terrain__'; // the picker group that collects all terrain-only (tier C) areas
 type PlaceEntry = PlaceIndex['places'][number];
+
+// The picker is organized by TOPIC, not continent. The hard rule (asked many times): every terrain-only
+// place (tier C - only terrain + satellite, no buildings, incl. Giza/Fuji/Chuquicamata) goes into ONE
+// "Terrain & landscapes" category, separate from the built cities.
+const MINING = new Set(['calama', 'sierra_gorda']); // built mining towns (Chuquicamata the mine is terrain-only)
+const CITY = new Set(['valparaiso', 'concepcion', 'valdivia', 'chiloe_castro', 'antofagasta', 'venice', 'santorini']);
+function placeKind(p: PlaceEntry): string {
+  const s = p.slug;
+  if (s === 'santiago_full' || s === 'santiago_centro' || s.startsWith('stgo_')) return 'santiago';
+  if (p.tier === 'C') return 'landscape'; // ALL terrain-only places, their own category
+  if (MINING.has(s)) return 'mining';
+  if (CITY.has(s)) return 'city';
+  return 'metro'; // tier A + the big world cities (incl. Agra, Rio)
+}
+const KIND_ORDER = ['santiago', 'metro', 'city', 'mining', 'landscape'];
+const KIND_LABEL: Record<string, [string, string]> = {
+  santiago: ['Santiago (comunas)', 'Santiago (comunas)'],
+  metro: ['Major cities', 'Grandes ciudades'],
+  city: ['Cities', 'Ciudades'],
+  mining: ['Mining', 'Mineria'],
+  landscape: ['Terrain & landscapes', 'Terreno y paisajes'],
+};
 
 
 export default function AppPage() {
@@ -81,6 +101,7 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
+  const [openCat, setOpenCat] = useState<string | null>(null); // which topic category is expanded (accordion)
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const current = places.find((p) => p.slug === slug);
@@ -100,30 +121,19 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
     () => places.filter((p) => !ql || `${p.name} ${p.city} ${p.country} ${p.continent}`.toLowerCase().includes(ql)),
     [places, ql],
   );
-  // Built places group by continent; terrain-only areas (tier C: no buildings, the landscapes + the
-  // monuments that render as relief) are pulled into their own group at the end, so the list is organized
-  // rather than one long mix.
+  // Places are grouped by TOPIC (Santiago comunas, Major cities, Cities, Mining, Landmarks, Landscapes),
+  // sorted by country then name inside each - so you scan by what you're looking for, not one long list.
   const grouped = useMemo(() => {
     const o: Record<string, PlaceEntry[]> = {};
-    filtered.forEach((p) => {
-      const key = p.tier === 'C' ? TERRAIN_KEY : p.continent || 'Other';
-      (o[key] ??= []).push(p);
-    });
-    Object.entries(o).forEach(([k, ps]) =>
-      ps.sort((a, b) =>
-        k === TERRAIN_KEY
-          ? a.continent.localeCompare(b.continent) || a.name.localeCompare(b.name)
-          : a.country.localeCompare(b.country) || a.city.localeCompare(b.city),
-      ),
-    );
+    filtered.forEach((p) => (o[placeKind(p)] ??= []).push(p));
+    Object.values(o).forEach((ps) => ps.sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name)));
     return o;
   }, [filtered]);
   const conts = [
-    ...CONTINENT_ORDER.filter((c) => grouped[c]),
-    ...Object.keys(grouped).filter((c) => c !== TERRAIN_KEY && !CONTINENT_ORDER.includes(c)).sort(),
-    ...(grouped[TERRAIN_KEY] ? [TERRAIN_KEY] : []),
+    ...KIND_ORDER.filter((k) => grouped[k]),
+    ...Object.keys(grouped).filter((k) => !KIND_ORDER.includes(k)).sort(),
   ];
-  const groupLabel = (k: string) => (k === TERRAIN_KEY ? t('Terrain & landscapes', 'Terreno y paisajes') : k);
+  const groupLabel = (k: string) => (KIND_LABEL[k] ? t(KIND_LABEL[k][0], KIND_LABEL[k][1]) : k);
   const pick = (s: string) => { onSelect(s); setOpen(false); setQ(''); };
 
   return (
@@ -144,21 +154,31 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
           />
           <div className="mq-picker-list">
             {conts.length === 0 && <p className="mq-picker-empty">{t('No match', 'Sin coincidencias')}</p>}
-            {conts.map((cont) => (
-              <div key={cont} className="mq-picker-group">
-                <div className="mq-picker-cont">{groupLabel(cont)}</div>
-                {grouped[cont].map((p) => (
-                  <button key={p.slug} className={`mq-picker-item ${p.slug === slug ? 'on' : ''}`} onClick={() => pick(p.slug)}>
-                    <b>{cont === TERRAIN_KEY ? p.name : p.city}</b>
-                    <span className="mq-muted">
-                      {cont === TERRAIN_KEY
-                        ? `${p.country} · ${p.continent}`
-                        : `${p.country}${p.name !== p.city ? ` · ${p.name}` : ''}`}
-                    </span>
+            {conts.map((cont) => {
+              // A search expands everything; otherwise categories are collapsed to just their header + count,
+              // and clicking one expands its places (accordion) - so it's a compact menu, not a 107-item list.
+              const expanded = !!ql || openCat === cont;
+              const byName = cont === 'landscape';
+              return (
+                <div key={cont} className="mq-picker-group">
+                  <button
+                    className={`mq-picker-cat ${expanded ? 'on' : ''}`}
+                    onClick={() => setOpenCat((c) => (c === cont ? null : cont))}
+                  >
+                    <span className="mq-picker-catchev">{expanded ? '▾' : '▸'}</span>
+                    <span className="mq-picker-catname">{groupLabel(cont)}</span>
+                    <span className="mq-picker-catcount">{grouped[cont].length}</span>
                   </button>
-                ))}
-              </div>
-            ))}
+                  {expanded &&
+                    grouped[cont].map((p) => (
+                      <button key={p.slug} className={`mq-picker-item ${p.slug === slug ? 'on' : ''}`} onClick={() => pick(p.slug)}>
+                        <b>{byName ? p.name : p.city}</b>
+                        <span className="mq-muted">{p.country}{p.name !== p.city && !byName ? ` · ${p.name}` : ''}</span>
+                      </button>
+                    ))}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
