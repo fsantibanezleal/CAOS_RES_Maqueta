@@ -20,10 +20,12 @@ from shapely.geometry import box
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "CAOS_GeoScena" / "src"))
 from geoscena.aoi import AOI  # noqa: E402
+from geoscena.fetch.environment import ENV_META, fetch_environment  # noqa: E402
 
 from maquetalab import places as places_mod  # noqa: E402
+from maquetalab.do_indicators import INDICATOR_META, indicators_for  # noqa: E402
 
-DERIVED = Path(__file__).resolve().parents[1] / "data" / "derived"
+DERIVED = Path(__file__).resolve().parents[2] / "data" / "derived"
 GEOB = "https://www.geoboundaries.org/api/current/gbOpen/{iso3}/{adm}/"
 
 # Country name (registry) -> ISO3 for geoBoundaries.
@@ -74,7 +76,10 @@ def _units_for(aoi: AOI, gdf: gpd.GeoDataFrame) -> list[dict]:
             east, north = aoi.to_local(list(xs), list(ys))
             rings.append([[float(x), float(-z)] for x, z in zip(east, north)])
         if rings:
-            units.append({"name": str(row[namecol]), "rings": rings})
+            # WGS84 centroid of the clipped unit, so environment (solar/climate) can be sampled there and
+            # the sub-area aggregation carries real per-comuna solar + climate, not only building-derived means.
+            c = g.centroid
+            units.append({"name": str(row[namecol]), "rings": rings, "clat": float(c.y), "clon": float(c.x)})
     return units
 
 
@@ -104,7 +109,37 @@ def gen_for_place(p) -> int:
             best, best_lvl = units, adm
     if len(best) < 2:  # a single enclosing unit is not a sub-area aggregation; skip
         return 0
-    out = {"level": best_lvl, "source": f"geoBoundaries gbOpen {iso3}", "license": "CC-BY-4.0", "units": best}
+    # Sample solar + climate at each unit centroid so the sub-area aggregation offers real per-comuna
+    # environment layers (solar PV yield, temperature, wind, precipitation), not only building-derived means.
+    # For Chilean comunas, also attach Data Observatory indicators (health facilities, foreign-born) joined
+    # by comuna name, so the choropleth spans geophysical + socio-economic layers.
+    env_keys: set[str] = set()
+    ind_keys: set[str] = set()
+    is_chile = p.country == "Chile"
+    for u in best:
+        try:
+            er = fetch_environment(u["clat"], u["clon"], fetched="2026-07-14")
+            if er.values:
+                u["env"] = er.values
+                env_keys |= set(er.values)
+        except Exception:  # noqa: BLE001 - a unit without environment just lacks those layers
+            pass
+        if is_chile:
+            inds = indicators_for(u["name"])
+            if inds:
+                u["indicators"] = inds
+                ind_keys |= set(inds)
+    out = {
+        "level": best_lvl,
+        "source": f"geoBoundaries gbOpen {iso3}",
+        "license": "CC-BY-4.0",
+        "units": best,
+        "env_meta": {k: {"label": ENV_META[k][0], "unit": ENV_META[k][1]} for k in sorted(env_keys) if k in ENV_META},
+        "indicator_meta": {
+            k: {"label": INDICATOR_META[k][0], "unit": INDICATOR_META[k][1]}
+            for k in sorted(ind_keys) if k in INDICATOR_META
+        },
+    }
     (d / "admin.json").write_text(json.dumps(out), encoding="utf-8")
     return len(best)
 
