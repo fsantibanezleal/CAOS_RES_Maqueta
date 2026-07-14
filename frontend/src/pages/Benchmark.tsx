@@ -28,8 +28,8 @@ export default function Benchmark() {
       <h2>Benchmark</h2>
       <p className="mq-lead">
         {t(
-          'The point of Maqueta is honesty at scale. This page reports, across all baked places, how much of the reconstruction is measured vs inferred, the size/complexity budgets, and the comparison against authoritative LoD2 models where one exists.',
-          'El sentido de Maqueta es la honestidad a escala. Esta página reporta, sobre todos los lugares horneados, cuánto de la reconstrucción es medido vs inferido, los presupuestos de tamaño/complejidad, y la comparación contra modelos LoD2 autoritativos donde exista.',
+          'The point of Maqueta is honesty at scale. Across every baked place (100+ cities, comunas, metro cores and terrain areas), this page reports how much of the reconstruction is measured vs inferred, the size/complexity budgets by tier, and the fused-vs-authoritative comparison against open LoD2 models where one exists. Every number is read straight from the committed benchmark.json.',
+          'El sentido de Maqueta es la honestidad a escala. Sobre cada lugar horneado (mas de 100 ciudades, comunas, nucleos metropolitanos y areas de relieve), esta pagina reporta cuanto de la reconstruccion es medido vs inferido, los presupuestos de tamano/complejidad por tier, y la comparacion fusion-vs-autoritativo contra modelos LoD2 abiertos donde exista. Cada numero se lee directo del benchmark.json versionado.',
         )}
       </p>
 
