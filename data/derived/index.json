@@ -800,7 +800,7 @@
       "country": "India",
       "city": "Agra",
       "n_layers": 4,
-      "total_bytes": 4606512,
+      "total_bytes": 2018916,
       "manifest_path": "agra_taj/manifest.json"
     },
     {
@@ -824,7 +824,7 @@
       "country": "Cambodia",
       "city": "Angkor",
       "n_layers": 2,
-      "total_bytes": 291620,
+      "total_bytes": 58588,
       "manifest_path": "angkor_wat/manifest.json"
     },
     {
@@ -1040,7 +1040,7 @@
       "country": "Egypt",
       "city": "Giza",
       "n_layers": 2,
-      "total_bytes": 234604,
+      "total_bytes": 50296,
       "manifest_path": "giza_pyramids/manifest.json"
     },
     {
@@ -1064,7 +1064,7 @@
       "country": "China",
       "city": "Great Wall",
       "n_layers": 2,
-      "total_bytes": 550108,
+      "total_bytes": 102780,
       "manifest_path": "great_wall/manifest.json"
     },
     {
@@ -1196,7 +1196,7 @@
       "country": "Peru",
       "city": "Machu Picchu",
       "n_layers": 2,
-      "total_bytes": 291928,
+      "total_bytes": 54920,
       "manifest_path": "machu_picchu/manifest.json"
     },
     {
@@ -1220,7 +1220,7 @@
       "country": "Switzerland",
       "city": "Matterhorn",
       "n_layers": 2,
-      "total_bytes": 382644,
+      "total_bytes": 70456,
       "manifest_path": "matterhorn/manifest.json"
     },
     {
@@ -1256,7 +1256,7 @@
       "country": "USA",
       "city": "Monument Valley",
       "n_layers": 2,
-      "total_bytes": 410288,
+      "total_bytes": 74756,
       "manifest_path": "monument_valley/manifest.json"
     },
     {
@@ -1280,7 +1280,7 @@
       "country": "Japan",
       "city": "Mount Fuji",
       "n_layers": 2,
-      "total_bytes": 429088,
+      "total_bytes": 78892,
       "manifest_path": "mount_fuji/manifest.json"
     },
     {
@@ -1328,7 +1328,7 @@
       "country": "Jordan",
       "city": "Petra",
       "n_layers": 2,
-      "total_bytes": 326004,
+      "total_bytes": 56680,
       "manifest_path": "petra/manifest.json"
     },
     {
@@ -1340,7 +1340,7 @@
       "country": "Brazil",
       "city": "Rio de Janeiro",
       "n_layers": 4,
-      "total_bytes": 29416268,
+      "total_bytes": 11976964,
       "manifest_path": "rio_de_janeiro/manifest.json"
     },
     {
@@ -1400,7 +1400,7 @@
       "country": "Greece",
       "city": "Santorini",
       "n_layers": 4,
-      "total_bytes": 4449636,
+      "total_bytes": 1340624,
       "manifest_path": "santorini/manifest.json"
     },
     {
@@ -2024,7 +2024,7 @@
       "country": "Italy",
       "city": "Venice",
       "n_layers": 4,
-      "total_bytes": 11311368,
+      "total_bytes": 3162268,
       "manifest_path": "venice/manifest.json"
     },
     {
@@ -2036,7 +2036,7 @@
       "country": "Zimbabwe",
       "city": "Victoria Falls",
       "n_layers": 2,
-      "total_bytes": 366696,
+      "total_bytes": 70916,
       "manifest_path": "victoria_falls/manifest.json"
     },
     {
@@ -2060,7 +2060,7 @@
       "country": "USA",
       "city": "Yosemite",
       "n_layers": 2,
-      "total_bytes": 425820,
+      "total_bytes": 79236,
       "manifest_path": "yosemite_valley/manifest.json"
     },
     {

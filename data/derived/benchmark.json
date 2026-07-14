@@ -14,16 +14,16 @@
     "prior": 0.047
   },
   "tier_totals_mb": {
-    "B": 1046.74,
+    "B": 1015.46,
     "A": 30.58,
-    "C": 4.17
+    "C": 1.16
   },
   "tier_counts": {
     "B": 79,
     "A": 10,
     "C": 18
   },
-  "total_mb": 1081.5,
+  "total_mb": 1047.2,
   "per_place": [
     {
       "slug": "amsterdam_center",
@@ -290,7 +290,7 @@
       "country": "India",
       "n_layers": 4,
       "total_triangles": 114893,
-      "total_mb": 4.607,
+      "total_mb": 2.019,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -938,7 +938,7 @@
       "country": "Brazil",
       "n_layers": 4,
       "total_triangles": 767636,
-      "total_mb": 29.416,
+      "total_mb": 11.977,
       "height_mix": {
         "measured": 15953,
         "floors": 180,
@@ -1058,7 +1058,7 @@
       "country": "Greece",
       "n_layers": 4,
       "total_triangles": 132755,
-      "total_mb": 4.45,
+      "total_mb": 1.341,
       "height_mix": {
         "measured": 0,
         "floors": 14,
@@ -2162,7 +2162,7 @@
       "country": "Italy",
       "n_layers": 4,
       "total_triangles": 353810,
-      "total_mb": 11.311,
+      "total_mb": 3.162,
       "height_mix": {
         "measured": 1536,
         "floors": 1563,
@@ -2186,7 +2186,7 @@
       "country": "Cambodia",
       "n_layers": 2,
       "total_triangles": 12606,
-      "total_mb": 0.292,
+      "total_mb": 0.059,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2234,7 +2234,7 @@
       "country": "Egypt",
       "n_layers": 2,
       "total_triangles": 9882,
-      "total_mb": 0.235,
+      "total_mb": 0.05,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2282,7 +2282,7 @@
       "country": "China",
       "n_layers": 2,
       "total_triangles": 25448,
-      "total_mb": 0.55,
+      "total_mb": 0.103,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2354,7 +2354,7 @@
       "country": "Peru",
       "n_layers": 2,
       "total_triangles": 13943,
-      "total_mb": 0.292,
+      "total_mb": 0.055,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2378,7 +2378,7 @@
       "country": "Switzerland",
       "n_layers": 2,
       "total_triangles": 18693,
-      "total_mb": 0.383,
+      "total_mb": 0.07,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2426,7 +2426,7 @@
       "country": "USA",
       "n_layers": 2,
       "total_triangles": 19452,
-      "total_mb": 0.41,
+      "total_mb": 0.075,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2450,7 +2450,7 @@
       "country": "Japan",
       "n_layers": 2,
       "total_triangles": 20558,
-      "total_mb": 0.429,
+      "total_mb": 0.079,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2474,7 +2474,7 @@
       "country": "Jordan",
       "n_layers": 2,
       "total_triangles": 15632,
-      "total_mb": 0.326,
+      "total_mb": 0.057,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2570,7 +2570,7 @@
       "country": "Zimbabwe",
       "n_layers": 2,
       "total_triangles": 16347,
-      "total_mb": 0.367,
+      "total_mb": 0.071,
       "height_mix": {
         "measured": 0,
         "floors": 0,
@@ -2594,7 +2594,7 @@
       "country": "USA",
       "n_layers": 2,
       "total_triangles": 20456,
-      "total_mb": 0.426,
+      "total_mb": 0.079,
       "height_mix": {
         "measured": 0,
         "floors": 0,

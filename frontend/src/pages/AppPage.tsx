@@ -9,6 +9,7 @@ import type { BundleManifest, PlaceIndex } from '../lib/contract.types';
 import { PROVENANCE, rgbCss } from '../lib/labels';
 
 const CONTINENT_ORDER = ['South America', 'North America', 'Europe', 'Africa', 'Asia', 'Oceania'];
+const TERRAIN_KEY = '__terrain__'; // the picker group that collects all terrain-only (tier C) areas
 type PlaceEntry = PlaceIndex['places'][number];
 
 
@@ -99,16 +100,30 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
     () => places.filter((p) => !ql || `${p.name} ${p.city} ${p.country} ${p.continent}`.toLowerCase().includes(ql)),
     [places, ql],
   );
+  // Built places group by continent; terrain-only areas (tier C: no buildings, the landscapes + the
+  // monuments that render as relief) are pulled into their own group at the end, so the list is organized
+  // rather than one long mix.
   const grouped = useMemo(() => {
     const o: Record<string, PlaceEntry[]> = {};
-    filtered.forEach((p) => (o[p.continent || 'Other'] ??= []).push(p));
-    Object.values(o).forEach((ps) => ps.sort((a, b) => a.country.localeCompare(b.country) || a.city.localeCompare(b.city)));
+    filtered.forEach((p) => {
+      const key = p.tier === 'C' ? TERRAIN_KEY : p.continent || 'Other';
+      (o[key] ??= []).push(p);
+    });
+    Object.entries(o).forEach(([k, ps]) =>
+      ps.sort((a, b) =>
+        k === TERRAIN_KEY
+          ? a.continent.localeCompare(b.continent) || a.name.localeCompare(b.name)
+          : a.country.localeCompare(b.country) || a.city.localeCompare(b.city),
+      ),
+    );
     return o;
   }, [filtered]);
   const conts = [
     ...CONTINENT_ORDER.filter((c) => grouped[c]),
-    ...Object.keys(grouped).filter((c) => !CONTINENT_ORDER.includes(c)).sort(),
+    ...Object.keys(grouped).filter((c) => c !== TERRAIN_KEY && !CONTINENT_ORDER.includes(c)).sort(),
+    ...(grouped[TERRAIN_KEY] ? [TERRAIN_KEY] : []),
   ];
+  const groupLabel = (k: string) => (k === TERRAIN_KEY ? t('Terrain & landscapes', 'Terreno y paisajes') : k);
   const pick = (s: string) => { onSelect(s); setOpen(false); setQ(''); };
 
   return (
@@ -131,11 +146,15 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
             {conts.length === 0 && <p className="mq-picker-empty">{t('No match', 'Sin coincidencias')}</p>}
             {conts.map((cont) => (
               <div key={cont} className="mq-picker-group">
-                <div className="mq-picker-cont">{cont}</div>
+                <div className="mq-picker-cont">{groupLabel(cont)}</div>
                 {grouped[cont].map((p) => (
                   <button key={p.slug} className={`mq-picker-item ${p.slug === slug ? 'on' : ''}`} onClick={() => pick(p.slug)}>
-                    <b>{p.city}</b>
-                    <span className="mq-muted">{p.country}{p.name !== p.city ? ` · ${p.name}` : ''}</span>
+                    <b>{cont === TERRAIN_KEY ? p.name : p.city}</b>
+                    <span className="mq-muted">
+                      {cont === TERRAIN_KEY
+                        ? `${p.country} · ${p.continent}`
+                        : `${p.country}${p.name !== p.city ? ` · ${p.name}` : ''}`}
+                    </span>
                   </button>
                 ))}
               </div>

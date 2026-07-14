@@ -70,8 +70,11 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
     setNumFilters(nf);
     setCatFilters(cf);
     if (!keepColorMode) {
-      setColorMode('height');
-      s.setColorMode('height');
+      // Default to colouring by building function when the place actually has function data; otherwise
+      // fall back to height (terrain-first places and sparsely-tagged fabric have no useful function split).
+      const def = a.some((sp) => sp.key === 'use') && s.categories('use').length > 0 ? 'use' : 'height';
+      setColorMode(def);
+      s.setColorMode(def);
     }
     const ei = s.edgesInfo();
     setEdgesState(ei.on);

@@ -30,6 +30,34 @@ All notable changes to Maqueta. Format: [Keep a Changelog](https://keepachangelo
 
 [0.07.000]: https://github.com/fsantibanezleal/CAOS_RES_Maqueta/releases/tag/v0.07.000
 
+## [0.07.000] - 2026-07-13
+
+### Added
+- **29 more places (107 total).** Chilean cities: Calama, Antofagasta, Sierra Gorda, Valdivia, Chiloe
+  (Castro). Major world metros: Shanghai, Beijing, Hong Kong, Delhi, Bangkok, Jakarta, Dubai, Los Angeles,
+  Chicago, Lagos. Iconic landmarks + landscapes: Giza Pyramids, Machu Picchu, Taj Mahal, Great Wall, Petra,
+  Angkor Wat, Mount Fuji, Rio de Janeiro, Venice, Matterhorn, Yosemite, Victoria Falls, Santorini, Monument
+  Valley. 18 of the 107 places are terrain-only (no buildings).
+- **Searchable, categorized place picker** replacing the native select: type to filter by city / country /
+  landmark; built places grouped by continent, and the terrain-only areas pulled into their own "Terrain &
+  landscapes" group so the 107-place list is organized rather than a flat list.
+
+### Changed
+- **Terrain rendering overhaul.** Meshes carry absolute altitude, so high places (Chuquicamata, Atacama at
+  ~2500 m, Bogota ~2600 m) rendered above the top of the frame; the camera, ground-pick and area tool now
+  frame at the scene's actual mean elevation. Relief + colour are baked into the terrain vertex colours
+  (hillshade + earthy hypsometric ramp) and rendered lighting-independent, so terrain-first places show a
+  real coloured topographic surface (Mount Fuji reads as a snow-capped cone, Chuquicamata as a coloured
+  pit + ridges) instead of a washed-out flat grey, and city relief never crushes to black.
+- **Default colour = Function** when the place has building-function data (else height).
+- Open on the cinematic low-oblique default view.
+
+### Fixed
+- Open Buildings height fetch could stall for minutes on a GCS bucket listing (GDAL tuning in the geoscena
+  fetcher; each fetch now takes seconds).
+
+[0.07.000]: https://github.com/fsantibanezleal/CAOS_RES_Maqueta/releases/tag/v0.07.000
+
 ## [0.06.000] - 2026-07-13
 
 ### Added
