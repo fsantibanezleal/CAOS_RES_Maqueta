@@ -32,12 +32,12 @@ export default function Methodology() {
       <p>
         {t(
           'An Area of Interest is a WGS84 centre plus a half-size in metres. Every layer is expressed in a local Azimuthal Equidistant projection centred on the AOI centroid, in metres, origin (0,0) at the centre. Over few-kilometre extents the distortion is well under a metre, so the viewer works directly in metres. On glTF export a single Y-up conversion is applied, so every .glb shares one orientation and a Three.js scene loads the layers with no per-app fix-up.',
-          'Un Area de Interes es un centro WGS84 mas un semilado en metros. Cada capa se expresa en una proyeccion Acimutal Equidistante local centrada en el centroide del AOI, en metros, origen (0,0) en el centro. En extensiones de pocos kilometros la distorsion es muy inferior a un metro, y el visor trabaja directo en metros. En exportacion glTF se aplica una sola conversion a Y-arriba, asi cada .glb comparte una orientacion y una escena Three.js carga las capas sin correccion por app.',
+          'Un Area de Interes es un centro WGS84 mas un semilado en metros. Cada capa se expresa en una proyeccion Acimutal Equidistante local centrada en el centroide del AOI, en metros, origen (0,0) en el centro. En extensiones de pocos kilometros la distorsion es muy inferior a un metro, y el visor trabaja directo en metros. En exportacion glTF se aplica una sola conversion a Y-arriba, así cada .glb comparte una orientacion y una escena Three.js carga las capas sin correccion por app.',
         )}
       </p>
       <Equation
         tex={String.raw`(x_{\text{glTF}},\,y_{\text{glTF}},\,z_{\text{glTF}}) = (\text{east},\ \text{up},\ -\text{north})`}
-        caption={t('The single Y-up convention shared by every baked layer.', 'La unica convencion Y-arriba que comparte cada capa horneada.')}
+        caption={t('The single Y-up convention shared by every baked layer.', 'La unica convencion Y-arriba que comparte cada capa precalculada.')}
       />
       <Fig
         viewBox="0 0 520 210"
@@ -78,13 +78,13 @@ export default function Methodology() {
       <p>
         {t(
           'Building height is the scaffold, so it is resolved by an explicit provenance ladder: for each footprint the first rule that yields a positive value wins, and the source used is recorded as a per-building tag so measured and inferred heights are never conflated.',
-          'La altura del edificio es el andamio, asi que se resuelve con una escalera de procedencia explicita: para cada huella gana la primera regla que da un valor positivo, y la fuente usada se registra como etiqueta por edificio, de modo que lo medido y lo inferido nunca se confunden.',
+          'La altura del edificio es el andamio, así que se resuelve con una escalera de procedencia explicita: para cada huella gana la primera regla que da un valor positivo, y la fuente usada se registra como etiqueta por edificio, de modo que lo medido y lo inferido nunca se confunden.',
         )}
       </p>
       <Equation
         tex={String.raw`h_i = \begin{cases} h^{\text{meas}}_i & \text{if } h^{\text{meas}}_i > 0 \quad (\textsf{measured}) \\ n^{\text{floors}}_i \cdot \bar h_{\text{floor}} & \text{else if } n^{\text{floors}}_i > 0 \quad (\textsf{floors}) \\ h^{\text{raster}}_i & \text{else if raster covers } i \quad (\textsf{raster}) \\ h_{\text{prior}} & \text{otherwise} \quad (\textsf{prior}) \end{cases}`}
         caption={t('Measured (Overture/OSM); floors x floor-height (default 3.2 m); the Open Buildings 2.5D raster (Global South); a default prior. Clipped to a 2.5 m minimum.',
-          'Medida (Overture/OSM); pisos x altura-de-piso (3.2 m por defecto); el raster 2.5D de Open Buildings (Sur Global); un prior por defecto. Con recorte al minimo de 2.5 m.')}
+          'Medida (Overture/OSM); pisos x altura-de-piso (3.2 m por defecto); el raster 2.5D de Open Buildings (Sur Global); un prior por defecto. Con recorte al mínimo de 2.5 m.')}
       />
       <Fig
         viewBox="0 0 520 150"
@@ -128,7 +128,7 @@ export default function Methodology() {
       <Equation
         tex={String.raw`\max_{p \in \text{grid}} \left| z(p) - \hat z_{\mathcal{T}}(p) \right| \le \varepsilon`}
         caption={t('z is the true elevation; z-hat is the current TIN linear interpolation. Batched top-K insertion turns thousands of triangulations into dozens.',
-          'z es la elevacion real; z-gorro es la interpolacion lineal de la TIN actual. La insercion por lotes (top-K) pasa de miles de triangulaciones a decenas.')}
+          'z es la elevacion real; z-gorro es la interpolación lineal de la TIN actual. La insercion por lotes (top-K) pasa de miles de triangulaciones a decenas.')}
       />
       <Fig viewBox="0 0 520 150" caption={t('A uniform grid (left) refined to an adaptive TIN (right): triangles cluster on the slope.',
         'Una grilla uniforme (izq.) refinada a una TIN adaptativa (der.): los triangulos se agrupan en la pendiente.')}>
@@ -148,7 +148,7 @@ export default function Methodology() {
       </Fig>
       <Callout variant="honest" title={t('Assumptions / limitations', 'Supuestos / limitaciones')}>
         {t('GLO-30 is a Digital Surface Model (30 m): it includes canopy and rooftops, so in dense cores the ground reads slightly high. It is a global product, not a national LiDAR DTM.',
-          'GLO-30 es un Modelo Digital de Superficie (30 m): incluye dosel y techos, asi que en centros densos el suelo queda algo alto. Es un producto global, no un DTM LiDAR nacional.')}
+          'GLO-30 es un Modelo Digital de Superficie (30 m): incluye dosel y techos, así que en centros densos el suelo queda algo alto. Es un producto global, no un DTM LiDAR nacional.')}
       </Callout>
       <Refs ids={['delatin', 'glo30', 'demcompare']} label={t('References', 'Referencias')} />
     </div>
@@ -159,7 +159,7 @@ export default function Methodology() {
       <p>
         {t(
           'Each footprint is projected to metres, its roof triangulated (ear-cutting, handling concave polygons) and extruded from a terrain-sampled base up to base+height, forming a closed prism (roof + walls). A per-vertex id links every triangle back to its building record, and per-building attributes (height, height source, land cover, footprint area, floor count, function, roof shape, plus the sampled analytical layers) ride in the glTF, so the viewer recolours, filters and selects by any attribute without recomputing. Roads are buffered by a class half-width and draped on the terrain.',
-          'Cada huella se proyecta a metros, se triangula su techo (ear-cutting, admite poligonos concavos) y se extruye desde una base tomada del relieve hasta base+altura, formando un prisma cerrado (techo + muros). Un id por vertice enlaza cada triangulo con su registro de edificio, y los atributos por edificio (altura, fuente de altura, cobertura, area de huella, num. de pisos, funcion, forma de techo, mas las capas analiticas muestreadas) viajan en el glTF, asi el visor recolorea, filtra y selecciona por cualquier atributo sin recomputar. Las calles se buferizan por ancho segun su clase y se drapean sobre el relieve.',
+          'Cada huella se proyecta a metros, se triangula su techo (ear-cutting, admite poligonos concavos) y se extruye desde una base tomada del relieve hasta base+altura, formando un prisma cerrado (techo + muros). Un id por vertice enlaza cada triangulo con su registro de edificio, y los atributos por edificio (altura, fuente de altura, cobertura, area de huella, num. de pisos, funcion, forma de techo, mas las capas analiticas muestreadas) viajan en el glTF, así el visor recolorea, filtra y selecciona por cualquier atributo sin recomputar. Las calles se buferizan por ancho según su clase y se drapean sobre el relieve.',
         )}
       </p>
       <Equation
@@ -210,7 +210,7 @@ export default function Methodology() {
       />
       <p>
         {t('These ride as per-building attributes, so they become colour-by, filter and aggregate-by-comuna layers exactly like height or floor count. A true-colour and a false-colour composite are also produced for the optional terrain drape.',
-          'Estos viajan como atributos por edificio, asi que se vuelven capas de colorear, filtrar y agregar por comuna igual que la altura o el numero de pisos. Tambien se producen un compuesto de color real y uno de falso color para el drapeado opcional sobre el relieve.')}
+          'Estos viajan como atributos por edificio, así que se vuelven capas de colorear, filtrar y agregar por comuna igual que la altura o el número de pisos. Tambien se producen un compuesto de color real y uno de falso color para el drapeado opcional sobre el relieve.')}
       </p>
       <Fig viewBox="0 0 520 160" caption={t('Reflectance bands to normalized-difference indices, sampled per footprint centroid.',
         'Bandas de reflectancia a indices de diferencia normalizada, muestreados por centroide de huella.')}>
@@ -232,7 +232,7 @@ export default function Methodology() {
       </Fig>
       <Callout variant="honest" title={t('Assumptions / limitations', 'Supuestos / limitaciones')}>
         {t('A single-date scene: a cloud over one block leaves a few centroids null (recorded, never interpolated). Indices are surface proxies, not calibrated biophysical variables; a small building samples the reflectance of its 10-20 m block, not its roof alone.',
-          'Una escena de una fecha: una nube sobre una manzana deja algunos centroides nulos (registrados, nunca interpolados). Los indices son proxies de superficie, no variables biofisicas calibradas; un edificio pequeno muestrea la reflectancia de su bloque de 10-20 m, no solo su techo.')}
+          'Una escena de una fecha: una nube sobre una manzana deja algunos centroides nulos (registrados, nunca interpolados). Los indices son proxies de superficie, no variables biofisicas calibradas; un edificio pequeño muestrea la reflectancia de su bloque de 10-20 m, no solo su techo.')}
       </Callout>
       <Refs ids={['sentinel2', 'ndvi', 'ndwi', 'ndbi', 'stac']} label={t('References', 'Referencias')} />
     </div>
@@ -243,7 +243,7 @@ export default function Methodology() {
       <p>
         {t(
           'The environment layer attaches the geophysical context of the place: solar-energy potential from PVGIS (grid-connected 1 kWp yearly PV yield and annual global horizontal irradiation) and climate normals from the Open-Meteo ERA5 archive (annual mean / coldest / warmest temperature, mean daily-max wind, annual precipitation). Both are no-auth JSON calls.',
-          'La capa de ambiente adjunta el contexto geofisico del lugar: potencial de energia solar de PVGIS (rendimiento PV anual de 1 kWp conectado a red e irradiacion horizontal global anual) y normales climaticas del archivo ERA5 de Open-Meteo (temperatura media / mas fria / mas calida anual, viento medio diario maximo, precipitacion anual). Ambos son llamadas JSON sin auth.',
+          'La capa de ambiente adjunta el contexto geofisico del lugar: potencial de energía solar de PVGIS (rendimiento PV anual de 1 kWp conectado a red e irradiacion horizontal global anual) y normales climaticas del archivo ERA5 de Open-Meteo (temperatura media / mas fria / mas calida anual, viento medio diario máximo, precipitacion anual). Ambos son llamadas JSON sin auth.',
         )}{' '}
         <Cite id="pvgis" /> <Cite id="era5" />
       </p>
@@ -266,7 +266,7 @@ export default function Methodology() {
       </Fig>
       <Callout variant="honest" title={t('Assumptions / limitations', 'Supuestos / limitaciones')}>
         {t('ERA5 is ~25 km, so within one city these are a single climatological point, not a gradient; that is exactly why they are stored per place and aggregated per comuna, where they do vary. Wind is a proxy (mean of daily maxima), and it is one recent year (2023), not a 30-year normal.',
-          'ERA5 es ~25 km, asi que dentro de una ciudad son un unico punto climatologico, no un gradiente; por eso se guardan por lugar y se agregan por comuna, donde si varian. El viento es un proxy (media de maximos diarios), y es un ano reciente (2023), no una normal de 30 anos.')}
+          'ERA5 es ~25 km, así que dentro de una ciudad son un unico punto climatologico, no un gradiente; por eso se guardan por lugar y se agregan por comuna, donde si varian. El viento es un proxy (media de maximos diarios), y es un ano reciente (2023), no una normal de 30 anos.')}
       </Callout>
       <Refs ids={['pvgis', 'era5']} label={t('References', 'Referencias')} />
     </div>
@@ -328,9 +328,9 @@ export default function Methodology() {
         <Cite id="gltf" />
       </p>
       <Fig viewBox="0 0 520 96" caption={t('Offline bake to one .glb per layer, meshopt-compressed, streamed with an LoD proxy first.',
-        'Horneado offline a un .glb por capa, comprimido con meshopt, transmitido con un proxy LoD primero.')}>
+        'Precalculado offline a un .glb por capa, comprimido con meshopt, transmitido con un proxy LoD primero.')}>
         {[
-          { x: 8, en: 'bake (geoscena)', es: 'horneado (geoscena)' },
+          { x: 8, en: 'bake (geoscena)', es: 'precalculado (geoscena)' },
           { x: 148, en: '.glb per layer', es: '.glb por capa' },
           { x: 288, en: 'meshopt (-60%)', es: 'meshopt (-60%)' },
           { x: 420, en: 'stream + LoD', es: 'stream + LoD' },
@@ -345,7 +345,7 @@ export default function Methodology() {
       </Fig>
       <Callout variant="note" title={t('Contract', 'Contrato')}>
         {t('meshopt is lossless for the _featureid attribute (picking) and extras.features (per-building data); the manifest is a typed contract mirrored in the frontend, so a schema drift fails the web build.',
-          'meshopt es sin perdida para el atributo _featureid (seleccion) y extras.features (datos por edificio); el manifiesto es un contrato tipado espejado en el frontend, asi una deriva de esquema rompe el build.')}
+          'meshopt es sin perdida para el atributo _featureid (seleccion) y extras.features (datos por edificio); el manifiesto es un contrato tipado espejado en el frontend, así una deriva de esquema rompe el build.')}
       </Callout>
       <Refs ids={['gltf']} label={t('References', 'Referencias')} />
     </div>
@@ -356,10 +356,10 @@ export default function Methodology() {
       <h2>{t('Methodology', 'Metodologia')}</h2>
       <p className="mq-lead">
         {t('How open public geodata becomes an interrogable 3D area: feature-level fusion into a local metric frame, a height-provenance ladder, an adaptive terrain mesh, building extrusion, the analytical layers (satellite indices, solar + climate, sub-area aggregation), and web delivery. One method family per tab, each with its equations, a figure and its references.',
-          'Como los geodatos publicos abiertos se vuelven un area 3D interrogable: fusion a nivel de caracteristicas en un marco metrico local, una escalera de procedencia de alturas, una malla de relieve adaptativa, extrusion de edificios, las capas analiticas (indices satelitales, solar + clima, agregacion por sub-area) y entrega web. Una familia de metodos por pestana, cada una con sus ecuaciones, una figura y sus referencias.')}
+          'Como los geodatos publicos abiertos se vuelven un area 3D interrogable: fusion a nivel de caracteristicas en un marco metrico local, una escalera de procedencia de alturas, una malla de relieve adaptativa, extrusion de edificios, las capas analiticas (indices satelitales, solar + clima, agregacion por sub-area) y entrega web. Una familia de métodos por pestana, cada una con sus ecuaciones, una figura y sus referencias.')}
       </p>
       <SubTabs
-        ariaLabel={t('Method families', 'Familias de metodos')}
+        ariaLabel={t('Method families', 'Familias de métodos')}
         orientation="vertical"
         tabs={[
           { id: 'fusion', label: t('Fusion & frame', 'Fusion y marco'), content: FUSION },

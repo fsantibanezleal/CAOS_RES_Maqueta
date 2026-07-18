@@ -55,7 +55,7 @@ const config: ShellConfig = {
     },
     disclaimer: {
       en: 'A research reconstruction: heights are labelled by provenance (measured vs inferred); terrain from a global 30 m DSM sits slightly high in dense cores; the satellite indices are single-scene surface proxies; solar/climate are near-constant per AOI (aggregated per comuna); non-commercial layers are flagged per scene.',
-      es: 'Una reconstruccion de investigacion: las alturas se etiquetan por procedencia (medida vs inferida); el relieve de un DSM global de 30 m queda algo alto en centros densos; los indices satelitales son proxies de superficie de una sola escena; solar/clima son casi constantes por AOI (agregados por comuna); las capas no comerciales se marcan por escena.',
+      es: 'Una reconstrucción de investigacion: las alturas se etiquetan por procedencia (medida vs inferida); el relieve de un DSM global de 30 m queda algo alto en centros densos; los indices satelitales son proxies de superficie de una sola escena; solar/clima son casi constantes por AOI (agregados por comuna); las capas no comerciales se marcan por escena.',
     },
   },
 };

@@ -20,7 +20,7 @@ export default function Experiments() {
       <p>
         {t(
           'Each place is an experiment in multi-modal fusion under a different data regime: OSM-rich cities where most heights are measured; Global-South cities that lean on the Open Buildings 2.5D raster; terrain-first areas with little built-up; and tier-A cities with an authoritative LoD2 model to test against. The registry is designed to span those regimes on purpose, so the honesty of the fusion is visible across very different data availabilities.',
-          'Cada lugar es un experimento de fusion multi-modal bajo un regimen de datos distinto: ciudades ricas en OSM donde casi todas las alturas son medidas; ciudades del Sur Global que dependen del raster 2.5D de Open Buildings; areas de relieve con poco construido; y ciudades tier-A con un modelo LoD2 autoritativo contra el cual medir. El registro esta disenado para abarcar esos regimenes a proposito, para que la honestidad de la fusion sea visible en disponibilidades de datos muy distintas.',
+          'Cada lugar es un experimento de fusion multi-modal bajo un régimen de datos distinto: ciudades ricas en OSM donde casi todas las alturas son medidas; ciudades del Sur Global que dependen del raster 2.5D de Open Buildings; areas de relieve con poco construido; y ciudades tier-A con un modelo LoD2 autoritativo contra el cual medir. El registro esta disenado para abarcar esos regímenes a propósito, para que la honestidad de la fusion sea visible en disponibilidades de datos muy distintas.',
         )}{' '}
         <Cite id="fusionlevels" />
       </p>
@@ -33,14 +33,14 @@ export default function Experiments() {
       </ul>
       <Callout variant="strong" title={t('Leakage-safe protocol', 'Protocolo sin fuga')}>
         {t('The LoD2 ground truth is never used to build the fused heights: heights come only from the provenance ladder, and the authoritative model is held out and compared post-hoc. Every number on this page is baked offline by the pipeline into benchmark.json; nothing is computed in the browser, so the results cannot drift with the viewer.',
-          'La verdad LoD2 nunca se usa para construir las alturas fusionadas: las alturas vienen solo de la escalera de procedencia, y el modelo autoritativo se reserva y se compara despues. Cada numero de esta pagina se hornea offline en benchmark.json; nada se calcula en el navegador, asi los resultados no pueden derivar con el visor.')}
+          'La verdad LoD2 nunca se usa para construir las alturas fusionadas: las alturas vienen solo de la escalera de procedencia, y el modelo autoritativo se reserva y se compara después. Cada número de esta página se hornea offline en benchmark.json; nada se calcula en el navegador, así los resultados no pueden derivar con el visor.')}
       </Callout>
     </div>
   );
 
   const COVERAGE = bench ? (
     <div className="mq-method">
-      <p>{t(`Across ${bench.n_places} baked place(s), grouped by tier:`, `Sobre ${bench.n_places} lugar(es) horneados, agrupados por tier:`)}</p>
+      <p>{t(`Across ${bench.n_places} baked place(s), grouped by tier:`, `Sobre ${bench.n_places} lugar(es) precalculados, agrupados por tier:`)}</p>
       <div className="mq-tablewrap">
         <table className="mq-table">
           <thead><tr><th>{t('Tier', 'Tier')}</th><th>{t('Places', 'Lugares')}</th><th>{t('Total MB', 'MB totales')}</th></tr></thead>
@@ -54,7 +54,7 @@ export default function Experiments() {
       </div>
       <p className="mq-muted">
         {t('Tier A = ground-truth (open LoD2/lidar); Tier B = global-fusion cities (heights via the ladder), including the metro cores that span official sub-areas; Tier C = terrain-first areas. The global measured-vs-inferred height mix is on the Benchmark page.',
-          'Tier A = verdad de terreno (LoD2/lidar abierto); Tier B = ciudades por fusion global (alturas por la escalera), incluidos los nucleos metropolitanos que abarcan sub-areas oficiales; Tier C = areas de relieve. La mezcla global medido-vs-inferido esta en la pagina Benchmark.')}
+          'Tier A = verdad de terreno (LoD2/lidar abierto); Tier B = ciudades por fusion global (alturas por la escalera), incluidos los nucleos metropolitanos que abarcan sub-areas oficiales; Tier C = areas de relieve. La mezcla global medido-vs-inferido esta en la página Benchmark.')}
       </p>
     </div>
   ) : <p className="mq-muted">{t('Loading...', 'Cargando...')}</p>;
@@ -94,9 +94,9 @@ export default function Experiments() {
       <h2>{t('Experiments', 'Experimentos')}</h2>
       <p className="mq-lead">
         {t('Every place is an experiment in multi-modal fusion. The design spans data regimes on purpose; the metrics and a leakage-safe protocol keep the results honest; the numbers are baked offline into benchmark.json, never computed in the browser.',
-          'Cada lugar es un experimento de fusion multi-modal. El diseno abarca regimenes de datos a proposito; las metricas y un protocolo sin fuga mantienen los resultados honestos; los numeros se hornean offline en benchmark.json, nunca se calculan en el navegador.')}
+          'Cada lugar es un experimento de fusion multi-modal. El diseño abarca regímenes de datos a propósito; las metricas y un protocolo sin fuga mantienen los resultados honestos; los números se precalculan offline en benchmark.json, nunca se calculan en el navegador.')}
       </p>
-      {err && <p className="mq-error">{t('Run the pipeline to populate this page.', 'Ejecuta el pipeline para poblar esta pagina.')} <code>{err}</code></p>}
+      {err && <p className="mq-error">{t('Run the pipeline to populate this page.', 'Ejecuta el pipeline para poblar esta página.')} <code>{err}</code></p>}
       <Tabs
         ariaLabel={t('Experiment sections', 'Secciones del experimento')}
         tabs={[
