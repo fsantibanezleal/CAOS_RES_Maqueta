@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "aoi": {
+    "name": "Lo Espejo",
+    "bbox_wgs84": [
+      -70.71238625327533,
+      -33.53989622709307,
+      -70.66801374672468,
+      -33.50290377290693
+    ],
+    "origin_wgs84": [
+      -70.6902,
+      -33.5214
+    ],
+    "crs_local": "+proj=aeqd +lat_0=-33.5214 +lon_0=-70.6902 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    "size_m": [
+      4118.000000000404,
+      4118.0000000004065
+    ]
+  },
+  "layers": [
+    {
+      "name": "terrain",
+      "file": "terrain.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 3215,
+        "triangles": 6290,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Copernicus GLO-30 DSM",
+        "url": "https://copernicus-dem-30m.s3.amazonaws.com/ (AWS Open Data)",
+        "license": "Copernicus-free",
+        "fetched": "2026-07-14",
+        "method": "vsicurl windowed read + bilinear reproject onto ~1 arcsec grid",
+        "extra": {
+          "tiles": [
+            "Copernicus_DSM_COG_10_S34_00_W071_00_DEM"
+          ],
+          "grid": [
+            146,
+            176
+          ]
+        },
+        "license_name": "Copernicus DEM free-of-charge license (ESA/DLR)",
+        "license_url": "https://spacedata.copernicus.eu/collections/copernicus-digital-elevation-model",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "buildings",
+      "file": "buildings.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 269714,
+        "triangles": 358169,
+        "features": 23199
+      },
+      "provenance": {
+        "source": "Overture Maps buildings",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=buildings/type=building",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_buildings": 23199
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "roads",
+      "file": "roads.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 74667,
+        "triangles": 63557,
+        "features": 0
+      },
+      "provenance": {
+        "source": "Overture Maps transportation",
+        "url": "s3://overturemaps-us-west-2/release/2026-06-17.0/theme=transportation/type=segment",
+        "license": "ODbL-1.0",
+        "fetched": "2026-07-14",
+        "method": "overturemaps CLI bbox extract of GeoParquet on S3",
+        "extra": {
+          "release": "2026-06-17.0",
+          "n_segments": 5555
+        },
+        "license_name": "Open Data Commons Open Database License v1.0",
+        "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+        "commercial_ok": true
+      }
+    },
+    {
+      "name": "population",
+      "file": "population.glb",
+      "stats": {
+        "kind": "mesh",
+        "vertices": 16072,
+        "triangles": 20090,
+        "features": 0
+      },
+      "provenance": {
+        "source": "GHS-POP R2023A (JRC), OpenLandMap COG mirror",
+        "url": "https://s3.openlandmap.org/arco/pop.count_ghs.jrc_m_100m_s_20210101_20211231_go_epsg.4326_v20230620.tif",
+        "license": "CC-BY-4.0",
+        "fetched": "2026-07-14",
+        "method": "vsicurl windowed read + bilinear reproject onto ~100 m grid (people per cell)",
+        "extra": {
+          "grid": [
+            41,
+            49
+          ]
+        },
+        "license_name": "Creative Commons Attribution 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "commercial_ok": true
+      }
+    }
+  ],
+  "stats": {
+    "layers": [
+      "terrain",
+      "buildings",
+      "roads",
+      "population"
+    ],
+    "height_mix": {
+      "measured": 11,
+      "floors": 105,
+      "raster": 22610,
+      "prior": 473
+    },
+    "budgets": {
+      "terrain": {
+        "kind": "mesh",
+        "vertices": 3215,
+        "triangles": 6290,
+        "features": 0
+      },
+      "buildings": {
+        "kind": "mesh",
+        "vertices": 269714,
+        "triangles": 358169,
+        "features": 23199
+      },
+      "roads": {
+        "kind": "mesh",
+        "vertices": 74667,
+        "triangles": 63557,
+        "features": 0
+      },
+      "population": {
+        "kind": "mesh",
+        "vertices": 16072,
+        "triangles": 20090,
+        "features": 0
+      }
+    },
+    "ground_truth": null,
+    "notes": [
+      "environment: precip_annual, solar_ghi, solar_pvout, temp_max, temp_mean, temp_min, wind_max_mean",
+      "open-buildings 2.5D raster used (32719)",
+      "modality soil_soc: 2912/23199 sampled",
+      "modality solar_ghi skipped: FileNotFoundError",
+      "s2 ndvi: 9119/23199 sampled",
+      "s2 ndwi: 9119/23199 sampled",
+      "s2 ndbi: 9119/23199 sampled",
+      "population total ~12132264"
+    ]
+  },
+  "modalities": [
+    {
+      "source": "ISRIC SoilGrids 2.0",
+      "url": "/vsicurl/https://files.isric.org/soilgrids/latest/data/soc/soc_0-5cm_mean.vrt",
+      "license": "CC-BY-4.0",
+      "fetched": "2026-07-14",
+      "method": "windowed raster read, resampled to a WGS84 AOI grid, sampled per building centroid",
+      "extra": {
+        "modality": "soil_soc",
+        "unit": "g/kg"
+      },
+      "license_name": "Creative Commons Attribution 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "commercial_ok": true,
+      "key": "soil_soc",
+      "label": "Soil organic carbon (0-5 cm)",
+      "unit": "g/kg"
+    },
+    {
+      "source": "Sentinel-2 L2A (S2B_19HCD_20230113_0_L2A, 2023-01-13, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2B_19HCD_20230113_0_L2A",
+        "date": "2023-01-13"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndvi",
+      "label": "NDVI (vegetation)",
+      "unit": "index"
+    },
+    {
+      "source": "Sentinel-2 L2A (S2B_19HCD_20230113_0_L2A, 2023-01-13, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2B_19HCD_20230113_0_L2A",
+        "date": "2023-01-13"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndwi",
+      "label": "NDWI (water)",
+      "unit": "index"
+    },
+    {
+      "source": "Sentinel-2 L2A (S2B_19HCD_20230113_0_L2A, 2023-01-13, 0% cloud)",
+      "url": "https://earth-search.aws.element84.com/v1 (collection sentinel-2-l2a, AWS sentinel-cogs)",
+      "license": "proprietary",
+      "fetched": "2026-07-14",
+      "method": "STAC scene pick (least cloud) + windowed /vsicurl band read + reproject to a WGS84 AOI grid; NDVI/NDWI/NDBI derived; RGB + false-colour composited",
+      "extra": {
+        "scene": "S2B_19HCD_20230113_0_L2A",
+        "date": "2023-01-13"
+      },
+      "license_name": "proprietary",
+      "license_url": "",
+      "commercial_ok": null,
+      "key": "ndbi",
+      "label": "NDBI (built-up)",
+      "unit": "index"
+    }
+  ],
+  "environment": {
+    "values": {
+      "solar_pvout": 1609.0,
+      "solar_ghi": 2111.0,
+      "temp_mean": 16.6,
+      "temp_min": 7.4,
+      "temp_max": 26.5,
+      "wind_max_mean": 15.7,
+      "precip_annual": 772.0
+    },
+    "meta": {
+      "solar_pvout": {
+        "label": "Solar PV yield",
+        "unit": "kWh/kWp/yr"
+      },
+      "solar_ghi": {
+        "label": "Solar irradiation (GHI)",
+        "unit": "kWh/m2/yr"
+      },
+      "temp_mean": {
+        "label": "Air temperature (mean)",
+        "unit": "degC"
+      },
+      "temp_min": {
+        "label": "Air temperature (coldest day)",
+        "unit": "degC"
+      },
+      "temp_max": {
+        "label": "Air temperature (warmest day)",
+        "unit": "degC"
+      },
+      "wind_max_mean": {
+        "label": "Wind (mean daily max)",
+        "unit": "km/h"
+      },
+      "precip_annual": {
+        "label": "Precipitation (annual)",
+        "unit": "mm/yr"
+      }
+    },
+    "sources": [
+      {
+        "source": "PVGIS v5.3 PV yield + irradiation (PVGIS-ERA5)",
+        "url": "https://re.jrc.ec.europa.eu/api/v5_3/PVcalc (European Commission JRC)",
+        "license": "proprietary",
+        "fetched": "2026-07-14",
+        "method": "grid-connected 1 kWp fixed-mount PVcalc, 14% system loss; yearly E_y + annual GHI at the AOI centre",
+        "extra": {
+          "radiation_db": "PVGIS-ERA5",
+          "loss_pct": 14.0
+        },
+        "license_name": "proprietary",
+        "license_url": "",
+        "commercial_ok": null
+      },
+      {
+        "source": "Open-Meteo ERA5 archive (2023 daily normals)",
+        "url": "https://archive-api.open-meteo.com/v1/archive (ERA5 reanalysis, ~25 km)",
+        "license": "cc-by-4.0",
+        "fetched": "2026-07-14",
+        "method": "2023 daily 2 m mean temp / 10 m max wind / precip sum, reduced to annual mean+extremes at the AOI centre",
+        "extra": {
+          "year": 2023,
+          "days": 365
+        },
+        "license_name": "cc-by-4.0",
+        "license_url": "",
+        "commercial_ok": null
+      }
+    ]
+  },
+  "any_noncommercial": false,
+  "credits": [
+    "Copernicus GLO-30 DSM (Copernicus DEM free-of-charge license (ESA/DLR))",
+    "GHS-POP R2023A (JRC), OpenLandMap COG mirror (Creative Commons Attribution 4.0)",
+    "ISRIC SoilGrids 2.0 (Creative Commons Attribution 4.0)",
+    "Overture Maps buildings (Open Data Commons Open Database License v1.0)",
+    "Overture Maps transportation (Open Data Commons Open Database License v1.0)",
+    "Sentinel-2 L2A (S2B_19HCD_20230113_0_L2A, 2023-01-13, 0% cloud) (proprietary)"
+  ]
+}

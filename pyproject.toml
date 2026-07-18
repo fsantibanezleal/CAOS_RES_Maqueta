@@ -12,7 +12,7 @@ version = "0.1.0"
 description = "Maqueta offline pipeline: fuse open public geodata into per-place 3D SceneBundles."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Apache-2.0" }
+license = { text = "MIT" }
 authors = [{ name = "Felipe Santibanez-Leal", email = "fsantibanez@gmail.com" }]
 dependencies = ["numpy>=1.26"]
 

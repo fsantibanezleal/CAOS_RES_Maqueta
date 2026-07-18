@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "n_places": 1,
+  "n_places": 118,
   "tiers": {
     "A": [
       "berlin_mitte",
@@ -16,8 +16,51 @@
     ],
     "B": [
       "santiago_centro",
+      "santiago_full",
+      "stgo_cerrillos",
+      "stgo_cerro_navia",
+      "stgo_conchali",
+      "stgo_el_bosque",
+      "stgo_estacion_central",
+      "stgo_huechuraba",
+      "stgo_independencia",
+      "stgo_la_cisterna",
+      "stgo_la_florida",
+      "stgo_la_granja",
+      "stgo_la_pintana",
+      "stgo_la_reina",
+      "stgo_las_condes",
+      "stgo_lo_barnechea",
+      "stgo_lo_espejo",
+      "stgo_lo_prado",
+      "stgo_macul",
+      "stgo_maipu",
+      "stgo_padre_hurtado",
+      "stgo_pedro_aguirre_cerda",
+      "stgo_penalolen",
+      "stgo_pirque",
+      "stgo_providencia",
+      "stgo_pudahuel",
+      "stgo_puente_alto",
+      "stgo_quilicura",
+      "stgo_quinta_normal",
+      "stgo_recoleta",
+      "stgo_renca",
+      "stgo_san_bernardo",
+      "stgo_san_joaquin",
+      "stgo_san_jose_de_maipo",
+      "stgo_san_miguel",
+      "stgo_san_ramon",
+      "stgo_santiago",
+      "stgo_vitacura",
+      "stgo_nunoa",
       "valparaiso",
       "concepcion",
+      "calama",
+      "antofagasta",
+      "sierra_gorda",
+      "valdivia",
+      "chiloe_castro",
       "london_city",
       "barcelona_eixample",
       "paris_center",
@@ -36,7 +79,32 @@
       "rome_center",
       "lisbon_baixa",
       "cape_town_center",
-      "bogota_center"
+      "bogota_center",
+      "shanghai_bund",
+      "beijing_center",
+      "hong_kong_central",
+      "delhi_center",
+      "bangkok_center",
+      "jakarta_center",
+      "dubai_downtown",
+      "los_angeles_downtown",
+      "chicago_loop",
+      "lagos_island",
+      "nyc_full",
+      "london_full",
+      "paris_full",
+      "berlin_full",
+      "barcelona_full",
+      "tokyo_full",
+      "seoul_full",
+      "delhi_full",
+      "mexico_city_full",
+      "buenos_aires_full",
+      "sao_paulo_full",
+      "agra_taj",
+      "rio_de_janeiro",
+      "venice",
+      "santorini"
     ],
     "C": [
       "chuquicamata",
@@ -46,19 +114,2120 @@
       "mont_blanc",
       "iguazu",
       "uluru",
-      "halong_bay"
+      "halong_bay",
+      "giza_pyramids",
+      "machu_picchu",
+      "great_wall",
+      "petra",
+      "angkor_wat",
+      "mount_fuji",
+      "matterhorn",
+      "yosemite_valley",
+      "victoria_falls",
+      "monument_valley"
     ]
   },
+  "hierarchy": [
+    {
+      "continent": "South America",
+      "countries": [
+        {
+          "country": "Argentina",
+          "cities": [
+            {
+              "city": "Buenos Aires",
+              "slugs": [
+                "buenos_aires_center",
+                "buenos_aires_full"
+              ]
+            },
+            {
+              "city": "Iguazu",
+              "slugs": [
+                "iguazu"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Brazil",
+          "cities": [
+            {
+              "city": "Rio de Janeiro",
+              "slugs": [
+                "rio_de_janeiro"
+              ]
+            },
+            {
+              "city": "Sao Paulo",
+              "slugs": [
+                "sao_paulo_center",
+                "sao_paulo_full"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Chile",
+          "cities": [
+            {
+              "city": "Antofagasta",
+              "slugs": [
+                "antofagasta"
+              ]
+            },
+            {
+              "city": "Atacama",
+              "slugs": [
+                "valle_luna"
+              ]
+            },
+            {
+              "city": "Calama",
+              "slugs": [
+                "calama"
+              ]
+            },
+            {
+              "city": "Chiloe",
+              "slugs": [
+                "chiloe_castro"
+              ]
+            },
+            {
+              "city": "Chuquicamata",
+              "slugs": [
+                "chuquicamata"
+              ]
+            },
+            {
+              "city": "Concepcion",
+              "slugs": [
+                "concepcion"
+              ]
+            },
+            {
+              "city": "Santiago",
+              "slugs": [
+                "santiago_centro",
+                "santiago_full",
+                "stgo_cerrillos",
+                "stgo_cerro_navia",
+                "stgo_conchali",
+                "stgo_el_bosque",
+                "stgo_estacion_central",
+                "stgo_huechuraba",
+                "stgo_independencia",
+                "stgo_la_cisterna",
+                "stgo_la_florida",
+                "stgo_la_granja",
+                "stgo_la_pintana",
+                "stgo_la_reina",
+                "stgo_las_condes",
+                "stgo_lo_barnechea",
+                "stgo_lo_espejo",
+                "stgo_lo_prado",
+                "stgo_macul",
+                "stgo_maipu",
+                "stgo_padre_hurtado",
+                "stgo_pedro_aguirre_cerda",
+                "stgo_penalolen",
+                "stgo_pirque",
+                "stgo_providencia",
+                "stgo_pudahuel",
+                "stgo_puente_alto",
+                "stgo_quilicura",
+                "stgo_quinta_normal",
+                "stgo_recoleta",
+                "stgo_renca",
+                "stgo_san_bernardo",
+                "stgo_san_joaquin",
+                "stgo_san_jose_de_maipo",
+                "stgo_san_miguel",
+                "stgo_san_ramon",
+                "stgo_santiago",
+                "stgo_vitacura",
+                "stgo_nunoa"
+              ]
+            },
+            {
+              "city": "Sierra Gorda",
+              "slugs": [
+                "sierra_gorda"
+              ]
+            },
+            {
+              "city": "Torres del Paine",
+              "slugs": [
+                "torres_paine"
+              ]
+            },
+            {
+              "city": "Valdivia",
+              "slugs": [
+                "valdivia"
+              ]
+            },
+            {
+              "city": "Valparaiso",
+              "slugs": [
+                "valparaiso"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Colombia",
+          "cities": [
+            {
+              "city": "Bogota",
+              "slugs": [
+                "bogota_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Peru",
+          "cities": [
+            {
+              "city": "Machu Picchu",
+              "slugs": [
+                "machu_picchu"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "North America",
+      "countries": [
+        {
+          "country": "Canada",
+          "cities": [
+            {
+              "city": "Toronto",
+              "slugs": [
+                "toronto_downtown"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Mexico",
+          "cities": [
+            {
+              "city": "Mexico City",
+              "slugs": [
+                "mexico_city_center",
+                "mexico_city_full"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "USA",
+          "cities": [
+            {
+              "city": "Chicago",
+              "slugs": [
+                "chicago_loop"
+              ]
+            },
+            {
+              "city": "Grand Canyon",
+              "slugs": [
+                "grand_canyon"
+              ]
+            },
+            {
+              "city": "Los Angeles",
+              "slugs": [
+                "los_angeles_downtown"
+              ]
+            },
+            {
+              "city": "Monument Valley",
+              "slugs": [
+                "monument_valley"
+              ]
+            },
+            {
+              "city": "New York",
+              "slugs": [
+                "manhattan_midtown",
+                "nyc_full"
+              ]
+            },
+            {
+              "city": "San Francisco",
+              "slugs": [
+                "san_francisco_downtown"
+              ]
+            },
+            {
+              "city": "Seattle",
+              "slugs": [
+                "seattle_downtown"
+              ]
+            },
+            {
+              "city": "Yosemite",
+              "slugs": [
+                "yosemite_valley"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Europe",
+      "countries": [
+        {
+          "country": "Austria",
+          "cities": [
+            {
+              "city": "Vienna",
+              "slugs": [
+                "vienna_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Finland",
+          "cities": [
+            {
+              "city": "Helsinki",
+              "slugs": [
+                "helsinki_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "France",
+          "cities": [
+            {
+              "city": "Mont Blanc",
+              "slugs": [
+                "mont_blanc"
+              ]
+            },
+            {
+              "city": "Paris",
+              "slugs": [
+                "paris_center",
+                "paris_full"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Germany",
+          "cities": [
+            {
+              "city": "Berlin",
+              "slugs": [
+                "berlin_mitte",
+                "berlin_full"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Greece",
+          "cities": [
+            {
+              "city": "Santorini",
+              "slugs": [
+                "santorini"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Italy",
+          "cities": [
+            {
+              "city": "Rome",
+              "slugs": [
+                "rome_center"
+              ]
+            },
+            {
+              "city": "Venice",
+              "slugs": [
+                "venice"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Netherlands",
+          "cities": [
+            {
+              "city": "Amsterdam",
+              "slugs": [
+                "amsterdam_center"
+              ]
+            },
+            {
+              "city": "Delft",
+              "slugs": [
+                "delft"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Portugal",
+          "cities": [
+            {
+              "city": "Lisbon",
+              "slugs": [
+                "lisbon_baixa"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Russia",
+          "cities": [
+            {
+              "city": "Moscow",
+              "slugs": [
+                "moscow_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Spain",
+          "cities": [
+            {
+              "city": "Barcelona",
+              "slugs": [
+                "barcelona_eixample",
+                "barcelona_full"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Switzerland",
+          "cities": [
+            {
+              "city": "Matterhorn",
+              "slugs": [
+                "matterhorn"
+              ]
+            },
+            {
+              "city": "Zurich",
+              "slugs": [
+                "zurich_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Turkey",
+          "cities": [
+            {
+              "city": "Istanbul",
+              "slugs": [
+                "istanbul_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "UK",
+          "cities": [
+            {
+              "city": "London",
+              "slugs": [
+                "london_city",
+                "london_full"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Africa",
+      "countries": [
+        {
+          "country": "Egypt",
+          "cities": [
+            {
+              "city": "Cairo",
+              "slugs": [
+                "cairo_center"
+              ]
+            },
+            {
+              "city": "Giza",
+              "slugs": [
+                "giza_pyramids"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Kenya",
+          "cities": [
+            {
+              "city": "Nairobi",
+              "slugs": [
+                "nairobi_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Nigeria",
+          "cities": [
+            {
+              "city": "Lagos",
+              "slugs": [
+                "lagos_island"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "South Africa",
+          "cities": [
+            {
+              "city": "Cape Town",
+              "slugs": [
+                "cape_town_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Zimbabwe",
+          "cities": [
+            {
+              "city": "Victoria Falls",
+              "slugs": [
+                "victoria_falls"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Asia",
+      "countries": [
+        {
+          "country": "Cambodia",
+          "cities": [
+            {
+              "city": "Angkor",
+              "slugs": [
+                "angkor_wat"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "China",
+          "cities": [
+            {
+              "city": "Beijing",
+              "slugs": [
+                "beijing_center"
+              ]
+            },
+            {
+              "city": "Great Wall",
+              "slugs": [
+                "great_wall"
+              ]
+            },
+            {
+              "city": "Hong Kong",
+              "slugs": [
+                "hong_kong_central"
+              ]
+            },
+            {
+              "city": "Shanghai",
+              "slugs": [
+                "shanghai_bund"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "India",
+          "cities": [
+            {
+              "city": "Agra",
+              "slugs": [
+                "agra_taj"
+              ]
+            },
+            {
+              "city": "Delhi",
+              "slugs": [
+                "delhi_center",
+                "delhi_full"
+              ]
+            },
+            {
+              "city": "Mumbai",
+              "slugs": [
+                "mumbai_fort"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Indonesia",
+          "cities": [
+            {
+              "city": "Jakarta",
+              "slugs": [
+                "jakarta_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Japan",
+          "cities": [
+            {
+              "city": "Mount Fuji",
+              "slugs": [
+                "mount_fuji"
+              ]
+            },
+            {
+              "city": "Tokyo",
+              "slugs": [
+                "tokyo_shinjuku",
+                "tokyo_full"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Jordan",
+          "cities": [
+            {
+              "city": "Petra",
+              "slugs": [
+                "petra"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Singapore",
+          "cities": [
+            {
+              "city": "Singapore",
+              "slugs": [
+                "singapore_downtown"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "South Korea",
+          "cities": [
+            {
+              "city": "Seoul",
+              "slugs": [
+                "seoul_jongno",
+                "seoul_full"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Thailand",
+          "cities": [
+            {
+              "city": "Bangkok",
+              "slugs": [
+                "bangkok_center"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "UAE",
+          "cities": [
+            {
+              "city": "Dubai",
+              "slugs": [
+                "dubai_downtown"
+              ]
+            }
+          ]
+        },
+        {
+          "country": "Vietnam",
+          "cities": [
+            {
+              "city": "Ha Long",
+              "slugs": [
+                "halong_bay"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "continent": "Oceania",
+      "countries": [
+        {
+          "country": "Australia",
+          "cities": [
+            {
+              "city": "Sydney",
+              "slugs": [
+                "sydney_cbd"
+              ]
+            },
+            {
+              "city": "Uluru",
+              "slugs": [
+                "uluru"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "places": [
+    {
+      "slug": "agra_taj",
+      "name": "Agra (Taj Mahal)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "India",
+      "city": "Agra",
+      "n_layers": 4,
+      "total_bytes": 2259956,
+      "manifest_path": "agra_taj/manifest.json"
+    },
+    {
+      "slug": "amsterdam_center",
+      "name": "Amsterdam Centrum",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Netherlands",
+      "city": "Amsterdam",
+      "n_layers": 8,
+      "total_bytes": 6586868,
+      "manifest_path": "amsterdam_center/manifest.json"
+    },
+    {
+      "slug": "angkor_wat",
+      "name": "Angkor Wat",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Asia",
+      "country": "Cambodia",
+      "city": "Angkor",
+      "n_layers": 2,
+      "total_bytes": 58476,
+      "manifest_path": "angkor_wat/manifest.json"
+    },
+    {
+      "slug": "antofagasta",
+      "name": "Antofagasta",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Antofagasta",
+      "n_layers": 6,
+      "total_bytes": 8025136,
+      "manifest_path": "antofagasta/manifest.json"
+    },
+    {
+      "slug": "bangkok_center",
+      "name": "Bangkok Center",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "Thailand",
+      "city": "Bangkok",
+      "n_layers": 4,
+      "total_bytes": 4786380,
+      "manifest_path": "bangkok_center/manifest.json"
+    },
+    {
+      "slug": "barcelona_eixample",
+      "name": "Barcelona Eixample",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Spain",
+      "city": "Barcelona",
+      "n_layers": 4,
+      "total_bytes": 4917776,
+      "manifest_path": "barcelona_eixample/manifest.json"
+    },
+    {
+      "slug": "barcelona_full",
+      "name": "Barcelona (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Spain",
+      "city": "Barcelona",
+      "n_layers": 7,
+      "total_bytes": 46615628,
+      "manifest_path": "barcelona_full/manifest.json"
+    },
+    {
+      "slug": "beijing_center",
+      "name": "Beijing Center",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "China",
+      "city": "Beijing",
+      "n_layers": 4,
+      "total_bytes": 2174232,
+      "manifest_path": "beijing_center/manifest.json"
+    },
+    {
+      "slug": "berlin_full",
+      "name": "Berlin (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Germany",
+      "city": "Berlin",
+      "n_layers": 7,
+      "total_bytes": 31968388,
+      "manifest_path": "berlin_full/manifest.json"
+    },
     {
       "slug": "berlin_mitte",
       "name": "Berlin Mitte",
       "tier": "A",
       "category": "ground-truth",
+      "continent": "Europe",
       "country": "Germany",
-      "n_layers": 2,
-      "total_bytes": 3528924,
+      "city": "Berlin",
+      "n_layers": 4,
+      "total_bytes": 1916668,
       "manifest_path": "berlin_mitte/manifest.json"
+    },
+    {
+      "slug": "bogota_center",
+      "name": "Bogota Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Colombia",
+      "city": "Bogota",
+      "n_layers": 4,
+      "total_bytes": 7825308,
+      "manifest_path": "bogota_center/manifest.json"
+    },
+    {
+      "slug": "buenos_aires_center",
+      "name": "Buenos Aires Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Argentina",
+      "city": "Buenos Aires",
+      "n_layers": 4,
+      "total_bytes": 3520196,
+      "manifest_path": "buenos_aires_center/manifest.json"
+    },
+    {
+      "slug": "buenos_aires_full",
+      "name": "Buenos Aires (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Argentina",
+      "city": "Buenos Aires",
+      "n_layers": 7,
+      "total_bytes": 84717088,
+      "manifest_path": "buenos_aires_full/manifest.json"
+    },
+    {
+      "slug": "cairo_center",
+      "name": "Cairo Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Africa",
+      "country": "Egypt",
+      "city": "Cairo",
+      "n_layers": 7,
+      "total_bytes": 2991532,
+      "manifest_path": "cairo_center/manifest.json"
+    },
+    {
+      "slug": "calama",
+      "name": "Calama",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Calama",
+      "n_layers": 7,
+      "total_bytes": 16454932,
+      "manifest_path": "calama/manifest.json"
+    },
+    {
+      "slug": "cape_town_center",
+      "name": "Cape Town CBD",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Africa",
+      "country": "South Africa",
+      "city": "Cape Town",
+      "n_layers": 4,
+      "total_bytes": 2257780,
+      "manifest_path": "cape_town_center/manifest.json"
+    },
+    {
+      "slug": "chicago_loop",
+      "name": "Chicago Loop",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Chicago",
+      "n_layers": 4,
+      "total_bytes": 1538140,
+      "manifest_path": "chicago_loop/manifest.json"
+    },
+    {
+      "slug": "chiloe_castro",
+      "name": "Chiloe (Castro)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Chiloe",
+      "n_layers": 6,
+      "total_bytes": 2986212,
+      "manifest_path": "chiloe_castro/manifest.json"
+    },
+    {
+      "slug": "chuquicamata",
+      "name": "Chuquicamata Mine",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Chuquicamata",
+      "n_layers": 2,
+      "total_bytes": 103164,
+      "manifest_path": "chuquicamata/manifest.json"
+    },
+    {
+      "slug": "concepcion",
+      "name": "Concepcion",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Concepcion",
+      "n_layers": 4,
+      "total_bytes": 3487540,
+      "manifest_path": "concepcion/manifest.json"
+    },
+    {
+      "slug": "delft",
+      "name": "Delft",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Netherlands",
+      "city": "Delft",
+      "n_layers": 8,
+      "total_bytes": 6722852,
+      "manifest_path": "delft/manifest.json"
+    },
+    {
+      "slug": "delhi_center",
+      "name": "Delhi (Connaught Place)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "India",
+      "city": "Delhi",
+      "n_layers": 4,
+      "total_bytes": 2378084,
+      "manifest_path": "delhi_center/manifest.json"
+    },
+    {
+      "slug": "delhi_full",
+      "name": "Delhi (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "India",
+      "city": "Delhi",
+      "n_layers": 7,
+      "total_bytes": 37711096,
+      "manifest_path": "delhi_full/manifest.json"
+    },
+    {
+      "slug": "dubai_downtown",
+      "name": "Dubai Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "UAE",
+      "city": "Dubai",
+      "n_layers": 4,
+      "total_bytes": 1024880,
+      "manifest_path": "dubai_downtown/manifest.json"
+    },
+    {
+      "slug": "giza_pyramids",
+      "name": "Giza Pyramids",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Africa",
+      "country": "Egypt",
+      "city": "Giza",
+      "n_layers": 2,
+      "total_bytes": 50308,
+      "manifest_path": "giza_pyramids/manifest.json"
+    },
+    {
+      "slug": "grand_canyon",
+      "name": "Grand Canyon (South Rim)",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Grand Canyon",
+      "n_layers": 2,
+      "total_bytes": 91468,
+      "manifest_path": "grand_canyon/manifest.json"
+    },
+    {
+      "slug": "great_wall",
+      "name": "Great Wall (Badaling)",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Asia",
+      "country": "China",
+      "city": "Great Wall",
+      "n_layers": 2,
+      "total_bytes": 103096,
+      "manifest_path": "great_wall/manifest.json"
+    },
+    {
+      "slug": "halong_bay",
+      "name": "Ha Long Bay",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Asia",
+      "country": "Vietnam",
+      "city": "Ha Long",
+      "n_layers": 2,
+      "total_bytes": 10872,
+      "manifest_path": "halong_bay/manifest.json"
+    },
+    {
+      "slug": "helsinki_center",
+      "name": "Helsinki Centre",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Finland",
+      "city": "Helsinki",
+      "n_layers": 4,
+      "total_bytes": 1791844,
+      "manifest_path": "helsinki_center/manifest.json"
+    },
+    {
+      "slug": "hong_kong_central",
+      "name": "Hong Kong Central",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "China",
+      "city": "Hong Kong",
+      "n_layers": 4,
+      "total_bytes": 1740012,
+      "manifest_path": "hong_kong_central/manifest.json"
+    },
+    {
+      "slug": "iguazu",
+      "name": "Iguazu Falls",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Argentina",
+      "city": "Iguazu",
+      "n_layers": 2,
+      "total_bytes": 43232,
+      "manifest_path": "iguazu/manifest.json"
+    },
+    {
+      "slug": "istanbul_center",
+      "name": "Istanbul Fatih",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Turkey",
+      "city": "Istanbul",
+      "n_layers": 7,
+      "total_bytes": 3657024,
+      "manifest_path": "istanbul_center/manifest.json"
+    },
+    {
+      "slug": "jakarta_center",
+      "name": "Jakarta Center",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "Indonesia",
+      "city": "Jakarta",
+      "n_layers": 4,
+      "total_bytes": 3838588,
+      "manifest_path": "jakarta_center/manifest.json"
+    },
+    {
+      "slug": "lagos_island",
+      "name": "Lagos Island",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Africa",
+      "country": "Nigeria",
+      "city": "Lagos",
+      "n_layers": 4,
+      "total_bytes": 2393076,
+      "manifest_path": "lagos_island/manifest.json"
+    },
+    {
+      "slug": "lisbon_baixa",
+      "name": "Lisbon Baixa",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Portugal",
+      "city": "Lisbon",
+      "n_layers": 4,
+      "total_bytes": 2867712,
+      "manifest_path": "lisbon_baixa/manifest.json"
+    },
+    {
+      "slug": "london_city",
+      "name": "London City",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "UK",
+      "city": "London",
+      "n_layers": 4,
+      "total_bytes": 3479496,
+      "manifest_path": "london_city/manifest.json"
+    },
+    {
+      "slug": "london_full",
+      "name": "London (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "UK",
+      "city": "London",
+      "n_layers": 7,
+      "total_bytes": 53928580,
+      "manifest_path": "london_full/manifest.json"
+    },
+    {
+      "slug": "los_angeles_downtown",
+      "name": "Los Angeles Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Los Angeles",
+      "n_layers": 4,
+      "total_bytes": 1579088,
+      "manifest_path": "los_angeles_downtown/manifest.json"
+    },
+    {
+      "slug": "machu_picchu",
+      "name": "Machu Picchu",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Peru",
+      "city": "Machu Picchu",
+      "n_layers": 2,
+      "total_bytes": 55052,
+      "manifest_path": "machu_picchu/manifest.json"
+    },
+    {
+      "slug": "manhattan_midtown",
+      "name": "Manhattan Midtown",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "North America",
+      "country": "USA",
+      "city": "New York",
+      "n_layers": 4,
+      "total_bytes": 2895384,
+      "manifest_path": "manhattan_midtown/manifest.json"
+    },
+    {
+      "slug": "matterhorn",
+      "name": "Matterhorn (Zermatt)",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Europe",
+      "country": "Switzerland",
+      "city": "Matterhorn",
+      "n_layers": 2,
+      "total_bytes": 70612,
+      "manifest_path": "matterhorn/manifest.json"
+    },
+    {
+      "slug": "mexico_city_center",
+      "name": "Mexico City Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "Mexico",
+      "city": "Mexico City",
+      "n_layers": 4,
+      "total_bytes": 3330736,
+      "manifest_path": "mexico_city_center/manifest.json"
+    },
+    {
+      "slug": "mexico_city_full",
+      "name": "Mexico City (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "Mexico",
+      "city": "Mexico City",
+      "n_layers": 7,
+      "total_bytes": 60782668,
+      "manifest_path": "mexico_city_full/manifest.json"
+    },
+    {
+      "slug": "mont_blanc",
+      "name": "Mont Blanc",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Europe",
+      "country": "France",
+      "city": "Mont Blanc",
+      "n_layers": 1,
+      "total_bytes": 64584,
+      "manifest_path": "mont_blanc/manifest.json"
+    },
+    {
+      "slug": "monument_valley",
+      "name": "Monument Valley",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Monument Valley",
+      "n_layers": 2,
+      "total_bytes": 74728,
+      "manifest_path": "monument_valley/manifest.json"
+    },
+    {
+      "slug": "moscow_center",
+      "name": "Moscow Center",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Russia",
+      "city": "Moscow",
+      "n_layers": 7,
+      "total_bytes": 2424092,
+      "manifest_path": "moscow_center/manifest.json"
+    },
+    {
+      "slug": "mount_fuji",
+      "name": "Mount Fuji",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Asia",
+      "country": "Japan",
+      "city": "Mount Fuji",
+      "n_layers": 2,
+      "total_bytes": 78696,
+      "manifest_path": "mount_fuji/manifest.json"
+    },
+    {
+      "slug": "mumbai_fort",
+      "name": "Mumbai Fort",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "India",
+      "city": "Mumbai",
+      "n_layers": 4,
+      "total_bytes": 1038108,
+      "manifest_path": "mumbai_fort/manifest.json"
+    },
+    {
+      "slug": "nairobi_center",
+      "name": "Nairobi CBD",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Africa",
+      "country": "Kenya",
+      "city": "Nairobi",
+      "n_layers": 4,
+      "total_bytes": 2091704,
+      "manifest_path": "nairobi_center/manifest.json"
+    },
+    {
+      "slug": "nyc_full",
+      "name": "New York (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "USA",
+      "city": "New York",
+      "n_layers": 7,
+      "total_bytes": 50874660,
+      "manifest_path": "nyc_full/manifest.json"
+    },
+    {
+      "slug": "paris_center",
+      "name": "Paris Centre",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "France",
+      "city": "Paris",
+      "n_layers": 4,
+      "total_bytes": 5057656,
+      "manifest_path": "paris_center/manifest.json"
+    },
+    {
+      "slug": "paris_full",
+      "name": "Paris (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "France",
+      "city": "Paris",
+      "n_layers": 7,
+      "total_bytes": 73819772,
+      "manifest_path": "paris_full/manifest.json"
+    },
+    {
+      "slug": "petra",
+      "name": "Petra",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Asia",
+      "country": "Jordan",
+      "city": "Petra",
+      "n_layers": 2,
+      "total_bytes": 56776,
+      "manifest_path": "petra/manifest.json"
+    },
+    {
+      "slug": "rio_de_janeiro",
+      "name": "Rio de Janeiro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Brazil",
+      "city": "Rio de Janeiro",
+      "n_layers": 4,
+      "total_bytes": 13211348,
+      "manifest_path": "rio_de_janeiro/manifest.json"
+    },
+    {
+      "slug": "rome_center",
+      "name": "Rome Centro Storico",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Italy",
+      "city": "Rome",
+      "n_layers": 4,
+      "total_bytes": 3321244,
+      "manifest_path": "rome_center/manifest.json"
+    },
+    {
+      "slug": "san_francisco_downtown",
+      "name": "San Francisco Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "USA",
+      "city": "San Francisco",
+      "n_layers": 7,
+      "total_bytes": 2523124,
+      "manifest_path": "san_francisco_downtown/manifest.json"
+    },
+    {
+      "slug": "santiago_centro",
+      "name": "Santiago Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 4016424,
+      "manifest_path": "santiago_centro/manifest.json"
+    },
+    {
+      "slug": "santiago_full",
+      "name": "Santiago (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 76216508,
+      "manifest_path": "santiago_full/manifest.json"
+    },
+    {
+      "slug": "santorini",
+      "name": "Santorini (Thera)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Greece",
+      "city": "Santorini",
+      "n_layers": 4,
+      "total_bytes": 1481196,
+      "manifest_path": "santorini/manifest.json"
+    },
+    {
+      "slug": "sao_paulo_center",
+      "name": "Sao Paulo Centro",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Brazil",
+      "city": "Sao Paulo",
+      "n_layers": 4,
+      "total_bytes": 5888252,
+      "manifest_path": "sao_paulo_center/manifest.json"
+    },
+    {
+      "slug": "sao_paulo_full",
+      "name": "Sao Paulo (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Brazil",
+      "city": "Sao Paulo",
+      "n_layers": 7,
+      "total_bytes": 87178352,
+      "manifest_path": "sao_paulo_full/manifest.json"
+    },
+    {
+      "slug": "seattle_downtown",
+      "name": "Seattle Downtown",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Seattle",
+      "n_layers": 4,
+      "total_bytes": 1406624,
+      "manifest_path": "seattle_downtown/manifest.json"
+    },
+    {
+      "slug": "seoul_full",
+      "name": "Seoul (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "South Korea",
+      "city": "Seoul",
+      "n_layers": 7,
+      "total_bytes": 22407244,
+      "manifest_path": "seoul_full/manifest.json"
+    },
+    {
+      "slug": "seoul_jongno",
+      "name": "Seoul Jongno",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "South Korea",
+      "city": "Seoul",
+      "n_layers": 7,
+      "total_bytes": 3045664,
+      "manifest_path": "seoul_jongno/manifest.json"
+    },
+    {
+      "slug": "shanghai_bund",
+      "name": "Shanghai (The Bund)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "China",
+      "city": "Shanghai",
+      "n_layers": 6,
+      "total_bytes": 1105120,
+      "manifest_path": "shanghai_bund/manifest.json"
+    },
+    {
+      "slug": "sierra_gorda",
+      "name": "Sierra Gorda",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Sierra Gorda",
+      "n_layers": 6,
+      "total_bytes": 239744,
+      "manifest_path": "sierra_gorda/manifest.json"
+    },
+    {
+      "slug": "singapore_downtown",
+      "name": "Singapore Downtown",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Asia",
+      "country": "Singapore",
+      "city": "Singapore",
+      "n_layers": 4,
+      "total_bytes": 1563808,
+      "manifest_path": "singapore_downtown/manifest.json"
+    },
+    {
+      "slug": "stgo_cerrillos",
+      "name": "Cerrillos",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 30542656,
+      "manifest_path": "stgo_cerrillos/manifest.json"
+    },
+    {
+      "slug": "stgo_cerro_navia",
+      "name": "Cerro Navia",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 33395764,
+      "manifest_path": "stgo_cerro_navia/manifest.json"
+    },
+    {
+      "slug": "stgo_conchali",
+      "name": "Conchal\u00ed",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 10410784,
+      "manifest_path": "stgo_conchali/manifest.json"
+    },
+    {
+      "slug": "stgo_el_bosque",
+      "name": "El Bosque",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 16279740,
+      "manifest_path": "stgo_el_bosque/manifest.json"
+    },
+    {
+      "slug": "stgo_estacion_central",
+      "name": "Estaci\u00f3n Central",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 19612032,
+      "manifest_path": "stgo_estacion_central/manifest.json"
+    },
+    {
+      "slug": "stgo_huechuraba",
+      "name": "Huechuraba",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 34710368,
+      "manifest_path": "stgo_huechuraba/manifest.json"
+    },
+    {
+      "slug": "stgo_independencia",
+      "name": "Independencia",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 7050988,
+      "manifest_path": "stgo_independencia/manifest.json"
+    },
+    {
+      "slug": "stgo_la_cisterna",
+      "name": "La Cisterna",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 13598296,
+      "manifest_path": "stgo_la_cisterna/manifest.json"
+    },
+    {
+      "slug": "stgo_la_florida",
+      "name": "La Florida",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 60142864,
+      "manifest_path": "stgo_la_florida/manifest.json"
+    },
+    {
+      "slug": "stgo_la_granja",
+      "name": "La Granja",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 30110124,
+      "manifest_path": "stgo_la_granja/manifest.json"
+    },
+    {
+      "slug": "stgo_la_pintana",
+      "name": "La Pintana",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 39301408,
+      "manifest_path": "stgo_la_pintana/manifest.json"
+    },
+    {
+      "slug": "stgo_la_reina",
+      "name": "La Reina",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 40478528,
+      "manifest_path": "stgo_la_reina/manifest.json"
+    },
+    {
+      "slug": "stgo_las_condes",
+      "name": "Las Condes",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 38325184,
+      "manifest_path": "stgo_las_condes/manifest.json"
+    },
+    {
+      "slug": "stgo_lo_barnechea",
+      "name": "Lo Barnechea",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 16422996,
+      "manifest_path": "stgo_lo_barnechea/manifest.json"
+    },
+    {
+      "slug": "stgo_lo_espejo",
+      "name": "Lo Espejo",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 8494028,
+      "manifest_path": "stgo_lo_espejo/manifest.json"
+    },
+    {
+      "slug": "stgo_lo_prado",
+      "name": "Lo Prado",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 7594936,
+      "manifest_path": "stgo_lo_prado/manifest.json"
+    },
+    {
+      "slug": "stgo_macul",
+      "name": "Macul",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 12737976,
+      "manifest_path": "stgo_macul/manifest.json"
+    },
+    {
+      "slug": "stgo_maipu",
+      "name": "Maip\u00fa",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 52655648,
+      "manifest_path": "stgo_maipu/manifest.json"
+    },
+    {
+      "slug": "stgo_nunoa",
+      "name": "\u00d1u\u00f1oa",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 19986660,
+      "manifest_path": "stgo_nunoa/manifest.json"
+    },
+    {
+      "slug": "stgo_padre_hurtado",
+      "name": "Padre Hurtado",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 11777924,
+      "manifest_path": "stgo_padre_hurtado/manifest.json"
+    },
+    {
+      "slug": "stgo_pedro_aguirre_cerda",
+      "name": "Pedro Aguirre Cerda",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 9137212,
+      "manifest_path": "stgo_pedro_aguirre_cerda/manifest.json"
+    },
+    {
+      "slug": "stgo_penalolen",
+      "name": "Pe\u00f1alol\u00e9n",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 40699560,
+      "manifest_path": "stgo_penalolen/manifest.json"
+    },
+    {
+      "slug": "stgo_pirque",
+      "name": "Pirque",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 6080264,
+      "manifest_path": "stgo_pirque/manifest.json"
+    },
+    {
+      "slug": "stgo_providencia",
+      "name": "Providencia",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 12428260,
+      "manifest_path": "stgo_providencia/manifest.json"
+    },
+    {
+      "slug": "stgo_pudahuel",
+      "name": "Pudahuel",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 19954240,
+      "manifest_path": "stgo_pudahuel/manifest.json"
+    },
+    {
+      "slug": "stgo_puente_alto",
+      "name": "Puente Alto",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 48669052,
+      "manifest_path": "stgo_puente_alto/manifest.json"
+    },
+    {
+      "slug": "stgo_quilicura",
+      "name": "Quilicura",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 31990952,
+      "manifest_path": "stgo_quilicura/manifest.json"
+    },
+    {
+      "slug": "stgo_quinta_normal",
+      "name": "Quinta Normal",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 14287388,
+      "manifest_path": "stgo_quinta_normal/manifest.json"
+    },
+    {
+      "slug": "stgo_recoleta",
+      "name": "Recoleta",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 20674248,
+      "manifest_path": "stgo_recoleta/manifest.json"
+    },
+    {
+      "slug": "stgo_renca",
+      "name": "Renca",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 49478660,
+      "manifest_path": "stgo_renca/manifest.json"
+    },
+    {
+      "slug": "stgo_san_bernardo",
+      "name": "San Bernardo",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 41526824,
+      "manifest_path": "stgo_san_bernardo/manifest.json"
+    },
+    {
+      "slug": "stgo_san_joaquin",
+      "name": "San Joaqu\u00edn",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 18874868,
+      "manifest_path": "stgo_san_joaquin/manifest.json"
+    },
+    {
+      "slug": "stgo_san_jose_de_maipo",
+      "name": "San Jos\u00e9 de Maipo",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 1270424,
+      "manifest_path": "stgo_san_jose_de_maipo/manifest.json"
+    },
+    {
+      "slug": "stgo_san_miguel",
+      "name": "San Miguel",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 15364548,
+      "manifest_path": "stgo_san_miguel/manifest.json"
+    },
+    {
+      "slug": "stgo_san_ramon",
+      "name": "San Ram\u00f3n",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 16065396,
+      "manifest_path": "stgo_san_ramon/manifest.json"
+    },
+    {
+      "slug": "stgo_santiago",
+      "name": "Santiago",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 20484536,
+      "manifest_path": "stgo_santiago/manifest.json"
+    },
+    {
+      "slug": "stgo_vitacura",
+      "name": "Vitacura",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Santiago",
+      "n_layers": 4,
+      "total_bytes": 31519540,
+      "manifest_path": "stgo_vitacura/manifest.json"
+    },
+    {
+      "slug": "sydney_cbd",
+      "name": "Sydney CBD",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Oceania",
+      "country": "Australia",
+      "city": "Sydney",
+      "n_layers": 7,
+      "total_bytes": 1878896,
+      "manifest_path": "sydney_cbd/manifest.json"
+    },
+    {
+      "slug": "tokyo_full",
+      "name": "Tokyo (metro core)",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Asia",
+      "country": "Japan",
+      "city": "Tokyo",
+      "n_layers": 7,
+      "total_bytes": 68699208,
+      "manifest_path": "tokyo_full/manifest.json"
+    },
+    {
+      "slug": "tokyo_shinjuku",
+      "name": "Tokyo Shinjuku",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Asia",
+      "country": "Japan",
+      "city": "Tokyo",
+      "n_layers": 4,
+      "total_bytes": 5099388,
+      "manifest_path": "tokyo_shinjuku/manifest.json"
+    },
+    {
+      "slug": "toronto_downtown",
+      "name": "Toronto Downtown",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "North America",
+      "country": "Canada",
+      "city": "Toronto",
+      "n_layers": 7,
+      "total_bytes": 1746100,
+      "manifest_path": "toronto_downtown/manifest.json"
+    },
+    {
+      "slug": "torres_paine",
+      "name": "Torres del Paine",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Torres del Paine",
+      "n_layers": 1,
+      "total_bytes": 64216,
+      "manifest_path": "torres_paine/manifest.json"
+    },
+    {
+      "slug": "uluru",
+      "name": "Uluru",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Oceania",
+      "country": "Australia",
+      "city": "Uluru",
+      "n_layers": 2,
+      "total_bytes": 22936,
+      "manifest_path": "uluru/manifest.json"
+    },
+    {
+      "slug": "valdivia",
+      "name": "Valdivia",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Valdivia",
+      "n_layers": 6,
+      "total_bytes": 5995312,
+      "manifest_path": "valdivia/manifest.json"
+    },
+    {
+      "slug": "valle_luna",
+      "name": "Valle de la Luna (Atacama)",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Atacama",
+      "n_layers": 2,
+      "total_bytes": 64000,
+      "manifest_path": "valle_luna/manifest.json"
+    },
+    {
+      "slug": "valparaiso",
+      "name": "Valparaiso",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "South America",
+      "country": "Chile",
+      "city": "Valparaiso",
+      "n_layers": 4,
+      "total_bytes": 4204440,
+      "manifest_path": "valparaiso/manifest.json"
+    },
+    {
+      "slug": "venice",
+      "name": "Venice",
+      "tier": "B",
+      "category": "global-fusion city",
+      "continent": "Europe",
+      "country": "Italy",
+      "city": "Venice",
+      "n_layers": 4,
+      "total_bytes": 3380708,
+      "manifest_path": "venice/manifest.json"
+    },
+    {
+      "slug": "victoria_falls",
+      "name": "Victoria Falls",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "Africa",
+      "country": "Zimbabwe",
+      "city": "Victoria Falls",
+      "n_layers": 2,
+      "total_bytes": 70844,
+      "manifest_path": "victoria_falls/manifest.json"
+    },
+    {
+      "slug": "vienna_center",
+      "name": "Vienna Innere Stadt",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Austria",
+      "city": "Vienna",
+      "n_layers": 4,
+      "total_bytes": 2684732,
+      "manifest_path": "vienna_center/manifest.json"
+    },
+    {
+      "slug": "yosemite_valley",
+      "name": "Yosemite Valley",
+      "tier": "C",
+      "category": "terrain-first area",
+      "continent": "North America",
+      "country": "USA",
+      "city": "Yosemite",
+      "n_layers": 2,
+      "total_bytes": 79396,
+      "manifest_path": "yosemite_valley/manifest.json"
+    },
+    {
+      "slug": "zurich_center",
+      "name": "Zurich Altstadt",
+      "tier": "A",
+      "category": "ground-truth",
+      "continent": "Europe",
+      "country": "Switzerland",
+      "city": "Zurich",
+      "n_layers": 4,
+      "total_bytes": 2469588,
+      "manifest_path": "zurich_center/manifest.json"
     }
   ]
 }

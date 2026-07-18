@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Boxes } from 'lucide-react';
-import { AppShell, applyTheme, readTheme, CitationsProvider, type ShellConfig } from '@fasl-work/caos-app-shell';
+import { AppShell, applyTheme, readTheme, CitationsProvider, useLangStore, type ShellConfig } from '@fasl-work/caos-app-shell';
 import '@fasl-work/caos-app-shell/styles.css';
 import './maqueta.css';
 import { CITATIONS } from './data/citations';
@@ -25,6 +25,12 @@ const displayVersion = pkg.version
 
 applyTheme(readTheme());
 
+// English is the default UI language. Only force it when the visitor has no stored choice yet, so the
+// language toggle still sticks for anyone who switches to Spanish (the shell persists under "caos.lang").
+if (typeof localStorage !== 'undefined' && !localStorage.getItem('caos.lang')) {
+  useLangStore.getState().setLang('en');
+}
+
 const config: ShellConfig = {
   product: { name: 'Maqueta', mark: <Boxes size={18} aria-hidden="true" /> },
   routes: [
@@ -44,12 +50,12 @@ const config: ShellConfig = {
   architecture,
   footer: {
     provenance: {
-      en: 'Every place is fused offline from open public geodata (Overture, Copernicus GLO-30, ESA WorldCover, OpenStreetMap) by the geoscena pipeline; each layer carries its source, license and fetch date, and each building its height provenance. Nothing is invented.',
-      es: 'Cada lugar se fusiona offline a partir de geodatos públicos abiertos (Overture, Copernicus GLO-30, ESA WorldCover, OpenStreetMap) con el pipeline geoscena; cada capa lleva su fuente, licencia y fecha, y cada edificio la procedencia de su altura. Nada es inventado.',
+      en: 'Data: a multi-modal fusion assembled offline by the geoscena pipeline from open public geodata: building footprints (Overture, ODbL), terrain (Copernicus GLO-30), land cover (ESA WorldCover), water / green / rail (OpenStreetMap), population (GHS-POP), 2.5D heights (Google Open Buildings), LoD2 ground truth (3DBAG), satellite multispectral NDVI/NDWI/NDBI (Copernicus Sentinel-2), solar potential (PVGIS), climate normals (Open-Meteo ERA5), admin sub-areas (geoBoundaries, CC-BY) and Chilean socio-economic indicators (Data Observatory). Each layer carries its source, license and fetch date. Code: Apache-2.0. Nothing is invented.',
+      es: 'Datos: una fusión multi-modal ensamblada offline por el pipeline geoscena a partir de geodatos públicos abiertos: huellas de edificios (Overture, ODbL), relieve (Copernicus GLO-30), cobertura de suelo (ESA WorldCover), agua / verde / vías (OpenStreetMap), población (GHS-POP), alturas 2.5D (Google Open Buildings), verdad LoD2 (3DBAG), multiespectral satelital NDVI/NDWI/NDBI (Copernicus Sentinel-2), potencial solar (PVGIS), clima (Open-Meteo ERA5), sub-areas administrativas (geoBoundaries, CC-BY) e indicadores socioeconomicos chilenos (Observatorio de Datos). Cada capa lleva su fuente, licencia y fecha. Codigo: Apache-2.0. Nada es inventado.',
     },
     disclaimer: {
-      en: 'A research reconstruction: heights are labelled by provenance (measured vs inferred), terrain from a global 30 m DSM sits slightly high in dense cores, and non-commercial layers are flagged per scene.',
-      es: 'Una reconstrucción de investigación: las alturas se etiquetan por procedencia (medida vs inferida), el relieve de un DSM global de 30 m queda algo alto en centros densos, y las capas no comerciales se marcan por escena.',
+      en: 'A research reconstruction: heights are labelled by provenance (measured vs inferred); terrain from a global 30 m DSM sits slightly high in dense cores; the satellite indices are single-scene surface proxies; solar/climate are near-constant per AOI (aggregated per comuna); non-commercial layers are flagged per scene.',
+      es: 'Una reconstrucción de investigacion: las alturas se etiquetan por procedencia (medida vs inferida); el relieve de un DSM global de 30 m queda algo alto en centros densos; los indices satelitales son proxies de superficie de una sola escena; solar/clima son casi constantes por AOI (agregados por comuna); las capas no comerciales se marcan por escena.',
     },
   },
 };

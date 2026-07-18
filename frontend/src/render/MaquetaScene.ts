@@ -1,65 +1,100 @@
-// The Maqueta 3D viewer: loads a place's SceneBundle (per-layer .glb) and renders it with the
-// shader-art identity (Fresnel rim on buildings, emissive neon roads, fog, bloom, orbital camera).
-// Geometry arrives in AOI-local metres, Y-up (the geoscena glTF convention), so layers drop straight
-// in. Interactions: orbital camera, per-layer visibility, and raycast building picking that resolves
-// the _featureid vertex attribute to a building's {height, source}. Compute-bomb-safe: the render loop
-// is paused by default (renders on demand + while interacting) and stops when the tab is hidden.
+// The Maqueta 3D workbench engine. Loads a place's fused SceneBundle (per-source .glb layers) and
+// renders it interactively: per-layer visibility, building colour-by (height / provenance / land use),
+// live height + provenance filtering, click-to-select with a 3D highlight, camera presets, neon-road
+// glow and an opt-in emissive pulse. Everything is driven from precomputed per-vertex arrays so recolour
+// and filter are instant. Compute-safe: render-on-demand loop, rAF auto-throttled when the tab hides.
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import type { BuildingFeature, BundleManifest } from '../lib/contract.types';
+import type { AreaStats, BuildingFeature, BundleManifest } from '../lib/contract.types';
+import { PROVENANCE, WORLDCOVER_LABELS, WORLDCOVER_RGB } from '../lib/labels';
 
+export type AreaPoint = { x: number; z: number };
+
+export type ColorMode = string; // an attribute key (see ATTRIBUTES)
 export interface PickInfo {
-  layer: string;
-  feature?: BuildingFeature;
+  feature: BuildingFeature;
   point: THREE.Vector3;
 }
 
-const LAYER_ORDER = ['terrain', 'water', 'green', 'roads', 'rail', 'buildings'];
-
-// Fresnel rim + height shading for buildings. Vertex colours carry the height ramp; the rim adds the
-// scan-glow edge of the inspiration. `uPulse` animates a radial scan when the user opts into animation.
-// Building material: a MeshStandardMaterial (three handles the glTF COLOR_0 -> height ramp reliably)
-// with an onBeforeCompile Fresnel-rim + radial-scan-pulse injection for the shader-art identity. A raw
-// ShaderMaterial does not reliably bind COLOR_0, so we extend the standard material instead.
-// Convert a normalized uint8 COLOR_0 attribute (as glTF stores vertex colours) to a plain,
-// non-normalized Float32 attribute. Some drivers -- and the SwiftShader software renderer used in
-// headless verification -- render normalized-uint8 vertex colours as black; a float attribute is
-// portable. glTF colours are sRGB-encoded, so we linearize here since the scene renders in linear space.
-function floatifyColors(geom: THREE.BufferGeometry): void {
-  const col = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
-  if (!col || col.array instanceof Float32Array) return;
-  const n = col.count;
-  const size = col.itemSize;
-  const out = new Float32Array(n * size);
-  const srgbToLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
-  for (let i = 0; i < n; i++) {
-    for (let k = 0; k < size; k++) {
-      const v = (col.array[i * size + k] as number) / 255;
-      out[i * size + k] = k < 3 ? srgbToLinear(v) : v;
-    }
-  }
-  geom.setAttribute('color', new THREE.BufferAttribute(out, size));
+// Generic building-attribute registry: each entry drives colour-by and filtering, so new modalities
+// (from the fusion research) plug in by adding a spec + carrying the value on the baked feature.
+export interface AttrSpec {
+  key: string;
+  en: string;
+  es: string;
+  kind: 'numeric' | 'categorical';
+  unit?: string;
+  value: (f: BuildingFeature) => number | string | null;
+  // A fused topic modality: only surfaced where its source meaningfully covers the place (a global raster
+  // like SoilGrids masks dense urban land), gated by MODALITY_MIN_COVERAGE in attributes().
+  modality?: boolean;
 }
+export const ATTRIBUTES: AttrSpec[] = [
+  { key: 'height', en: 'Height', es: 'Altura', kind: 'numeric', unit: 'm', value: (f) => f.height_m },
+  { key: 'provenance', en: 'Height provenance', es: 'Procedencia', kind: 'categorical', value: (f) => f.height_source },
+  { key: 'floors', en: 'Floors', es: 'Pisos', kind: 'numeric', value: (f) => f.num_floors ?? null },
+  { key: 'area', en: 'Footprint area', es: 'Area de huella', kind: 'numeric', unit: 'm2', value: (f) => f.area_m2 ?? null },
+  { key: 'use', en: 'Function', es: 'Funcion', kind: 'categorical', value: (f) => f.use ?? null },
+  { key: 'landuse', en: 'Land cover', es: 'Cobertura', kind: 'categorical', value: (f) => (f.class != null ? String(f.class) : null) },
+  // Fused topic modalities (shown only where the source covers the place - attributes() filters no-data specs).
+  { key: 'solar', en: 'Solar (GHI)', es: 'Solar (GHI)', kind: 'numeric', unit: 'kWh/m2/d', value: (f) => f.solar_ghi ?? null, modality: true },
+  { key: 'soil', en: 'Soil carbon', es: 'Carbono suelo', kind: 'numeric', unit: 'g/kg', value: (f) => f.soil_soc ?? null, modality: true },
+  { key: 'ndvi', en: 'Vegetation (NDVI)', es: 'Vegetacion (NDVI)', kind: 'numeric', unit: '', value: (f) => f.ndvi ?? null, modality: true },
+  { key: 'ndwi', en: 'Water (NDWI)', es: 'Agua (NDWI)', kind: 'numeric', unit: '', value: (f) => f.ndwi ?? null, modality: true },
+  { key: 'ndbi', en: 'Built-up (NDBI)', es: 'Construido (NDBI)', kind: 'numeric', unit: '', value: (f) => f.ndbi ?? null, modality: true },
+];
+export const attrSpec = (key: string) => ATTRIBUTES.find((a) => a.key === key) ?? ATTRIBUTES[0];
 
-// Building material. We use an UNLIT MeshBasicMaterial (vertex colours = the height ramp) and add all
-// shading ourselves via onBeforeCompile: a cheap directional shade from the geometry normal, a Fresnel
-// rim, and an opt-in radial scan pulse. This renders identically on every driver (GPU or the SwiftShader
-// software renderer used in verification) because it does not depend on the PBR lighting path, which
-// SwiftShader does not execute. The look is the stylized neon-extrusion identity of the inspiration.
-// Building material. A lit MeshLambertMaterial (vertex colours = the height ramp): unlike MeshStandard's
-// PBR path, Lambert lighting renders reliably on all drivers and gives the extrusions face shading so the
-// city reads in 3D. The scan-pulse identity rides on an onBeforeCompile emissive-rim add.
-// Building material. A lit MeshLambertMaterial with vertex colours (the height ramp): Lambert lighting
-// renders reliably on all drivers and gives the extrusions face shading so the city reads in 3D. Emissive
-// is tied to the vertex colour so buildings glow slightly (the neon identity) and never crush to black.
-function makeBuildingMaterial(dark: boolean): THREE.MeshLambertMaterial {
-  return new THREE.MeshLambertMaterial({
-    vertexColors: true,
-    emissive: new THREE.Color(0xffffff),
-    emissiveIntensity: dark ? 0.28 : 0.16,
-  });
+// Shoelace area (m2) of a world-space polygon in the XZ ground plane.
+function polyArea(poly: { x: number; z: number }[]): number {
+  let a = 0;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    a += (poly[j].x + poly[i].x) * (poly[j].z - poly[i].z);
+  }
+  return Math.abs(a / 2);
+}
+const EMPTY_AREA_STATS: AreaStats = {
+  count: 0,
+  polygonAreaM2: 0,
+  footprintAreaM2: 0,
+  coverageRatio: 0,
+  densityPerKm2: 0,
+  builtVolumeM3: 0,
+  height: null,
+  floors: null,
+  functionMix: [],
+  landcoverMix: [],
+  provenanceMix: [],
+  heightHist: [],
+};
+
+// A stable categorical colour palette (distinct hues), plus the fixed provenance/land-cover maps.
+const CAT_PALETTE: [number, number, number][] = [
+  [66, 133, 244], [219, 68, 55], [244, 180, 0], [15, 157, 88], [171, 71, 188],
+  [0, 172, 193], [255, 112, 67], [158, 157, 36], [94, 53, 177], [3, 155, 229],
+  [124, 179, 66], [216, 27, 96], [141, 110, 99], [84, 110, 122],
+];
+
+const LAYER_ORDER = ['terrain', 'population', 'water', 'green', 'roads', 'rail', 'buildings', 'lod2'];
+// Above this building count, edges are not auto-built on load (the user can still enable the wireframe).
+const EDGE_AUTO_MAX = 60000;
+// A fused modality attribute is only offered if at least this fraction of buildings carry a value (a
+// global raster like SoilGrids masks dense urban land, so a city would otherwise show a near-empty layer).
+const MODALITY_MIN_COVERAGE = 0.12;
+const PROVENANCE_RGB: Record<string, [number, number, number]> = {
+  measured: [46, 158, 111],
+  floors: [74, 134, 232],
+  raster: [214, 130, 21],
+  prior: [154, 162, 173],
+};
+
+function heightRamp(t: number): [number, number, number] {
+  // blue (low) -> teal -> amber (high)
+  const c = Math.max(0, Math.min(1, t));
+  return [40 + c * 215, 90 + c * 110, 200 - c * 150];
 }
 
 export class MaquetaScene {
@@ -69,40 +104,113 @@ export class MaquetaScene {
   private controls: OrbitControls;
   private raycaster = new THREE.Raycaster();
   private layers = new Map<string, THREE.Object3D>();
-  private buildingMesh: THREE.Mesh | null = null;
-  private buildingFeatures: BuildingFeature[] = [];
-  private loader = new GLTFLoader();
+  // GLTFLoader with the Meshopt decoder so EXT_meshopt_compression bundles (the delivery-layer
+  // compression the pipeline applies) load; uncompressed bundles still load unchanged.
+  private loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
   private container: HTMLElement;
-  private needsRender = true;
-  private animate = false; // pulse animation opt-in (paused by default)
+
+  private buildingMesh: THREE.Mesh | null = null;
+  private buildingMat: THREE.MeshPhongMaterial;
+  private edges: THREE.LineSegments | null = null;
+  private edgeMat: THREE.LineBasicMaterial;
+  // Wireframe edges give each extrusion a readable 3D shape. On very large scenes (e.g. full Santiago,
+  // ~179k buildings) building EdgesGeometry on load would jank the main thread, so edges are deferred:
+  // auto-built for scenes up to EDGE_AUTO_MAX buildings, lazily on first enable for larger ones.
+  private pendingEdgeGeom: THREE.BufferGeometry | null = null;
+  private pendingEdgeParent: THREE.Object3D | null = null;
+  private edgesOn = true;
+  private features: BuildingFeature[] = [];
+  private featuresById = new Map<number, BuildingFeature>();
+  private vFeature: Int32Array = new Int32Array(0); // per-vertex building id
+  private vShade: Float32Array = new Float32Array(0); // per-vertex baked shade (base darker -> roof lighter)
+  private centById = new Map<number, { x: number; z: number }>(); // world-space footprint centroid per building
+  private areaGroup: THREE.Group | null = null; // the drawn area-of-interest polygon overlay
+  // Admin sub-areas (comunas/districts) for aggregate-by-unit + choropleth. A unit also carries its own
+  // scalar layers: env (solar/climate sampled at the unit centroid) + indicators (Data Observatory, Chile),
+  // so the choropleth spans geophysical + socio-economic values, not only building-derived means.
+  private adminUnits: {
+    name: string;
+    rings: AreaPoint[][];
+    bbox: [number, number, number, number];
+    count: number;
+    env?: Record<string, number>;
+    indicators?: Record<string, number>;
+  }[] = [];
+  private adminEnvMeta: Record<string, { label: string; unit: string }> = {};
+  private adminIndMeta: Record<string, { label: string; unit: string }> = {};
+  private buildingUnit = new Map<number, number>(); // building id -> admin unit index (-1 = none)
+  private adminGroup: THREE.Group | null = null; // drawn admin-boundary overlay
+  private groundY = 0; // mean scene elevation (m): meshes sit at absolute altitude, so high places (Atacama,
+  // Chuquicamata at ~2500 m) would otherwise float above the frame. Camera, ground-pick + area tool use this.
+  private terrainMesh: THREE.Mesh | null = null;
+  private terrainThematicMat: THREE.Material | null = null; // the baked hillshade/hypsometric material
+  private aoiBBox: [number, number, number, number] | null = null; // [w,s,e,n] WGS84, for the imagery request
+  private imageryOn = false; // drape real Sentinel-2 cloudless imagery over the terrain instead of thematic colour
+  private numRanges = new Map<string, [number, number]>(); // per numeric attr [min,max]
+  private catValuesByKey = new Map<string, string[]>(); // per categorical attr distinct values
+  private coverageByKey = new Map<string, number>(); // per attr: fraction of buildings carrying a value
+  private colorCache = new Map<string, Float32Array>();
+  private highlight: THREE.LineSegments | THREE.Mesh | null = null;
+
+  private colorMode: string = 'height';
+  private numFilters = new Map<string, [number, number]>(); // active numeric filters (AND)
+  private catFilters = new Map<string, Set<string>>(); // active categorical filters (AND)
+  private neon = 1;
+  private animate = false;
   private pulse = 0;
-  private onPick?: (p: PickInfo | null) => void;
+  private dark = false;
+  private sceneR = 2000; // scene extent (max AOI side, m); drives fog + camera distance
+  private keyLight: THREE.DirectionalLight | null = null; // sun; casts the shadows that give the city depth
+  private shadows = true;
+
+  private needsRender = true;
   private disposed = false;
   private ro: ResizeObserver;
-  private buildingMat: THREE.MeshLambertMaterial;
+  private onPick?: (p: PickInfo | null) => void;
+  private drawMode = false;
+  private onGroundClick?: (p: AreaPoint | null) => void;
 
   constructor(container: HTMLElement, dark: boolean) {
     this.container = container;
     const w = container.clientWidth || 800;
     const h = container.clientHeight || 500;
-
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(w, h);
+    // Filmic tone mapping gives the colours a richer, less flat response. (Real-time cast shadows were
+    // tried but produced acne on the normal-less baked terrain; a baked soft AO gradient is used instead.)
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.05;
     container.appendChild(this.renderer.domElement);
 
-    this.camera = new THREE.PerspectiveCamera(52, w / h, 1, 20000);
-    this.camera.position.set(900, 700, 900);
-
+    this.camera = new THREE.PerspectiveCamera(52, w / h, 1, 40000);
+    this.camera.position.set(1400, 1300, 1400);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.maxPolarAngle = Math.PI * 0.495;
     this.controls.addEventListener('change', () => (this.needsRender = true));
 
-    this.buildingMat = makeBuildingMaterial(dark);
+    // Phong + flatShading gives each extrusion real depth: the baked glb carries NO normals, and Lambert
+    // then lights every face identically (flat blobs). flatShading derives a per-face normal in the shader
+    // from screen-space position derivatives, so roofs and the four walls each catch the light differently
+    // and the 3D form reads without needing a selection or the wireframe.
+    this.buildingMat = new THREE.MeshPhongMaterial({
+      vertexColors: true,
+      flatShading: true,
+      shininess: 4,
+      specular: new THREE.Color(0x141a22),
+      emissive: new THREE.Color(0xffffff),
+      emissiveIntensity: dark ? 0.14 : 0.06,
+    });
+    this.installBuildingFilter(this.buildingMat);
+    // Edge lines give each extrusion a readable 3D shape (not a flat colour blob).
+    this.edgeMat = new THREE.LineBasicMaterial({
+      color: dark ? 0x0a0f16 : 0x2a2f38,
+      transparent: true,
+      opacity: dark ? 0.5 : 0.35,
+    });
 
     this.setTheme(dark);
-
     if (import.meta.env.DEV) (window as unknown as { __mq?: unknown }).__mq = this;
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(container);
@@ -111,113 +219,380 @@ export class MaquetaScene {
     this.loop();
   }
 
+  // Inject a per-vertex "hidden" flag into the building material so height/provenance filters can
+  // discard whole buildings without rebuilding geometry.
+  private installBuildingFilter(mat: THREE.Material) {
+    mat.onBeforeCompile = (shader) => {
+      shader.vertexShader =
+        'attribute float aHidden;\nvarying float vHidden;\n' +
+        shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n vHidden = aHidden;');
+      shader.fragmentShader =
+        'varying float vHidden;\n' +
+        shader.fragmentShader.replace(
+          '#include <clipping_planes_fragment>',
+          '#include <clipping_planes_fragment>\n if (vHidden > 0.5) discard;',
+        );
+    };
+  }
+
   setTheme(dark: boolean) {
-    this.scene.background = new THREE.Color(dark ? 0x0a0e14 : 0xdfe6ef);
-    this.scene.fog = new THREE.Fog(dark ? 0x0a0e14 : 0xdfe6ef, 1800, 6000);
+    this.dark = dark;
+    const bg = dark ? 0x0a0e14 : 0xdfe6ef;
+    this.scene.background = new THREE.Color(bg);
+    // Fog scales with the scene extent, else large AOIs (full Santiago, 11 km) sit entirely beyond a
+    // fixed far-plane and the whole city washes out into the background. The city core stays crisp; the
+    // far relief (e.g. the Andes at the edge of the AOI, where the terrain TIN is seen edge-on) hazes into
+    // the sky as atmospheric depth instead of a hard, torn silhouette.
+    this.scene.fog = new THREE.Fog(bg, this.sceneR * 0.95, this.sceneR * 1.85);
     this.scene.clear();
-    const amb = new THREE.AmbientLight(0xffffff, dark ? 0.55 : 0.9);
-    const dir = new THREE.DirectionalLight(0xffffff, dark ? 0.8 : 1.0);
-    dir.position.set(1, 2, 1.5);
-    this.scene.add(amb, dir);
-    this.buildingMat.emissiveIntensity = dark ? 0.28 : 0.14;
-    // re-attach loaded layers
+    // Lower ambient + a dominant key light so flat-shaded faces get real contrast (lit roof vs shaded
+    // walls = depth). A hemisphere sky/ground fill keeps the shadowed sides from going dead-flat, and a
+    // weak back-fill from the opposite side stops silhouettes from crushing to black.
+    // Balanced so the sun's cast shadows read as soft GREY (depth), not black holes: enough sky/ambient
+    // fill to keep shadowed ground legible, with the sun still clearly the key.
+    this.scene.add(new THREE.AmbientLight(0xffffff, dark ? 0.34 : 0.5));
+    this.scene.add(
+      new THREE.HemisphereLight(dark ? 0x6f86b0 : 0xbcd2f0, dark ? 0x1a2230 : 0x9aa0a8, dark ? 0.4 : 0.46),
+    );
+    const dir = new THREE.DirectionalLight(dark ? 0xfff2df : 0xfff4e6, dark ? 1.05 : 1.25);
+    dir.castShadow = this.shadows;
+    dir.shadow.mapSize.set(2048, 2048);
+    dir.shadow.bias = -0.0006;
+    this.keyLight = dir;
+    this.scene.add(dir);
+    this.scene.add(dir.target);
+    this.applyShadowCamera();
+    const fill = new THREE.DirectionalLight(dark ? 0x9fb4dc : 0xcfe0f5, dark ? 0.16 : 0.18);
+    fill.position.set(-0.8, 0.5, -0.7);
+    this.scene.add(fill);
+    this.buildingMat.emissiveIntensity = dark ? 0.12 : 0.05;
+    this.edgeMat.color.set(dark ? 0x0a0f16 : 0x2a2f38);
+    this.edgeMat.opacity = dark ? 0.5 : 0.35;
     for (const obj of this.layers.values()) this.scene.add(obj);
+    if (this.highlight) this.scene.add(this.highlight);
     this.needsRender = true;
   }
 
-  async loadBundle(baseUrl: string, manifest: BundleManifest): Promise<void> {
-    // clear existing
+  // Progressive load: the base modalities (terrain, roads, water, green, rail, population) are small and
+  // load in ~1 s; the buildings layer can be tens of MB (full Santiago is ~54 MB). So we load and frame
+  // the base first, fire `onBaseReady` (the app hides its overlay and the scene is already navigable),
+  // then stream the buildings in. The heavy default is interactive in a second instead of ~18 s blank.
+  async loadBundle(
+    baseUrl: string,
+    manifest: BundleManifest,
+    onBaseReady?: () => void,
+    onProxyReady?: () => void,
+  ): Promise<void> {
     for (const obj of this.layers.values()) this.scene.remove(obj);
     this.layers.clear();
+    this.clearHighlight();
     this.buildingMesh = null;
-    this.buildingFeatures = [];
+    this.edges = null;
+    this.pendingEdgeGeom = null;
+    this.pendingEdgeParent = null;
+    this.features = [];
+    this.colorCache.clear();
 
     const ordered = [...manifest.layers].sort(
       (a, b) => LAYER_ORDER.indexOf(a.name) - LAYER_ORDER.indexOf(b.name),
     );
-    for (const layer of ordered) {
-      const gltf = await this.loader.loadAsync(`${baseUrl}/${layer.file}`);
-      const root = gltf.scene;
-      root.name = layer.name;
-      root.traverse((o) => {
-        const m = o as THREE.Mesh;
-        if (!(m as THREE.Mesh).isMesh) return;
-        floatifyColors(m.geometry as THREE.BufferGeometry);
-        if (layer.name === 'buildings') {
-          m.material = this.buildingMat;
-          this.buildingMesh = m;
-          // trimesh nests our per-feature table under scene extras (scene.userData.extras.features);
-          // accept either the nested or the flat shape.
-          const ud = (gltf.scene.userData ?? {}) as {
-            features?: BuildingFeature[];
-            extras?: { features?: BuildingFeature[] };
-          };
-          this.buildingFeatures = ud.features ?? ud.extras?.features ?? [];
-        } else {
-          m.material = this.layerMaterial(layer.name);
-        }
-      });
-      this.scene.add(root);
-      this.layers.set(layer.name, root);
-    }
+    const lite = ordered.find((l) => l.name === 'buildings_lite');
+    const full = ordered.find((l) => l.name === 'buildings');
+    const base = ordered.filter((l) => l.name !== 'buildings' && l.name !== 'buildings_lite');
+
+    // Shadows give the city its depth, but a full shadow pass over a huge scene (full Santiago, ~179k
+    // buildings / 3.5M tris) is too costly, so gate them by building count (on for comunas + normal places).
+    this.shadows = ((full?.stats.features as number) ?? 0) <= 90000;
+    if (this.keyLight) this.keyLight.castShadow = this.shadows;
+
+    // Phase 1: base modalities + frame the camera. Fire onBaseReady NOW so the app hides its overlay the
+    // moment terrain + roads are on screen (a couple of MB), the fastest possible first paint.
+    for (const layer of base) await this.loadOneLayer(baseUrl, layer);
+    this.aoiBBox = manifest.aoi.bbox_wgs84;
     this.frameCamera(manifest.aoi.size_m);
     this.needsRender = true;
-  }
+    onBaseReady?.();
 
-  private layerMaterial(name: string): THREE.Material {
-    // Roads/rail are UNLIT + bright (the neon look); terrain is lit (Lambert) so relief reads via the
-    // directional light; water/green are lit Lambert too. Lit materials render reliably on real GPUs.
-    switch (name) {
-      case 'roads':
-      case 'rail':
-        return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
-      case 'water':
-        return new THREE.MeshLambertMaterial({ vertexColors: true });
-      case 'green':
-        return new THREE.MeshLambertMaterial({ vertexColors: true });
-      default: // terrain
-        return new THREE.MeshLambertMaterial({ vertexColors: true });
-    }
-  }
+    // Phase 2: the buildings PROXY (the lite LoD if the place has one, else the full layer). This is what
+    // makes a heavy scene interactive fast: the ~22k-building lite proxy is a few MB, so the city + all
+    // controls light up shortly after the base. onProxyReady lets the app populate the panel.
+    const proxy = lite ?? full;
+    if (proxy) await this.loadOneLayer(baseUrl, proxy);
+    this.applyColor();
+    this.applyFilter();
+    this.needsRender = true;
+    onProxyReady?.();
 
-  private frameCamera([wm, hm]: [number, number]) {
-    const r = Math.max(wm, hm);
-    this.controls.target.set(0, 0, 0);
-    this.camera.position.set(r * 0.6, r * 0.55, r * 0.6);
-    this.camera.far = r * 8;
-    this.camera.updateProjectionMatrix();
-    this.controls.update();
-  }
-
-  setLayerVisible(name: string, visible: boolean) {
-    const o = this.layers.get(name);
-    if (o) {
-      o.visible = visible;
+    // Phase 3: if we showed a lite proxy, stream the FULL buildings in the background and swap it in.
+    if (lite && full) {
+      const liteRoot = this.layers.get('buildings_lite') ?? null;
+      await this.loadOneLayer(baseUrl, full); // buildingMesh/features now point at the full layer
+      if (liteRoot) {
+        this.scene.remove(liteRoot);
+        this.layers.delete('buildings_lite');
+        liteRoot.traverse((o) => {
+          const mm = o as THREE.Mesh;
+          if (mm.isMesh && mm.geometry) (mm.geometry as THREE.BufferGeometry).dispose();
+        });
+      }
+      this.edges = null; // the lite proxy's edges went with its root; the full layer defers edges
+      this.clearHighlight(); // a selection made on the lite proxy no longer maps to the full layer
+      this.applyColor();
+      this.applyFilter();
       this.needsRender = true;
     }
   }
 
-  setAnimate(on: boolean) {
-    this.animate = on;
-    this.needsRender = true;
+  private async loadOneLayer(baseUrl: string, layer: BundleManifest['layers'][number]): Promise<void> {
+    const gltf = await this.loader.loadAsync(`${baseUrl}/${layer.file}`);
+    const root = gltf.scene;
+    root.name = layer.name;
+    const isBuildings = layer.name === 'buildings' || layer.name === 'buildings_lite';
+    root.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh) return;
+      floatifyColors(m.geometry as THREE.BufferGeometry);
+      if (isBuildings) {
+        m.material = this.buildingMat;
+        m.castShadow = true;
+        m.receiveShadow = true;
+        this.buildingMesh = m;
+        const ud = (gltf.scene.userData ?? {}) as {
+          features?: BuildingFeature[];
+          extras?: { features?: BuildingFeature[] };
+        };
+        this.features = ud.features ?? ud.extras?.features ?? [];
+        m.updateWorldMatrix(true, false);
+        this.deriveBuildingArrays(m.geometry as THREE.BufferGeometry, m.matrixWorld);
+        // Auto-build edges for small/medium scenes; defer for very large ones (built on first enable).
+        const geom = m.geometry as THREE.BufferGeometry;
+        this.pendingEdgeGeom = geom;
+        this.pendingEdgeParent = root;
+        this.edgesOn = this.features.length <= EDGE_AUTO_MAX;
+        if (this.edgesOn) this.buildEdges(geom, root);
+      } else {
+        m.material = this.layerMaterial(layer.name);
+        if (layer.name === 'terrain') {
+          m.updateWorldMatrix(true, false);
+          this.prepareTerrain(m.geometry as THREE.BufferGeometry, m.matrixWorld);
+          this.terrainMesh = m;
+          this.terrainThematicMat = m.material as THREE.Material;
+          if (this.imageryOn) this.applyImagery(true);
+        } else if (layer.name === 'lod2') {
+          m.castShadow = true;
+          m.receiveShadow = true;
+        }
+      }
+    });
+    this.scene.add(root);
+    this.layers.set(layer.name, root);
   }
 
+  // Index features by id, precompute per-attribute ranges/categories, store per-vertex building id.
+  private deriveBuildingArrays(geom: THREE.BufferGeometry, worldMatrix: THREE.Matrix4) {
+    const fidAttr = (geom.getAttribute('_featureid') ||
+      geom.getAttribute('_FEATUREID') ||
+      geom.getAttribute('featureid')) as THREE.BufferAttribute | undefined;
+    const n = geom.getAttribute('position').count;
+    this.vFeature = new Int32Array(n);
+    for (let i = 0; i < n; i++) this.vFeature[i] = fidAttr ? Math.round(fidAttr.getX(i)) : -1;
 
-  cameraPreset(kind: 'aerial' | 'oblique' | 'street') {
-    const r = 1200;
-    if (kind === 'aerial') this.camera.position.set(0, r * 1.4, 1);
-    else if (kind === 'oblique') this.camera.position.set(r * 0.6, r * 0.55, r * 0.6);
-    else this.camera.position.set(r * 0.15, 120, r * 0.15);
-    this.controls.target.set(0, 0, 0);
-    this.controls.update();
-    this.needsRender = true;
+    // Bake a soft vertical shade per vertex: darker at the building base (ambient-occlusion feel where
+    // walls meet the ground), lighter toward the roof (sky light). This is what gives each block a solid,
+    // "not flat" read without real-time shadows (which acne on the normal-less baked terrain). Computed
+    // once from each building's own height range (Y is the up axis after the Y-up export).
+    const posY = geom.getAttribute('position') as THREE.BufferAttribute;
+    this.vShade = new Float32Array(n);
+    const loY = new Map<number, number>();
+    const hiY = new Map<number, number>();
+    // Also accumulate each building's footprint centroid (local x,z) in the same pass, for the area tool's
+    // point-in-polygon test. Transformed to world space below once the mesh matrix is known.
+    const sumX = new Map<number, number>();
+    const sumZ = new Map<number, number>();
+    const cnt = new Map<number, number>();
+    for (let i = 0; i < n; i++) {
+      const id = this.vFeature[i];
+      const y = posY.getY(i);
+      const lo = loY.get(id);
+      const hi = hiY.get(id);
+      if (lo === undefined || y < lo) loY.set(id, y);
+      if (hi === undefined || y > hi) hiY.set(id, y);
+      sumX.set(id, (sumX.get(id) ?? 0) + posY.getX(i));
+      sumZ.set(id, (sumZ.get(id) ?? 0) + posY.getZ(i));
+      cnt.set(id, (cnt.get(id) ?? 0) + 1);
+    }
+    for (let i = 0; i < n; i++) {
+      const id = this.vFeature[i];
+      const lo = loY.get(id) ?? 0;
+      const hi = hiY.get(id) ?? lo;
+      const span = hi - lo;
+      // frac 0 at base -> 1 at roof; ease so the darkening hugs the lower third (occlusion falls off fast).
+      const frac = span > 1e-3 ? (posY.getY(i) - lo) / span : 1;
+      this.vShade[i] = 0.62 + 0.38 * Math.pow(frac, 0.6);
+    }
+    this.centById.clear();
+    const cv = new THREE.Vector3();
+    for (const [id, c] of cnt) {
+      cv.set((sumX.get(id) ?? 0) / c, 0, (sumZ.get(id) ?? 0) / c).applyMatrix4(worldMatrix);
+      this.centById.set(id, { x: cv.x, z: cv.z });
+    }
+
+    this.featuresById = new Map(this.features.map((f) => [f.id, f]));
+    this.numRanges.clear();
+    this.catValuesByKey.clear();
+    this.coverageByKey.clear();
+    const total = this.features.length || 1;
+    for (const spec of ATTRIBUTES) {
+      let have = 0;
+      if (spec.kind === 'numeric') {
+        let lo = Infinity;
+        let hi = -Infinity;
+        for (const f of this.features) {
+          const v = spec.value(f);
+          if (typeof v === 'number' && isFinite(v)) {
+            have++;
+            if (v < lo) lo = v;
+            if (v > hi) hi = v;
+          }
+        }
+        // Only record a range when the attribute actually has data, so attributes() hides no-data specs
+        // (e.g. a modality whose source does not cover this place).
+        if (isFinite(lo) && hi > lo) this.numRanges.set(spec.key, [Math.floor(lo), Math.ceil(hi)]);
+        else if (isFinite(lo)) this.numRanges.set(spec.key, [Math.floor(lo), Math.floor(lo) + 1]);
+      } else {
+        const seen = new Set<string>();
+        for (const f of this.features) {
+          const v = spec.value(f);
+          if (v != null) {
+            have++;
+            seen.add(String(v));
+          }
+        }
+        this.catValuesByKey.set(spec.key, [...seen].sort());
+      }
+      this.coverageByKey.set(spec.key, have / total);
+    }
+    this.colorCache.clear();
+    geom.setAttribute('aHidden', new THREE.BufferAttribute(new Float32Array(n), 1));
   }
 
+  attributes(): AttrSpec[] {
+    // only expose attributes that actually have data in this scene; modality attributes also need enough
+    // coverage (a global raster masks dense urban land, so a city would otherwise show a near-empty layer).
+    return ATTRIBUTES.filter((s) => {
+      if (s.modality && (this.coverageByKey.get(s.key) ?? 0) < MODALITY_MIN_COVERAGE) return false;
+      return s.kind === 'numeric'
+        ? (this.numRanges.get(s.key)?.[1] ?? 0) > 0
+        : (this.catValuesByKey.get(s.key)?.length ?? 0) > 0;
+    });
+  }
+  numericRange(key: string): [number, number] {
+    return this.numRanges.get(key) ?? [0, 1];
+  }
+  categories(key: string): string[] {
+    return this.catValuesByKey.get(key) ?? [];
+  }
+
+  // ---- colour-by (any attribute) ----
+  setColorMode(key: string) {
+    this.colorMode = key;
+    this.applyColor();
+    this.needsRender = true;
+  }
+  private colorFor(f: BuildingFeature | undefined, spec: AttrSpec, catIdx: Map<string, number>): [number, number, number] {
+    if (!f) return [120, 120, 120];
+    const v = spec.value(f);
+    if (spec.kind === 'numeric') {
+      const [lo, hi] = this.numRanges.get(spec.key) ?? [0, 1];
+      const t = typeof v === 'number' ? (v - lo) / (hi - lo + 1e-6) : 0;
+      return heightRamp(t);
+    }
+    if (spec.key === 'provenance') return PROVENANCE_RGB[String(v)] ?? [120, 120, 120];
+    if (spec.key === 'landuse') return WORLDCOVER_RGB[Number(v)] ?? [120, 120, 120];
+    const idx = v == null ? -1 : (catIdx.get(String(v)) ?? -1);
+    return idx < 0 ? [140, 140, 140] : CAT_PALETTE[idx % CAT_PALETTE.length];
+  }
+  private applyColor() {
+    if (!this.buildingMesh) return;
+    const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+    let arr = this.colorCache.get(this.colorMode);
+    if (!arr) {
+      const spec = attrSpec(this.colorMode);
+      const catIdx = new Map((this.catValuesByKey.get(spec.key) ?? []).map((c, i) => [c, i]));
+      const n = this.vFeature.length;
+      arr = new Float32Array(n * 3);
+      const hasShade = this.vShade.length === n;
+      for (let i = 0; i < n; i++) {
+        const rgb = this.colorFor(this.featuresById.get(this.vFeature[i]), spec, catIdx);
+        const s = hasShade ? this.vShade[i] : 1;
+        arr[i * 3] = srgbToLinear(rgb[0] / 255) * s;
+        arr[i * 3 + 1] = srgbToLinear(rgb[1] / 255) * s;
+        arr[i * 3 + 2] = srgbToLinear(rgb[2] / 255) * s;
+      }
+      this.colorCache.set(this.colorMode, arr);
+    }
+    geom.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  }
+
+  // ---- filters (any attribute, combined with AND) ----
+  setNumericFilter(key: string, min: number, max: number) {
+    this.numFilters.set(key, [min, max]);
+    this.applyFilter();
+    this.needsRender = true;
+  }
+  clearNumericFilter(key: string) {
+    this.numFilters.delete(key);
+    this.applyFilter();
+    this.needsRender = true;
+  }
+  setCategoricalFilter(key: string, allowed: Set<string>) {
+    this.catFilters.set(key, allowed);
+    this.applyFilter();
+    this.needsRender = true;
+  }
+  private applyFilter() {
+    if (!this.buildingMesh) return;
+    const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+    const hidden = geom.getAttribute('aHidden') as THREE.BufferAttribute;
+    // precompute per-feature pass/fail (cheap, once per filter change)
+    const pass = new Map<number, boolean>();
+    for (const f of this.features) {
+      let ok = true;
+      for (const [key, [lo, hi]] of this.numFilters) {
+        const v = attrSpec(key).value(f);
+        if (typeof v !== 'number' || v < lo || v > hi) { ok = false; break; }
+      }
+      if (ok)
+        for (const [key, allowed] of this.catFilters) {
+          const v = attrSpec(key).value(f);
+          if (v == null || !allowed.has(String(v))) { ok = false; break; }
+        }
+      pass.set(f.id, ok);
+    }
+    for (let i = 0; i < this.vFeature.length; i++) hidden.setX(i, pass.get(this.vFeature[i]) === false ? 1 : 0);
+    hidden.needsUpdate = true;
+  }
+
+  // ---- selection ----
   setOnPick(cb: (p: PickInfo | null) => void) {
     this.onPick = cb;
   }
-
+  setOnGroundClick(cb: (p: AreaPoint | null) => void) {
+    this.onGroundClick = cb;
+  }
+  // When drawing an area, clicks drop polygon vertices instead of picking buildings, and orbit-rotate is
+  // suppressed so a click stays a click (zoom + pan still work for framing).
+  setDrawMode(on: boolean) {
+    this.drawMode = on;
+    this.controls.enableRotate = !on;
+    this.renderer.domElement.style.cursor = on ? 'crosshair' : '';
+  }
   private onPointer = (ev: PointerEvent) => {
+    if (ev.button !== 0) return; // left button only; right/middle drive orbit pan
+    if (this.drawMode) {
+      if (this.onGroundClick) this.onGroundClick(this.groundPointAt(ev.clientX, ev.clientY));
+      return;
+    }
     if (!this.buildingMesh || !this.onPick) return;
     const rect = this.renderer.domElement.getBoundingClientRect();
     const ndc = new THREE.Vector2(
@@ -225,30 +600,787 @@ export class MaquetaScene {
       -((ev.clientY - rect.top) / rect.height) * 2 + 1,
     );
     this.raycaster.setFromCamera(ndc, this.camera);
-    const hits = this.raycaster.intersectObject(this.buildingMesh, true);
-    if (!hits.length) {
+    const hit = this.raycaster.intersectObject(this.buildingMesh, true)[0];
+    if (!hit || !hit.face) {
+      this.clearHighlight();
       this.onPick(null);
+      this.needsRender = true;
       return;
     }
-    const hit = hits[0];
-    const geom = (hit.object as THREE.Mesh).geometry as THREE.BufferGeometry;
-    // The per-vertex feature id may surface under a few names depending on the loader; try them.
-    const attr = (geom.getAttribute('_featureid') ||
-      geom.getAttribute('_FEATUREID') ||
-      geom.getAttribute('featureid')) as THREE.BufferAttribute | undefined;
-    let fid = -1;
-    if (attr && hit.face) fid = Math.round(attr.getX(hit.face.a));
-    const feature = fid >= 0 ? this.buildingFeatures.find((f) => f.id === fid) : undefined;
-    this.onPick({ layer: 'buildings', feature, point: hit.point.clone() });
+    const fid = this.vFeature[hit.face.a];
+    const feature = this.features.find((f) => f.id === fid);
+    if (feature) {
+      this.highlightBuilding(fid);
+      this.onPick({ feature, point: hit.point.clone() });
+    } else {
+      this.clearHighlight();
+      this.onPick(null);
+    }
     this.needsRender = true;
   };
 
+  // Build a bright wireframe overlay around the selected building's triangles.
+  private highlightBuilding(fid: number) {
+    this.clearHighlight();
+    if (!this.buildingMesh) return;
+    const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+    const pos = geom.getAttribute('position') as THREE.BufferAttribute;
+    const pts: number[] = [];
+    const idx = geom.index;
+    const nFaces = idx ? idx.count / 3 : pos.count / 3;
+    for (let f = 0; f < nFaces; f++) {
+      const a = idx ? idx.getX(f * 3) : f * 3;
+      if (this.vFeature[a] !== fid) continue;
+      const b = idx ? idx.getX(f * 3 + 1) : f * 3 + 1;
+      const c = idx ? idx.getX(f * 3 + 2) : f * 3 + 2;
+      for (const [i, j] of [
+        [a, b],
+        [b, c],
+        [c, a],
+      ]) {
+        pts.push(pos.getX(i), pos.getY(i), pos.getZ(i), pos.getX(j), pos.getY(j), pos.getZ(j));
+      }
+    }
+    if (!pts.length) return;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    this.highlight = new THREE.LineSegments(
+      g,
+      new THREE.LineBasicMaterial({ color: 0x00e5ff, toneMapped: false, depthTest: false }),
+    );
+    this.highlight.renderOrder = 999;
+    this.scene.add(this.highlight);
+  }
+  // Build edge lines for the buildings so each extrusion's shape reads in 3D. EdgesGeometry keeps only
+  // edges whose adjacent faces differ by > the threshold angle (building corners, roof outlines).
+  private buildEdges(geom: THREE.BufferGeometry, parent: THREE.Object3D) {
+    try {
+      const eg = new THREE.EdgesGeometry(geom, 25);
+      this.edges = new THREE.LineSegments(eg, this.edgeMat);
+      this.edges.renderOrder = 1;
+      parent.add(this.edges); // rides in the buildings group -> toggles + hides with the layer
+    } catch {
+      this.edges = null;
+    }
+  }
+
+  // Wireframe state for the panel toggle: whether edges are on, and whether this scene is "large"
+  // (edges deferred). The Viewer uses `large` to default the toggle off + show a hint on big scenes.
+  edgesInfo(): { on: boolean; large: boolean } {
+    return { on: this.edgesOn, large: this.features.length > EDGE_AUTO_MAX };
+  }
+
+  // Toggle the building wireframe. Builds the (deferred) edge geometry lazily on first enable.
+  setEdges(on: boolean) {
+    this.edgesOn = on;
+    if (on && !this.edges && this.pendingEdgeGeom && this.pendingEdgeParent) {
+      this.buildEdges(this.pendingEdgeGeom, this.pendingEdgeParent);
+    }
+    if (this.edges) this.edges.visible = on;
+    this.needsRender = true;
+  }
+
+  private clearHighlight() {
+    if (this.highlight) {
+      this.scene.remove(this.highlight);
+      (this.highlight.geometry as THREE.BufferGeometry).dispose();
+      this.highlight = null;
+    }
+  }
+
+  // ---- area / sub-area statistics tool ----
+  // Raycast a screen point onto the ground plane (y=0) to get its world (x,z). Used to place the vertices
+  // of the area polygon the user draws over the map.
+  groundPointAt(clientX: number, clientY: number): AreaPoint | null {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    const ndc = new THREE.Vector2(
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      -((clientY - rect.top) / rect.height) * 2 + 1,
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const hit = new THREE.Vector3();
+    // Intersect the ground plane at the scene's actual elevation, not y=0 (else high-altitude scenes pick
+    // the wrong x,z through parallax).
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -this.groundY);
+    return this.raycaster.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
+  }
+
+  // Draw the area polygon: a bright boundary on the ground, a soft ground fill, and a low translucent
+  // vertical curtain so the selected region reads clearly even among tall buildings. `closed` draws the
+  // fill/curtain; while still drawing we show just the open boundary line.
+  showAreaPolygon(points: AreaPoint[], closed: boolean) {
+    this.clearArea();
+    if (points.length < 1) return;
+    const g = new THREE.Group();
+    g.name = 'area';
+    const accent = this.dark ? 0x6cc8ff : 0x1f6feb;
+    const gy = this.groundY;
+    const pts3 = points.map((p) => new THREE.Vector3(p.x, gy + 2, p.z));
+    if (closed && points.length >= 3) pts3.push(pts3[0].clone());
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(pts3),
+      new THREE.LineBasicMaterial({ color: accent, transparent: true, opacity: 0.95, depthTest: false }),
+    );
+    line.renderOrder = 998;
+    g.add(line);
+    // vertex dots so the user sees where they clicked
+    const dotGeo = new THREE.SphereGeometry(Math.max(3, this.sceneR * 0.004), 8, 6);
+    const dotMat = new THREE.MeshBasicMaterial({ color: accent, depthTest: false });
+    for (const p of points) {
+      const d = new THREE.Mesh(dotGeo, dotMat);
+      d.position.set(p.x, gy + 2, p.z);
+      d.renderOrder = 999;
+      g.add(d);
+    }
+    if (closed && points.length >= 3) {
+      const H = Math.max(30, this.sceneR * 0.02);
+      const shape = new THREE.Shape(points.map((p) => new THREE.Vector2(p.x, p.z)));
+      const fill = new THREE.ShapeGeometry(shape);
+      const fp = fill.getAttribute('position') as THREE.BufferAttribute;
+      for (let i = 0; i < fp.count; i++) fp.setXYZ(i, fp.getX(i), gy + 1.5, fp.getY(i)); // XY shape -> XZ ground
+      fp.needsUpdate = true;
+      fill.computeVertexNormals();
+      const fillMesh = new THREE.Mesh(
+        fill,
+        new THREE.MeshBasicMaterial({
+          color: accent,
+          transparent: true,
+          opacity: 0.1,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        }),
+      );
+      fillMesh.renderOrder = 996;
+      g.add(fillMesh);
+      const cv: number[] = [];
+      const top = gy + H;
+      const N = points.length;
+      for (let i = 0; i < N; i++) {
+        const a = points[i];
+        const b = points[(i + 1) % N];
+        cv.push(a.x, gy, a.z, b.x, gy, b.z, b.x, top, b.z, a.x, gy, a.z, b.x, top, b.z, a.x, top, a.z);
+      }
+      const cg = new THREE.BufferGeometry();
+      cg.setAttribute('position', new THREE.Float32BufferAttribute(cv, 3));
+      const curtain = new THREE.Mesh(
+        cg,
+        new THREE.MeshBasicMaterial({
+          color: accent,
+          transparent: true,
+          opacity: 0.14,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        }),
+      );
+      curtain.renderOrder = 997;
+      g.add(curtain);
+    }
+    this.areaGroup = g;
+    this.scene.add(g);
+    this.needsRender = true;
+  }
+
+  clearArea() {
+    if (this.areaGroup) {
+      this.scene.remove(this.areaGroup);
+      this.areaGroup.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.geometry) m.geometry.dispose();
+      });
+      this.areaGroup = null;
+      this.needsRender = true;
+    }
+  }
+
+  // ---- aggregate by admin sub-area (comuna / district) ----
+  // Load the baked admin boundaries for this place and assign every building to its unit (point-in-polygon
+  // over the footprint centroids, bbox-culled). Returns the units with their building counts.
+  async loadAdmin(baseUrl: string): Promise<{ name: string; count: number }[]> {
+    this.adminUnits = [];
+    this.buildingUnit.clear();
+    try {
+      const res = await fetch(`${baseUrl}/admin.json`);
+      if (!res.ok) return [];
+      const data = (await res.json()) as {
+        units?: { name: string; rings: number[][][]; env?: Record<string, number>; indicators?: Record<string, number> }[];
+        env_meta?: Record<string, { label: string; unit: string }>;
+        indicator_meta?: Record<string, { label: string; unit: string }>;
+      };
+      this.adminEnvMeta = data.env_meta ?? {};
+      this.adminIndMeta = data.indicator_meta ?? {};
+      this.adminUnits = (data.units ?? []).map((u) => {
+        const rings = u.rings.map((r) => r.map(([x, z]) => ({ x, z })));
+        let xmin = Infinity;
+        let xmax = -Infinity;
+        let zmin = Infinity;
+        let zmax = -Infinity;
+        for (const r of rings)
+          for (const p of r) {
+            if (p.x < xmin) xmin = p.x;
+            if (p.x > xmax) xmax = p.x;
+            if (p.z < zmin) zmin = p.z;
+            if (p.z > zmax) zmax = p.z;
+          }
+        return {
+          name: u.name,
+          rings,
+          bbox: [xmin, zmin, xmax, zmax] as [number, number, number, number],
+          count: 0,
+          env: u.env,
+          indicators: u.indicators,
+        };
+      });
+      for (const [id, c] of this.centById) {
+        let ui = -1;
+        for (let u = 0; u < this.adminUnits.length; u++) {
+          const bb = this.adminUnits[u].bbox;
+          if (c.x < bb[0] || c.x > bb[2] || c.z < bb[1] || c.z > bb[3]) continue;
+          if (this.adminUnits[u].rings.some((r) => MaquetaScene.pointInPoly(c.x, c.z, r))) {
+            ui = u;
+            break;
+          }
+        }
+        this.buildingUnit.set(id, ui);
+        if (ui >= 0) this.adminUnits[ui].count++;
+      }
+      return this.adminUnits.map((u) => ({ name: u.name, count: u.count }));
+    } catch {
+      return [];
+    }
+  }
+
+  hasAdmin(): boolean {
+    return this.adminUnits.length > 0;
+  }
+
+  // The unit-level scalar layers available for this place (solar/climate env + Data Observatory indicators),
+  // as aggregation attributes the UI can offer alongside the building-derived ones. Keys are namespaced
+  // (env:<k> / ind:<k>) so adminStats can tell them from building attributes.
+  adminUnitAttributes(): { key: string; label: string; unit: string; group: 'environment' | 'indicator' }[] {
+    const out: { key: string; label: string; unit: string; group: 'environment' | 'indicator' }[] = [];
+    const seenEnv = new Set<string>();
+    const seenInd = new Set<string>();
+    for (const u of this.adminUnits) {
+      for (const k of Object.keys(u.env ?? {})) seenEnv.add(k);
+      for (const k of Object.keys(u.indicators ?? {})) seenInd.add(k);
+    }
+    for (const k of seenEnv) {
+      const m = this.adminEnvMeta[k];
+      out.push({ key: `env:${k}`, label: m?.label ?? k, unit: m?.unit ?? '', group: 'environment' });
+    }
+    for (const k of seenInd) {
+      const m = this.adminIndMeta[k];
+      out.push({ key: `ind:${k}`, label: m?.label ?? k, unit: m?.unit ?? '', group: 'indicator' });
+    }
+    return out;
+  }
+
+  // Per-unit aggregate of one attribute. Building attributes are averaged over the buildings in each unit;
+  // unit-level layers (env:<k> / ind:<k>) are the scalar baked at the unit itself (solar/climate/DO indicator).
+  adminStats(attrKey: string): { name: string; value: number; count: number }[] {
+    if (attrKey.startsWith('env:') || attrKey.startsWith('ind:')) {
+      const isEnv = attrKey.startsWith('env:');
+      const k = attrKey.slice(4);
+      return this.adminUnits.map((u) => {
+        const src = isEnv ? u.env : u.indicators;
+        const v = src && src[k] != null ? src[k] : NaN;
+        return { name: u.name, value: v, count: u.count };
+      });
+    }
+    const spec = attrSpec(attrKey);
+    const n = this.adminUnits.length;
+    const sums = new Array(n).fill(0);
+    const counts = new Array(n).fill(0);
+    for (const [id, ui] of this.buildingUnit) {
+      if (ui < 0) continue;
+      const f = this.featuresById.get(id);
+      const v = f ? spec.value(f) : null;
+      if (v != null && Number.isFinite(v as number)) {
+        sums[ui] += v as number;
+        counts[ui]++;
+      }
+    }
+    return this.adminUnits.map((u, i) => ({ name: u.name, value: counts[i] ? sums[i] / counts[i] : NaN, count: counts[i] }));
+  }
+
+  // The value of the currently-active metric FOR a specific selected building, for the read-out panel.
+  // Per-building attributes (height, NDVI, area, ...) return the building's own value; unit-level layers
+  // (env:<k> solar/climate, ind:<k> Data Observatory) return the value of the admin unit that contains the
+  // building (solar/wind/temperature are per-area, so "the value for the building" is its comuna's value).
+  metricForBuilding(id: number, attrKey: string, lang: 'en' | 'es'): { label: string; text: string; area?: string } | null {
+    const fmt = (v: number) => (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString() : Math.abs(v) < 10 ? v.toFixed(2) : v.toFixed(1));
+    if (attrKey.startsWith('env:') || attrKey.startsWith('ind:')) {
+      const isEnv = attrKey.startsWith('env:');
+      const k = attrKey.slice(4);
+      const ui = this.buildingUnit.get(id) ?? -1;
+      if (ui < 0) return null;
+      const unit = this.adminUnits[ui];
+      const src = isEnv ? unit.env : unit.indicators;
+      const v = src?.[k];
+      if (v == null || !Number.isFinite(v)) return null;
+      const meta = (isEnv ? this.adminEnvMeta : this.adminIndMeta)[k];
+      return { label: meta?.label ?? k, text: `${fmt(v)}${meta?.unit ? ' ' + meta.unit : ''}`, area: unit.name };
+    }
+    const spec = attrSpec(attrKey);
+    const f = this.featuresById.get(id);
+    if (!f) return null;
+    const v = spec.value(f);
+    if (v == null) return null;
+    const label = lang === 'es' ? spec.es : spec.en;
+    const text = typeof v === 'number' ? `${fmt(v)}${spec.unit ? ' ' + spec.unit : ''}` : String(v);
+    return { label, text };
+  }
+
+  // Colour every building by its admin unit's mean of `attrKey` (a choropleth), and draw the unit outlines.
+  // Pass null to turn the choropleth off and restore the normal attribute colouring.
+  setAdminChoropleth(attrKey: string | null) {
+    if (!attrKey) {
+      this.clearAdminOverlay();
+      this.applyColor();
+      return;
+    }
+    const stats = this.adminStats(attrKey);
+    const vals = stats.map((s) => s.value).filter((v) => Number.isFinite(v));
+    const lo = vals.length ? Math.min(...vals) : 0;
+    const hi = vals.length ? Math.max(...vals) : 1;
+    const span = hi - lo || 1;
+    if (this.buildingMesh) {
+      const geom = this.buildingMesh.geometry as THREE.BufferGeometry;
+      const nverts = this.vFeature.length;
+      const arr = new Float32Array(nverts * 3);
+      for (let i = 0; i < nverts; i++) {
+        const ui = this.buildingUnit.get(this.vFeature[i]) ?? -1;
+        let rgb: [number, number, number] = [150, 150, 150];
+        if (ui >= 0 && Number.isFinite(stats[ui].value)) rgb = heightRamp((stats[ui].value - lo) / span);
+        const s = this.vShade.length === nverts ? this.vShade[i] : 1;
+        arr[i * 3] = srgbToLinear(rgb[0] / 255) * s;
+        arr[i * 3 + 1] = srgbToLinear(rgb[1] / 255) * s;
+        arr[i * 3 + 2] = srgbToLinear(rgb[2] / 255) * s;
+      }
+      geom.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+    }
+    this.drawAdminBoundaries();
+    this.needsRender = true;
+  }
+
+  private drawAdminBoundaries() {
+    this.clearAdminOverlay();
+    const g = new THREE.Group();
+    g.name = 'admin';
+    const accent = this.dark ? 0x9fe0ff : 0x0a3a5a;
+    const mat = new THREE.LineBasicMaterial({ color: accent, transparent: true, opacity: 0.85, depthTest: false });
+    for (const u of this.adminUnits) {
+      for (const r of u.rings) {
+        const pts = r.map((p) => new THREE.Vector3(p.x, this.groundY + 4, p.z));
+        if (pts.length >= 2) {
+          const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat);
+          line.renderOrder = 995;
+          g.add(line);
+        }
+      }
+    }
+    this.adminGroup = g;
+    this.scene.add(g);
+  }
+
+  private clearAdminOverlay() {
+    if (this.adminGroup) {
+      this.scene.remove(this.adminGroup);
+      this.adminGroup.traverse((o) => {
+        const m = o as THREE.Line;
+        if (m.geometry) m.geometry.dispose();
+      });
+      this.adminGroup = null;
+      this.needsRender = true;
+    }
+  }
+
+  private static pointInPoly(x: number, z: number, poly: AreaPoint[]): boolean {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i].x;
+      const zi = poly[i].z;
+      const xj = poly[j].x;
+      const zj = poly[j].z;
+      if (zi > z !== zj > z && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+
+  // Aggregate fused stats over every building whose footprint centroid falls inside `points` (world x,z).
+  // When `points` is null the whole place is summarized. `lang` selects EN/ES category labels.
+  computeAreaStats(points: AreaPoint[] | null, lang: 'en' | 'es' = 'en'): AreaStats | null {
+    if (!this.features.length) return null;
+    if (points && points.length < 3) return null;
+    const inside: BuildingFeature[] =
+      points == null
+        ? this.features
+        : this.features.filter((f) => {
+            const c = this.centById.get(f.id);
+            return c ? MaquetaScene.pointInPoly(c.x, c.z, points) : false;
+          });
+    if (!inside.length) return { ...EMPTY_AREA_STATS, polygonAreaM2: points ? polyArea(points) : 0 };
+
+    let footprint = 0;
+    let volume = 0;
+    const heights: number[] = [];
+    const floorsArr: number[] = [];
+    const fn = new Map<string, number>();
+    const lc = new Map<string, number>();
+    const pv = new Map<string, number>();
+    const histEdges = [0, 6, 12, 20, 35, 60, 100, Infinity];
+    const hist = new Array(histEdges.length - 1).fill(0);
+    for (const f of inside) {
+      const a = f.area_m2 ?? 0;
+      footprint += a;
+      if (Number.isFinite(f.height_m)) {
+        heights.push(f.height_m);
+        volume += a * f.height_m;
+        for (let b = 0; b < hist.length; b++) {
+          if (f.height_m >= histEdges[b] && f.height_m < histEdges[b + 1]) {
+            hist[b]++;
+            break;
+          }
+        }
+      }
+      if (f.num_floors != null && Number.isFinite(f.num_floors)) floorsArr.push(f.num_floors);
+      const use = f.use ?? (lang === 'es' ? 'Sin dato' : 'Unknown');
+      fn.set(use, (fn.get(use) ?? 0) + 1);
+      const lcl = f.class != null ? WORLDCOVER_LABELS[f.class]?.[lang] ?? String(f.class) : lang === 'es' ? 'Sin dato' : 'Unknown';
+      lc.set(lcl, (lc.get(lcl) ?? 0) + 1);
+      const pvl = PROVENANCE[f.height_source]?.[lang] ?? f.height_source;
+      pv.set(pvl, (pv.get(pvl) ?? 0) + 1);
+    }
+    heights.sort((a, b) => a - b);
+    const pct = (arr: number[], p: number) => (arr.length ? arr[Math.min(arr.length - 1, Math.floor(p * arr.length))] : 0);
+    const mean = (arr: number[]) => (arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0);
+    const toBins = (m: Map<string, number>): { label: string; count: number }[] =>
+      [...m.entries()].map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+    const histLabels = ['0-6', '6-12', '12-20', '20-35', '35-60', '60-100', '100+'];
+    const polygonAreaM2 = points ? polyArea(points) : footprint / Math.max(1e-6, 0.35); // whole-place: no polygon
+    return {
+      count: inside.length,
+      polygonAreaM2,
+      footprintAreaM2: footprint,
+      coverageRatio: points ? Math.min(1, footprint / Math.max(1, polygonAreaM2)) : 0,
+      densityPerKm2: points ? inside.length / Math.max(1e-6, polygonAreaM2 / 1e6) : 0,
+      builtVolumeM3: volume,
+      height: heights.length
+        ? { mean: mean(heights), median: pct(heights, 0.5), p90: pct(heights, 0.9), max: heights[heights.length - 1] }
+        : null,
+      floors: floorsArr.length ? { mean: mean(floorsArr), max: Math.max(...floorsArr) } : null,
+      functionMix: toBins(fn),
+      landcoverMix: toBins(lc),
+      provenanceMix: toBins(pv),
+      heightHist: hist.map((count, i) => ({ label: histLabels[i], count })),
+    };
+  }
+
+  // ---- scene controls ----
+  setLayerVisible(name: string, visible: boolean) {
+    const o = this.layers.get(name);
+    if (o) {
+      o.visible = visible;
+      this.needsRender = true;
+    }
+    // The "buildings" toggle also drives the lite LoD proxy while it stands in for the full layer.
+    if (name === 'buildings') {
+      const proxy = this.layers.get('buildings_lite');
+      if (proxy) proxy.visible = visible;
+    }
+  }
+  setNeon(v: number) {
+    this.neon = v;
+    for (const [name, obj] of this.layers) {
+      if (name === 'roads' || name === 'rail') {
+        obj.traverse((o) => {
+          const m = (o as THREE.Mesh).material as THREE.MeshBasicMaterial | undefined;
+          if (m && 'color' in m) (m as THREE.MeshBasicMaterial).opacity = 1;
+        });
+      }
+    }
+    // Keep a floor of face shading even at full neon so buildings never flatten back into glowing blobs.
+    this.buildingMat.emissiveIntensity = (this.dark ? 0.1 : 0.04) + v * 0.16;
+    this.needsRender = true;
+  }
+  setAnimate(on: boolean) {
+    this.animate = on;
+    this.needsRender = true;
+  }
+  cameraPreset(kind: 'aerial' | 'oblique' | 'street') {
+    const r = 1400;
+    if (kind === 'aerial') this.camera.position.set(0, r * 1.5, 1);
+    else if (kind === 'oblique') this.camera.position.set(r * 0.8, r * 0.75, r * 0.8);
+    else this.camera.position.set(r * 0.1, 150, r * 0.1);
+    this.controls.target.set(0, 0, 0);
+    this.controls.update();
+    this.needsRender = true;
+  }
+
+  // The baked terrain TIN ships without normals. We want smooth hill-shading so the relief reads as real
+  // 3D, but meshopt position quantization collapses near-coincident vertices on steep slopes (the Andes)
+  // into ZERO-AREA triangles. Any normal built from a zero-area face is a zero/NaN vector, and normalize()
+  // of that in the shader yields NaN which renders as pure black (swallowing even the emissive floor) over
+  // the whole steep region. So: drop the degenerate triangles from the index first, THEN compute normals.
+  private prepareTerrain(geom: THREE.BufferGeometry, worldMatrix: THREE.Matrix4) {
+    const pos = geom.getAttribute('position') as THREE.BufferAttribute | undefined;
+    if (!pos) return;
+    const idx = geom.getIndex();
+    const ax = new THREE.Vector3();
+    const bx = new THREE.Vector3();
+    const cx = new THREE.Vector3();
+    const e1 = new THREE.Vector3();
+    const e2 = new THREE.Vector3();
+    // area^2 threshold in the geometry's local (pre-node-scale) units; tiny, only kills truly collapsed tris.
+    const EPS2 = 1e-14;
+    let dropped = 0;
+    if (idx) {
+      const src = idx.array;
+      const kept: number[] = [];
+      for (let t = 0; t < src.length; t += 3) {
+        const i = src[t];
+        const j = src[t + 1];
+        const k = src[t + 2];
+        ax.fromBufferAttribute(pos, i);
+        bx.fromBufferAttribute(pos, j);
+        cx.fromBufferAttribute(pos, k);
+        e1.subVectors(bx, ax);
+        e2.subVectors(cx, ax);
+        if (e1.cross(e2).lengthSq() > EPS2) kept.push(i, j, k);
+        else dropped++;
+      }
+      if (dropped) geom.setIndex(kept);
+    }
+    geom.deleteAttribute('normal');
+    geom.computeVertexNormals();
+    // Belt-and-suspenders: any residual zero-length normal (isolated vertex) becomes straight up.
+    const nrm = geom.getAttribute('normal') as THREE.BufferAttribute;
+    const na = nrm.array as Float32Array;
+    for (let i = 0; i < na.length; i += 3) {
+      if (!(na[i] * na[i] + na[i + 1] * na[i + 1] + na[i + 2] * na[i + 2] > 1e-8)) {
+        na[i] = 0;
+        na[i + 1] = 1;
+        na[i + 2] = 0;
+      }
+    }
+    // The baked TIN winding is inverted (its top faces point down), which both flips the normals and, on an
+    // overhead camera, back-face-culls the flat surface so only the ridges show. Detect via the mean normal
+    // and flip so the hillshade is correct; the material also renders DoubleSide so the surface never culls.
+    let sumNy = 0;
+    for (let i = 1; i < na.length; i += 3) sumNy += na[i];
+    if (sumNy < 0) for (let i = 0; i < na.length; i++) na[i] = -na[i];
+    nrm.needsUpdate = true;
+
+    // Bake a hillshade + gentle hypsometric tint into the terrain vertex colours, so the relief reads as a
+    // coloured topographic surface rendered WITHOUT dynamic lighting. This fixes both failure modes of the
+    // old lit-Lambert terrain: the washed-out flat grey on terrain-first places (Chuquicamata, Atacama, the
+    // landscape landmarks), and the crushed-black far slopes on the city views. Terrain-first scenes now
+    // show real relief and colour; on cities the land-cover hue survives (blended) under the buildings.
+    const col = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
+    if (col && col.count === pos.count) {
+      let loY = Infinity;
+      let hiY = -Infinity;
+      for (let i = 0; i < pos.count; i++) {
+        const y = pos.getY(i);
+        if (y < loY) loY = y;
+        if (y > hiY) hiY = y;
+      }
+      const span = hiY - loY || 1;
+      const toLight = new THREE.Vector3(-0.4, 0.82, 0.42).normalize();
+      const wm = worldMatrix.elements; // to read each vertex's ABSOLUTE altitude (for the snow line)
+      // Earthy hypsometric ramp (valley -> slope -> ridge -> peak). All kept well BELOW the pale sky
+      // background luminance so the surface always reads as a solid coloured terrain, never washing into
+      // the sky. A snow cap only kicks in on genuinely high, near-flat tops. Stored linear.
+      const c0 = [0.26, 0.38, 0.22].map(srgbToLinear); // low: vegetated green
+      const c1 = [0.5, 0.44, 0.29].map(srgbToLinear); // mid: khaki / tan
+      const c2 = [0.52, 0.46, 0.4].map(srgbToLinear); // high: rock tan
+      const snow = [0.86, 0.88, 0.92].map(srgbToLinear);
+      const MIX = 0.68; // hypsometric dominates; the baked land-cover hue still tints cities through it
+      for (let i = 0; i < pos.count; i++) {
+        const f = (pos.getY(i) - loY) / span; // 0 valley .. 1 ridge
+        const u = f < 0.5 ? f / 0.5 : (f - 0.5) / 0.5;
+        const lo = f < 0.5 ? c0 : c1;
+        const hi = f < 0.5 ? c1 : c2;
+        const nx = na[i * 3];
+        const ny = na[i * 3 + 1];
+        const nz = na[i * 3 + 2];
+        const d = Math.max(0, nx * toLight.x + ny * toLight.y + nz * toLight.z);
+        const shade = 0.58 + 0.46 * d; // 0.58 (shadow) .. ~1.0 (flat/lit): no wash-out, real relief
+        let hr = lo[0] + (hi[0] - lo[0]) * u;
+        let hg = lo[1] + (hi[1] - lo[1]) * u;
+        let hb = lo[2] + (hi[2] - lo[2]) * u;
+        // Snow keyed to ABSOLUTE altitude (not relative elevation within the AOI), else desert plateaus
+        // (Giza) get false snow. Ramp 2900 m -> 3600 m, only on the flatter, sun-facing tops. This lights
+        // up genuine alpine peaks (Matterhorn, Fuji) and leaves low/mid places earthy.
+        const worldY = wm[1] * pos.getX(i) + wm[5] * pos.getY(i) + wm[9] * pos.getZ(i) + wm[13];
+        const highAlt = Math.max(0, Math.min(1, (worldY - 2900) / 700));
+        const snowAmt = highAlt * Math.max(0, (ny - 0.5) / 0.5);
+        if (snowAmt > 0) {
+          hr = hr + (snow[0] - hr) * snowAmt;
+          hg = hg + (snow[1] - hg) * snowAmt;
+          hb = hb + (snow[2] - hb) * snowAmt;
+        }
+        const br = col.getX(i);
+        const bg = col.getY(i);
+        const bb = col.getZ(i);
+        col.setXYZ(
+          i,
+          Math.min(1, (br * (1 - MIX) + hr * MIX) * shade),
+          Math.min(1, (bg * (1 - MIX) + hg * MIX) * shade),
+          Math.min(1, (bb * (1 - MIX) + hb * MIX) * shade),
+        );
+      }
+      col.needsUpdate = true;
+    }
+
+    // Planar UVs so real satellite imagery (fetched for the AOI bbox) can be draped on the terrain: u along
+    // east (x), v along north. north = -z in this frame, and loaded textures flip Y, so v = (z - zmin)/range
+    // puts min-z (max-north) at the top of the image. Verified against the vector streets.
+    let uxLo = Infinity, uxHi = -Infinity, uzLo = Infinity, uzHi = -Infinity;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      if (x < uxLo) uxLo = x;
+      if (x > uxHi) uxHi = x;
+      if (z < uzLo) uzLo = z;
+      if (z > uzHi) uzHi = z;
+    }
+    const rx = uxHi - uxLo || 1;
+    const rz = uzHi - uzLo || 1;
+    const uv = new Float32Array(pos.count * 2);
+    for (let i = 0; i < pos.count; i++) {
+      uv[i * 2] = (pos.getX(i) - uxLo) / rx;
+      uv[i * 2 + 1] = (pos.getZ(i) - uzLo) / rz;
+    }
+    geom.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+
+    if (dropped && import.meta.env.DEV) console.debug(`terrain: dropped ${dropped} degenerate triangle(s)`);
+  }
+
+  // Drape real Sentinel-2 cloudless satellite imagery (EOX, CC-BY) over the terrain, fetched for the AOI
+  // bbox at runtime (CORS-open, no re-bake). Toggling off restores the thematic hillshade/hypsometric look.
+  setTerrainImagery(on: boolean) {
+    this.imageryOn = on;
+    this.applyImagery(on);
+  }
+  private applyImagery(on: boolean) {
+    const mesh = this.terrainMesh;
+    if (!mesh) return;
+    if (!on) {
+      if (this.terrainThematicMat) mesh.material = this.terrainThematicMat;
+      this.needsRender = true;
+      return;
+    }
+    if (!this.aoiBBox) return;
+    const [w, s, e, n] = this.aoiBBox;
+    const midlat = (((s + n) / 2) * Math.PI) / 180;
+    const geoW = (e - w) * Math.cos(midlat);
+    const geoH = n - s;
+    const maxpx = 1536;
+    const width = geoW >= geoH ? maxpx : Math.max(64, Math.round((maxpx * geoW) / geoH));
+    const height = geoW >= geoH ? Math.max(64, Math.round((maxpx * geoH) / geoW)) : maxpx;
+    // EOX Sentinel-2 cloudless, WMS 1.3.0 / EPSG:4326 => bbox order is minLat,minLon,maxLat,maxLon.
+    const url =
+      `https://tiles.maps.eox.at/wms?service=WMS&version=1.3.0&request=GetMap&layers=s2cloudless-2024` +
+      `&crs=EPSG:4326&bbox=${s},${w},${n},${e}&width=${width}&height=${height}&format=image/jpeg&styles=`;
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin('anonymous');
+    loader.load(url, (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
+      if (this.imageryOn && this.terrainMesh) {
+        this.terrainMesh.material = new THREE.MeshBasicMaterial({ map: tex });
+        this.needsRender = true;
+      }
+    });
+  }
+
+  private layerMaterial(name: string): THREE.Material {
+    switch (name) {
+      case 'terrain':
+        // Relief + colour are baked into the vertex colours (hillshade + hypsometric) in prepareTerrain, so
+        // the terrain renders lighting-independent: real topographic contrast and colour on terrain-first
+        // places, no washed-out grey, and no crushed-black far slopes on the city views. Fog still hazes the
+        // far edge into the sky. DoubleSide because the baked TIN winding is inverted (else the flat surface
+        // back-face-culls on an overhead camera and only the ridges show).
+        return new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
+      case 'roads':
+        return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
+      case 'rail':
+        return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false });
+      case 'water':
+        return new THREE.MeshLambertMaterial({ vertexColors: true, emissive: 0x001830, emissiveIntensity: 0.3 });
+      case 'green':
+        return new THREE.MeshLambertMaterial({ vertexColors: true });
+      case 'population':
+        return new THREE.MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 0.75, emissive: 0x000000 });
+      case 'lod2':
+        // Authoritative 3DBAG ground truth, rendered as a distinct warm, semi-transparent overlay (not the
+        // blue height ramp) so it reads clearly ON TOP of the fused buildings for a visual comparison.
+        return new THREE.MeshPhongMaterial({
+          color: 0xffa94d,
+          flatShading: true,
+          transparent: true,
+          opacity: 0.5,
+          emissive: new THREE.Color(0x2a1c08),
+          emissiveIntensity: 0.25,
+        });
+      default:
+        return new THREE.MeshLambertMaterial({ vertexColors: true });
+    }
+  }
+
+  // Position the sun + size its orthographic shadow frustum to the current scene, so shadows cover the
+  // whole AOI at a usable resolution. Sun comes from the NW and high, for long, readable building shadows.
+  private applyShadowCamera() {
+    const d = this.keyLight;
+    if (!d) return;
+    const r = this.sceneR;
+    // Sun from the west at ~40 deg elevation: shadows long enough to read the built form, short enough to
+    // not swamp the ground. The ortho frustum is widened so the shadows are not clipped.
+    d.position.set(-r * 0.72, r * 0.78, r * 0.48);
+    d.target.position.set(0, 0, 0);
+    d.target.updateMatrixWorld();
+    const cam = d.shadow.camera as THREE.OrthographicCamera;
+    cam.left = -r * 0.72;
+    cam.right = r * 0.72;
+    cam.top = r * 0.72;
+    cam.bottom = -r * 0.72;
+    cam.near = r * 0.05;
+    cam.far = r * 4.0;
+    d.shadow.bias = -0.0003 - r * 1.5e-8; // scale the depth bias a touch with scene size to fight acne
+    cam.updateProjectionMatrix();
+  }
+
+  private frameCamera([wm, hm]: [number, number]) {
+    const r = Math.max(wm, hm);
+    this.sceneR = r;
+    // Meshes carry their absolute altitude, so a high place (Atacama / Chuquicamata ~2500 m, Bogota
+    // ~2600 m) sits far above y=0. Read the loaded terrain's mean elevation and frame at THAT height,
+    // else the whole scene renders above the top of the view. Falls back to 0 for a flat/sea-level place.
+    const terrain = this.layers.get('terrain');
+    if (terrain) {
+      const bb = new THREE.Box3().setFromObject(terrain);
+      this.groundY = Number.isFinite(bb.min.y) && Number.isFinite(bb.max.y) ? (bb.min.y + bb.max.y) / 2 : 0;
+    } else {
+      this.groundY = 0;
+    }
+    this.applyShadowCamera();
+    // Re-fit the fog to this scene's extent (the theme set it for the previous scene's size).
+    const bg = this.dark ? 0x0a0e14 : 0xdfe6ef;
+    this.scene.fog = new THREE.Fog(bg, this.sceneR * 0.95, this.sceneR * 1.85);
+    // Open on the most cinematic framing: a low oblique that fills the frame with the built fabric and
+    // lets it recede to the far relief hazing into the sky (the Andes on the Santiago default). Closer and
+    // lower than a plain overview so the first impression is the 3D city, not a distant plan.
+    this.controls.target.set(0, this.groundY + r * 0.02, 0);
+    this.camera.position.set(r * 0.52, this.groundY + r * 0.4, r * 0.52);
+    this.camera.far = r * 10;
+    this.camera.updateProjectionMatrix();
+    this.controls.update();
+  }
   private onVisibility = () => {
-    // Nudge a redraw when the tab becomes visible again (rAF is auto-throttled by the browser while
-    // hidden, so the loop itself keeps running -- no compute bomb -- and just idles on needsRender).
     if (!document.hidden) this.needsRender = true;
   };
-
   private resize() {
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
@@ -258,17 +1390,12 @@ export class MaquetaScene {
     this.renderer.setSize(w, h);
     this.needsRender = true;
   }
-
   private loop = () => {
     if (this.disposed) return;
-    // rAF is naturally paused/throttled by the browser when the tab is hidden (no compute bomb), so we
-    // do NOT bail on document.hidden here -- bailing would leave the canvas unrendered when the page
-    // loads unfocused. We only pause the pulse ANIMATION while hidden.
     this.controls.update();
     if (this.animate && !document.hidden) {
-      // gentle emissive breathing (the opt-in "pulse"); runs once-per-frame while visible only.
       this.pulse += 0.03;
-      this.buildingMat.emissiveIntensity = 0.2 + 0.12 * Math.abs(Math.sin(this.pulse));
+      this.buildingMat.emissiveIntensity = 0.08 + 0.12 * Math.abs(Math.sin(this.pulse)) + this.neon * 0.08;
       this.needsRender = true;
     }
     if (this.needsRender) {
@@ -277,7 +1404,6 @@ export class MaquetaScene {
     }
     requestAnimationFrame(this.loop);
   };
-
   dispose() {
     this.disposed = true;
     this.ro.disconnect();
@@ -286,4 +1412,22 @@ export class MaquetaScene {
     this.renderer.dispose();
     this.container.removeChild(this.renderer.domElement);
   }
+
+}
+
+function floatifyColors(geom: THREE.BufferGeometry): void {
+  const col = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
+  if (!col || col.array instanceof Float32Array) return;
+  const n = col.count;
+  const size = col.itemSize;
+  const out = new Float32Array(n * size);
+  for (let i = 0; i < n; i++)
+    for (let k = 0; k < size; k++) {
+      const v = (col.array[i * size + k] as number) / 255;
+      out[i * size + k] = k < 3 ? srgbToLinear(v) : v;
+    }
+  geom.setAttribute('color', new THREE.BufferAttribute(out, size));
+}
+function srgbToLinear(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
 }

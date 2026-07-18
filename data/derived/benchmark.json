@@ -1,34 +1,71 @@
 {
   "schema_version": 1,
-  "n_places": 1,
+  "n_places": 118,
   "global_height_mix": {
-    "measured": 353,
-    "floors": 1706,
-    "raster": 0,
-    "prior": 731
+    "measured": 357732,
+    "floors": 259616,
+    "raster": 2965164,
+    "prior": 470826
   },
   "global_height_fraction": {
-    "measured": 0.127,
-    "floors": 0.611,
-    "raster": 0.0,
-    "prior": 0.262
+    "measured": 0.088,
+    "floors": 0.064,
+    "raster": 0.732,
+    "prior": 0.116
   },
   "tier_totals_mb": {
-    "A": 3.53
+    "B": 1749.22,
+    "A": 33.14,
+    "C": 1.16
   },
   "tier_counts": {
-    "A": 1
+    "B": 90,
+    "A": 10,
+    "C": 18
   },
-  "total_mb": 3.53,
+  "total_mb": 1783.52,
   "per_place": [
+    {
+      "slug": "amsterdam_center",
+      "name": "Amsterdam Centrum",
+      "tier": "A",
+      "country": "Netherlands",
+      "n_layers": 8,
+      "total_triangles": 526625,
+      "total_mb": 6.587,
+      "height_mix": {
+        "measured": 124,
+        "floors": 1025,
+        "raster": 0,
+        "prior": 13225
+      },
+      "height_fraction": {
+        "measured": 0.009,
+        "floors": 0.071,
+        "raster": 0.0,
+        "prior": 0.92
+      },
+      "measured_pct": 0.9,
+      "any_noncommercial": false,
+      "ground_truth": {
+        "n_fused": 14374,
+        "n_truth": 50,
+        "matched": 143,
+        "coverage_pct": 1.0,
+        "height_rmse_m": 8.32,
+        "height_mae_m": 7.48,
+        "height_bias_m": -6.57,
+        "truth_source": "3D BAG LoD2 (TU Delft)"
+      }
+    },
     {
       "slug": "berlin_mitte",
       "name": "Berlin Mitte",
       "tier": "A",
       "country": "Germany",
-      "n_layers": 2,
-      "total_triangles": 117783,
-      "total_mb": 3.529,
+      "n_layers": 4,
+      "total_triangles": 232480,
+      "total_mb": 1.917,
       "height_mix": {
         "measured": 353,
         "floors": 1706,
@@ -42,7 +79,2801 @@
         "prior": 0.262
       },
       "measured_pct": 12.7,
-      "any_noncommercial": false
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "delft",
+      "name": "Delft",
+      "tier": "A",
+      "country": "Netherlands",
+      "n_layers": 8,
+      "total_triangles": 440048,
+      "total_mb": 6.723,
+      "height_mix": {
+        "measured": 44,
+        "floors": 6566,
+        "raster": 0,
+        "prior": 9313
+      },
+      "height_fraction": {
+        "measured": 0.003,
+        "floors": 0.412,
+        "raster": 0.0,
+        "prior": 0.585
+      },
+      "measured_pct": 0.3,
+      "any_noncommercial": false,
+      "ground_truth": {
+        "n_fused": 15923,
+        "n_truth": 397,
+        "matched": 2722,
+        "coverage_pct": 17.1,
+        "height_rmse_m": 3.06,
+        "height_mae_m": 2.47,
+        "height_bias_m": -0.13,
+        "truth_source": "3D BAG LoD2 (TU Delft)"
+      }
+    },
+    {
+      "slug": "helsinki_center",
+      "name": "Helsinki Centre",
+      "tier": "A",
+      "country": "Finland",
+      "n_layers": 4,
+      "total_triangles": 277396,
+      "total_mb": 1.792,
+      "height_mix": {
+        "measured": 301,
+        "floors": 1226,
+        "raster": 0,
+        "prior": 797
+      },
+      "height_fraction": {
+        "measured": 0.13,
+        "floors": 0.528,
+        "raster": 0.0,
+        "prior": 0.343
+      },
+      "measured_pct": 13.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "manhattan_midtown",
+      "name": "Manhattan Midtown",
+      "tier": "A",
+      "country": "USA",
+      "n_layers": 4,
+      "total_triangles": 254517,
+      "total_mb": 2.895,
+      "height_mix": {
+        "measured": 5852,
+        "floors": 18,
+        "raster": 0,
+        "prior": 86
+      },
+      "height_fraction": {
+        "measured": 0.983,
+        "floors": 0.003,
+        "raster": 0.0,
+        "prior": 0.014
+      },
+      "measured_pct": 98.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "seattle_downtown",
+      "name": "Seattle Downtown",
+      "tier": "A",
+      "country": "USA",
+      "n_layers": 4,
+      "total_triangles": 199085,
+      "total_mb": 1.407,
+      "height_mix": {
+        "measured": 1585,
+        "floors": 42,
+        "raster": 0,
+        "prior": 464
+      },
+      "height_fraction": {
+        "measured": 0.758,
+        "floors": 0.02,
+        "raster": 0.0,
+        "prior": 0.222
+      },
+      "measured_pct": 75.8,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "singapore_downtown",
+      "name": "Singapore Downtown",
+      "tier": "A",
+      "country": "Singapore",
+      "n_layers": 4,
+      "total_triangles": 152431,
+      "total_mb": 1.564,
+      "height_mix": {
+        "measured": 1585,
+        "floors": 510,
+        "raster": 1073,
+        "prior": 172
+      },
+      "height_fraction": {
+        "measured": 0.475,
+        "floors": 0.153,
+        "raster": 0.321,
+        "prior": 0.051
+      },
+      "measured_pct": 47.5,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "tokyo_shinjuku",
+      "name": "Tokyo Shinjuku",
+      "tier": "A",
+      "country": "Japan",
+      "n_layers": 4,
+      "total_triangles": 309626,
+      "total_mb": 5.099,
+      "height_mix": {
+        "measured": 737,
+        "floors": 666,
+        "raster": 0,
+        "prior": 12907
+      },
+      "height_fraction": {
+        "measured": 0.052,
+        "floors": 0.047,
+        "raster": 0.0,
+        "prior": 0.902
+      },
+      "measured_pct": 5.2,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "vienna_center",
+      "name": "Vienna Innere Stadt",
+      "tier": "A",
+      "country": "Austria",
+      "n_layers": 4,
+      "total_triangles": 317673,
+      "total_mb": 2.685,
+      "height_mix": {
+        "measured": 1599,
+        "floors": 1778,
+        "raster": 0,
+        "prior": 443
+      },
+      "height_fraction": {
+        "measured": 0.419,
+        "floors": 0.465,
+        "raster": 0.0,
+        "prior": 0.116
+      },
+      "measured_pct": 41.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "zurich_center",
+      "name": "Zurich Altstadt",
+      "tier": "A",
+      "country": "Switzerland",
+      "n_layers": 4,
+      "total_triangles": 252099,
+      "total_mb": 2.47,
+      "height_mix": {
+        "measured": 1042,
+        "floors": 1103,
+        "raster": 0,
+        "prior": 2477
+      },
+      "height_fraction": {
+        "measured": 0.225,
+        "floors": 0.239,
+        "raster": 0.0,
+        "prior": 0.536
+      },
+      "measured_pct": 22.5,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "agra_taj",
+      "name": "Agra (Taj Mahal)",
+      "tier": "B",
+      "country": "India",
+      "n_layers": 4,
+      "total_triangles": 114893,
+      "total_mb": 2.26,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 6362,
+        "prior": 193
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.971,
+        "prior": 0.029
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "antofagasta",
+      "name": "Antofagasta",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 358230,
+      "total_mb": 8.025,
+      "height_mix": {
+        "measured": 7,
+        "floors": 163,
+        "raster": 23144,
+        "prior": 274
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.007,
+        "raster": 0.981,
+        "prior": 0.012
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "bangkok_center",
+      "name": "Bangkok Center",
+      "tier": "B",
+      "country": "Thailand",
+      "n_layers": 4,
+      "total_triangles": 250462,
+      "total_mb": 4.786,
+      "height_mix": {
+        "measured": 1,
+        "floors": 1882,
+        "raster": 11621,
+        "prior": 158
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.138,
+        "raster": 0.851,
+        "prior": 0.012
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "barcelona_eixample",
+      "name": "Barcelona Eixample",
+      "tier": "B",
+      "country": "Spain",
+      "n_layers": 4,
+      "total_triangles": 451595,
+      "total_mb": 4.918,
+      "height_mix": {
+        "measured": 1007,
+        "floors": 4537,
+        "raster": 0,
+        "prior": 3362
+      },
+      "height_fraction": {
+        "measured": 0.113,
+        "floors": 0.509,
+        "raster": 0.0,
+        "prior": 0.377
+      },
+      "measured_pct": 11.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "barcelona_full",
+      "name": "Barcelona (metro core)",
+      "tier": "B",
+      "country": "Spain",
+      "n_layers": 7,
+      "total_triangles": 4384332,
+      "total_mb": 46.616,
+      "height_mix": {
+        "measured": 12911,
+        "floors": 30476,
+        "raster": 0,
+        "prior": 18200
+      },
+      "height_fraction": {
+        "measured": 0.21,
+        "floors": 0.495,
+        "raster": 0.0,
+        "prior": 0.296
+      },
+      "measured_pct": 21.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "beijing_center",
+      "name": "Beijing Center",
+      "tier": "B",
+      "country": "China",
+      "n_layers": 4,
+      "total_triangles": 134794,
+      "total_mb": 2.174,
+      "height_mix": {
+        "measured": 249,
+        "floors": 263,
+        "raster": 0,
+        "prior": 6078
+      },
+      "height_fraction": {
+        "measured": 0.038,
+        "floors": 0.04,
+        "raster": 0.0,
+        "prior": 0.922
+      },
+      "measured_pct": 3.8,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "berlin_full",
+      "name": "Berlin (metro core)",
+      "tier": "B",
+      "country": "Germany",
+      "n_layers": 7,
+      "total_triangles": 3165051,
+      "total_mb": 31.968,
+      "height_mix": {
+        "measured": 11172,
+        "floors": 31823,
+        "raster": 0,
+        "prior": 11005
+      },
+      "height_fraction": {
+        "measured": 0.207,
+        "floors": 0.589,
+        "raster": 0.0,
+        "prior": 0.204
+      },
+      "measured_pct": 20.7,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "bogota_center",
+      "name": "Bogota Centro",
+      "tier": "B",
+      "country": "Colombia",
+      "n_layers": 4,
+      "total_triangles": 466546,
+      "total_mb": 7.825,
+      "height_mix": {
+        "measured": 8,
+        "floors": 120,
+        "raster": 18933,
+        "prior": 204
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.006,
+        "raster": 0.983,
+        "prior": 0.011
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "buenos_aires_center",
+      "name": "Buenos Aires Centro",
+      "tier": "B",
+      "country": "Argentina",
+      "n_layers": 4,
+      "total_triangles": 203903,
+      "total_mb": 3.52,
+      "height_mix": {
+        "measured": 188,
+        "floors": 192,
+        "raster": 9687,
+        "prior": 103
+      },
+      "height_fraction": {
+        "measured": 0.018,
+        "floors": 0.019,
+        "raster": 0.953,
+        "prior": 0.01
+      },
+      "measured_pct": 1.8,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "buenos_aires_full",
+      "name": "Buenos Aires (metro core)",
+      "tier": "B",
+      "country": "Argentina",
+      "n_layers": 7,
+      "total_triangles": 3539780,
+      "total_mb": 84.717,
+      "height_mix": {
+        "measured": 313,
+        "floors": 2122,
+        "raster": 219903,
+        "prior": 538
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.01,
+        "raster": 0.987,
+        "prior": 0.002
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "cairo_center",
+      "name": "Cairo Downtown",
+      "tier": "B",
+      "country": "Egypt",
+      "n_layers": 7,
+      "total_triangles": 206578,
+      "total_mb": 2.992,
+      "height_mix": {
+        "measured": 73,
+        "floors": 51,
+        "raster": 7597,
+        "prior": 158
+      },
+      "height_fraction": {
+        "measured": 0.009,
+        "floors": 0.006,
+        "raster": 0.964,
+        "prior": 0.02
+      },
+      "measured_pct": 0.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "calama",
+      "name": "Calama",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 7,
+      "total_triangles": 647306,
+      "total_mb": 16.455,
+      "height_mix": {
+        "measured": 0,
+        "floors": 21,
+        "raster": 49839,
+        "prior": 192
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.996,
+        "prior": 0.004
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "cape_town_center",
+      "name": "Cape Town CBD",
+      "tier": "B",
+      "country": "South Africa",
+      "n_layers": 4,
+      "total_triangles": 195359,
+      "total_mb": 2.258,
+      "height_mix": {
+        "measured": 73,
+        "floors": 671,
+        "raster": 3695,
+        "prior": 139
+      },
+      "height_fraction": {
+        "measured": 0.016,
+        "floors": 0.147,
+        "raster": 0.807,
+        "prior": 0.03
+      },
+      "measured_pct": 1.6,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "chicago_loop",
+      "name": "Chicago Loop",
+      "tier": "B",
+      "country": "USA",
+      "n_layers": 4,
+      "total_triangles": 218249,
+      "total_mb": 1.538,
+      "height_mix": {
+        "measured": 1421,
+        "floors": 107,
+        "raster": 0,
+        "prior": 585
+      },
+      "height_fraction": {
+        "measured": 0.673,
+        "floors": 0.051,
+        "raster": 0.0,
+        "prior": 0.277
+      },
+      "measured_pct": 67.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "chiloe_castro",
+      "name": "Chiloe (Castro)",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 142990,
+      "total_mb": 2.986,
+      "height_mix": {
+        "measured": 0,
+        "floors": 15,
+        "raster": 8775,
+        "prior": 50
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.002,
+        "raster": 0.993,
+        "prior": 0.006
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "concepcion",
+      "name": "Concepcion",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 198984,
+      "total_mb": 3.488,
+      "height_mix": {
+        "measured": 644,
+        "floors": 226,
+        "raster": 8536,
+        "prior": 84
+      },
+      "height_fraction": {
+        "measured": 0.068,
+        "floors": 0.024,
+        "raster": 0.899,
+        "prior": 0.009
+      },
+      "measured_pct": 6.8,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "delhi_center",
+      "name": "Delhi (Connaught Place)",
+      "tier": "B",
+      "country": "India",
+      "n_layers": 4,
+      "total_triangles": 163653,
+      "total_mb": 2.378,
+      "height_mix": {
+        "measured": 4,
+        "floors": 248,
+        "raster": 5640,
+        "prior": 224
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.041,
+        "raster": 0.922,
+        "prior": 0.037
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "delhi_full",
+      "name": "Delhi (metro core)",
+      "tier": "B",
+      "country": "India",
+      "n_layers": 7,
+      "total_triangles": 1863546,
+      "total_mb": 37.711,
+      "height_mix": {
+        "measured": 55,
+        "floors": 639,
+        "raster": 83919,
+        "prior": 2100
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.007,
+        "raster": 0.968,
+        "prior": 0.024
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "dubai_downtown",
+      "name": "Dubai Downtown",
+      "tier": "B",
+      "country": "UAE",
+      "n_layers": 4,
+      "total_triangles": 130607,
+      "total_mb": 1.025,
+      "height_mix": {
+        "measured": 314,
+        "floors": 58,
+        "raster": 0,
+        "prior": 1364
+      },
+      "height_fraction": {
+        "measured": 0.181,
+        "floors": 0.033,
+        "raster": 0.0,
+        "prior": 0.786
+      },
+      "measured_pct": 18.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "hong_kong_central",
+      "name": "Hong Kong Central",
+      "tier": "B",
+      "country": "China",
+      "n_layers": 4,
+      "total_triangles": 218139,
+      "total_mb": 1.74,
+      "height_mix": {
+        "measured": 86,
+        "floors": 1166,
+        "raster": 0,
+        "prior": 1690
+      },
+      "height_fraction": {
+        "measured": 0.029,
+        "floors": 0.396,
+        "raster": 0.0,
+        "prior": 0.574
+      },
+      "measured_pct": 2.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "istanbul_center",
+      "name": "Istanbul Fatih",
+      "tier": "B",
+      "country": "Turkey",
+      "n_layers": 7,
+      "total_triangles": 245038,
+      "total_mb": 3.657,
+      "height_mix": {
+        "measured": 37,
+        "floors": 141,
+        "raster": 0,
+        "prior": 10598
+      },
+      "height_fraction": {
+        "measured": 0.003,
+        "floors": 0.013,
+        "raster": 0.0,
+        "prior": 0.983
+      },
+      "measured_pct": 0.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "jakarta_center",
+      "name": "Jakarta Center",
+      "tier": "B",
+      "country": "Indonesia",
+      "n_layers": 4,
+      "total_triangles": 201665,
+      "total_mb": 3.839,
+      "height_mix": {
+        "measured": 7,
+        "floors": 477,
+        "raster": 11134,
+        "prior": 135
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.041,
+        "raster": 0.947,
+        "prior": 0.011
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "lagos_island",
+      "name": "Lagos Island",
+      "tier": "B",
+      "country": "Nigeria",
+      "n_layers": 4,
+      "total_triangles": 122152,
+      "total_mb": 2.393,
+      "height_mix": {
+        "measured": 24,
+        "floors": 1423,
+        "raster": 5915,
+        "prior": 98
+      },
+      "height_fraction": {
+        "measured": 0.003,
+        "floors": 0.191,
+        "raster": 0.793,
+        "prior": 0.013
+      },
+      "measured_pct": 0.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "lisbon_baixa",
+      "name": "Lisbon Baixa",
+      "tier": "B",
+      "country": "Portugal",
+      "n_layers": 4,
+      "total_triangles": 216757,
+      "total_mb": 2.868,
+      "height_mix": {
+        "measured": 386,
+        "floors": 1709,
+        "raster": 0,
+        "prior": 5283
+      },
+      "height_fraction": {
+        "measured": 0.052,
+        "floors": 0.232,
+        "raster": 0.0,
+        "prior": 0.716
+      },
+      "measured_pct": 5.2,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "london_city",
+      "name": "London City",
+      "tier": "B",
+      "country": "UK",
+      "n_layers": 4,
+      "total_triangles": 404431,
+      "total_mb": 3.479,
+      "height_mix": {
+        "measured": 875,
+        "floors": 2492,
+        "raster": 0,
+        "prior": 2731
+      },
+      "height_fraction": {
+        "measured": 0.143,
+        "floors": 0.409,
+        "raster": 0.0,
+        "prior": 0.448
+      },
+      "measured_pct": 14.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "london_full",
+      "name": "London (metro core)",
+      "tier": "B",
+      "country": "UK",
+      "n_layers": 7,
+      "total_triangles": 4386441,
+      "total_mb": 53.929,
+      "height_mix": {
+        "measured": 16300,
+        "floors": 28315,
+        "raster": 0,
+        "prior": 51612
+      },
+      "height_fraction": {
+        "measured": 0.169,
+        "floors": 0.294,
+        "raster": 0.0,
+        "prior": 0.536
+      },
+      "measured_pct": 16.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "los_angeles_downtown",
+      "name": "Los Angeles Downtown",
+      "tier": "B",
+      "country": "USA",
+      "n_layers": 4,
+      "total_triangles": 200766,
+      "total_mb": 1.579,
+      "height_mix": {
+        "measured": 2236,
+        "floors": 19,
+        "raster": 0,
+        "prior": 54
+      },
+      "height_fraction": {
+        "measured": 0.968,
+        "floors": 0.008,
+        "raster": 0.0,
+        "prior": 0.023
+      },
+      "measured_pct": 96.8,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "mexico_city_center",
+      "name": "Mexico City Centro",
+      "tier": "B",
+      "country": "Mexico",
+      "n_layers": 4,
+      "total_triangles": 200067,
+      "total_mb": 3.331,
+      "height_mix": {
+        "measured": 10,
+        "floors": 257,
+        "raster": 8791,
+        "prior": 98
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.028,
+        "raster": 0.96,
+        "prior": 0.011
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "mexico_city_full",
+      "name": "Mexico City (metro core)",
+      "tier": "B",
+      "country": "Mexico",
+      "n_layers": 7,
+      "total_triangles": 3041059,
+      "total_mb": 60.783,
+      "height_mix": {
+        "measured": 239,
+        "floors": 1893,
+        "raster": 138080,
+        "prior": 645
+      },
+      "height_fraction": {
+        "measured": 0.002,
+        "floors": 0.013,
+        "raster": 0.98,
+        "prior": 0.005
+      },
+      "measured_pct": 0.2,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "moscow_center",
+      "name": "Moscow Center",
+      "tier": "B",
+      "country": "Russia",
+      "n_layers": 7,
+      "total_triangles": 334198,
+      "total_mb": 2.424,
+      "height_mix": {
+        "measured": 102,
+        "floors": 2377,
+        "raster": 0,
+        "prior": 789
+      },
+      "height_fraction": {
+        "measured": 0.031,
+        "floors": 0.727,
+        "raster": 0.0,
+        "prior": 0.241
+      },
+      "measured_pct": 3.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "mumbai_fort",
+      "name": "Mumbai Fort",
+      "tier": "B",
+      "country": "India",
+      "n_layers": 4,
+      "total_triangles": 73016,
+      "total_mb": 1.038,
+      "height_mix": {
+        "measured": 6,
+        "floors": 138,
+        "raster": 2462,
+        "prior": 162
+      },
+      "height_fraction": {
+        "measured": 0.002,
+        "floors": 0.05,
+        "raster": 0.889,
+        "prior": 0.059
+      },
+      "measured_pct": 0.2,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "nairobi_center",
+      "name": "Nairobi CBD",
+      "tier": "B",
+      "country": "Kenya",
+      "n_layers": 4,
+      "total_triangles": 144158,
+      "total_mb": 2.092,
+      "height_mix": {
+        "measured": 44,
+        "floors": 183,
+        "raster": 4963,
+        "prior": 247
+      },
+      "height_fraction": {
+        "measured": 0.008,
+        "floors": 0.034,
+        "raster": 0.913,
+        "prior": 0.045
+      },
+      "measured_pct": 0.8,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "nyc_full",
+      "name": "New York (metro core)",
+      "tier": "B",
+      "country": "USA",
+      "n_layers": 7,
+      "total_triangles": 3557805,
+      "total_mb": 50.875,
+      "height_mix": {
+        "measured": 97730,
+        "floors": 108,
+        "raster": 0,
+        "prior": 597
+      },
+      "height_fraction": {
+        "measured": 0.993,
+        "floors": 0.001,
+        "raster": 0.0,
+        "prior": 0.006
+      },
+      "measured_pct": 99.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "paris_center",
+      "name": "Paris Centre",
+      "tier": "B",
+      "country": "France",
+      "n_layers": 4,
+      "total_triangles": 518532,
+      "total_mb": 5.058,
+      "height_mix": {
+        "measured": 351,
+        "floors": 5641,
+        "raster": 0,
+        "prior": 2737
+      },
+      "height_fraction": {
+        "measured": 0.04,
+        "floors": 0.646,
+        "raster": 0.0,
+        "prior": 0.314
+      },
+      "measured_pct": 4.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "paris_full",
+      "name": "Paris (metro core)",
+      "tier": "B",
+      "country": "France",
+      "n_layers": 7,
+      "total_triangles": 7045818,
+      "total_mb": 73.82,
+      "height_mix": {
+        "measured": 4842,
+        "floors": 57901,
+        "raster": 0,
+        "prior": 44299
+      },
+      "height_fraction": {
+        "measured": 0.045,
+        "floors": 0.541,
+        "raster": 0.0,
+        "prior": 0.414
+      },
+      "measured_pct": 4.5,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "rio_de_janeiro",
+      "name": "Rio de Janeiro",
+      "tier": "B",
+      "country": "Brazil",
+      "n_layers": 4,
+      "total_triangles": 767636,
+      "total_mb": 13.211,
+      "height_mix": {
+        "measured": 15953,
+        "floors": 180,
+        "raster": 17349,
+        "prior": 193
+      },
+      "height_fraction": {
+        "measured": 0.474,
+        "floors": 0.005,
+        "raster": 0.515,
+        "prior": 0.006
+      },
+      "measured_pct": 47.4,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "rome_center",
+      "name": "Rome Centro Storico",
+      "tier": "B",
+      "country": "Italy",
+      "n_layers": 4,
+      "total_triangles": 327014,
+      "total_mb": 3.321,
+      "height_mix": {
+        "measured": 432,
+        "floors": 782,
+        "raster": 0,
+        "prior": 5377
+      },
+      "height_fraction": {
+        "measured": 0.066,
+        "floors": 0.119,
+        "raster": 0.0,
+        "prior": 0.816
+      },
+      "measured_pct": 6.6,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "san_francisco_downtown",
+      "name": "San Francisco Downtown",
+      "tier": "B",
+      "country": "USA",
+      "n_layers": 7,
+      "total_triangles": 251046,
+      "total_mb": 2.523,
+      "height_mix": {
+        "measured": 4344,
+        "floors": 155,
+        "raster": 0,
+        "prior": 280
+      },
+      "height_fraction": {
+        "measured": 0.909,
+        "floors": 0.032,
+        "raster": 0.0,
+        "prior": 0.059
+      },
+      "measured_pct": 90.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "santiago_centro",
+      "name": "Santiago Centro",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 292704,
+      "total_mb": 4.016,
+      "height_mix": {
+        "measured": 127,
+        "floors": 332,
+        "raster": 8698,
+        "prior": 129
+      },
+      "height_fraction": {
+        "measured": 0.014,
+        "floors": 0.036,
+        "raster": 0.937,
+        "prior": 0.014
+      },
+      "measured_pct": 1.4,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "santiago_full",
+      "name": "Santiago (metro core)",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 4077092,
+      "total_mb": 76.217,
+      "height_mix": {
+        "measured": 853,
+        "floors": 8599,
+        "raster": 167939,
+        "prior": 1511
+      },
+      "height_fraction": {
+        "measured": 0.005,
+        "floors": 0.048,
+        "raster": 0.939,
+        "prior": 0.008
+      },
+      "measured_pct": 0.5,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "santorini",
+      "name": "Santorini (Thera)",
+      "tier": "B",
+      "country": "Greece",
+      "n_layers": 4,
+      "total_triangles": 132755,
+      "total_mb": 1.481,
+      "height_mix": {
+        "measured": 0,
+        "floors": 14,
+        "raster": 0,
+        "prior": 3771
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.004,
+        "raster": 0.0,
+        "prior": 0.996
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "sao_paulo_center",
+      "name": "Sao Paulo Centro",
+      "tier": "B",
+      "country": "Brazil",
+      "n_layers": 4,
+      "total_triangles": 443513,
+      "total_mb": 5.888,
+      "height_mix": {
+        "measured": 12181,
+        "floors": 33,
+        "raster": 827,
+        "prior": 49
+      },
+      "height_fraction": {
+        "measured": 0.931,
+        "floors": 0.003,
+        "raster": 0.063,
+        "prior": 0.004
+      },
+      "measured_pct": 93.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "sao_paulo_full",
+      "name": "Sao Paulo (metro core)",
+      "tier": "B",
+      "country": "Brazil",
+      "n_layers": 7,
+      "total_triangles": 5841249,
+      "total_mb": 87.178,
+      "height_mix": {
+        "measured": 144919,
+        "floors": 524,
+        "raster": 19733,
+        "prior": 536
+      },
+      "height_fraction": {
+        "measured": 0.875,
+        "floors": 0.003,
+        "raster": 0.119,
+        "prior": 0.003
+      },
+      "measured_pct": 87.5,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "seoul_full",
+      "name": "Seoul (metro core)",
+      "tier": "B",
+      "country": "South Korea",
+      "n_layers": 7,
+      "total_triangles": 1535112,
+      "total_mb": 22.407,
+      "height_mix": {
+        "measured": 4142,
+        "floors": 2596,
+        "raster": 0,
+        "prior": 52173
+      },
+      "height_fraction": {
+        "measured": 0.07,
+        "floors": 0.044,
+        "raster": 0.0,
+        "prior": 0.886
+      },
+      "measured_pct": 7.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "seoul_jongno",
+      "name": "Seoul Jongno",
+      "tier": "B",
+      "country": "South Korea",
+      "n_layers": 7,
+      "total_triangles": 218969,
+      "total_mb": 3.046,
+      "height_mix": {
+        "measured": 381,
+        "floors": 370,
+        "raster": 0,
+        "prior": 7031
+      },
+      "height_fraction": {
+        "measured": 0.049,
+        "floors": 0.048,
+        "raster": 0.0,
+        "prior": 0.903
+      },
+      "measured_pct": 4.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "shanghai_bund",
+      "name": "Shanghai (The Bund)",
+      "tier": "B",
+      "country": "China",
+      "n_layers": 6,
+      "total_triangles": 122483,
+      "total_mb": 1.105,
+      "height_mix": {
+        "measured": 35,
+        "floors": 546,
+        "raster": 0,
+        "prior": 2054
+      },
+      "height_fraction": {
+        "measured": 0.013,
+        "floors": 0.207,
+        "raster": 0.0,
+        "prior": 0.78
+      },
+      "measured_pct": 1.3,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "sierra_gorda",
+      "name": "Sierra Gorda",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 16101,
+      "total_mb": 0.24,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 599,
+        "prior": 46
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.929,
+        "prior": 0.071
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_cerrillos",
+      "name": "Cerrillos",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1557636,
+      "total_mb": 30.543,
+      "height_mix": {
+        "measured": 5,
+        "floors": 245,
+        "raster": 60057,
+        "prior": 1129
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.004,
+        "raster": 0.978,
+        "prior": 0.018
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_cerro_navia",
+      "name": "Cerro Navia",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1647127,
+      "total_mb": 33.396,
+      "height_mix": {
+        "measured": 3,
+        "floors": 503,
+        "raster": 68461,
+        "prior": 871
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.007,
+        "raster": 0.98,
+        "prior": 0.012
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_conchali",
+      "name": "Conchal\u00ed",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 527000,
+      "total_mb": 10.411,
+      "height_mix": {
+        "measured": 0,
+        "floors": 84,
+        "raster": 28334,
+        "prior": 415
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.003,
+        "raster": 0.983,
+        "prior": 0.014
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_el_bosque",
+      "name": "El Bosque",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 799171,
+      "total_mb": 16.28,
+      "height_mix": {
+        "measured": 1,
+        "floors": 25,
+        "raster": 44292,
+        "prior": 582
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.001,
+        "raster": 0.986,
+        "prior": 0.013
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_estacion_central",
+      "name": "Estaci\u00f3n Central",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 991055,
+      "total_mb": 19.612,
+      "height_mix": {
+        "measured": 9,
+        "floors": 571,
+        "raster": 53200,
+        "prior": 584
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.011,
+        "raster": 0.979,
+        "prior": 0.011
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_huechuraba",
+      "name": "Huechuraba",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1809367,
+      "total_mb": 34.71,
+      "height_mix": {
+        "measured": 2,
+        "floors": 174,
+        "raster": 71727,
+        "prior": 906
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.002,
+        "raster": 0.985,
+        "prior": 0.012
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_independencia",
+      "name": "Independencia",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 378910,
+      "total_mb": 7.051,
+      "height_mix": {
+        "measured": 1,
+        "floors": 144,
+        "raster": 19092,
+        "prior": 262
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.007,
+        "raster": 0.979,
+        "prior": 0.013
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_la_cisterna",
+      "name": "La Cisterna",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 646691,
+      "total_mb": 13.598,
+      "height_mix": {
+        "measured": 0,
+        "floors": 76,
+        "raster": 37932,
+        "prior": 325
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.002,
+        "raster": 0.99,
+        "prior": 0.008
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_la_florida",
+      "name": "La Florida",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 2816588,
+      "total_mb": 60.143,
+      "height_mix": {
+        "measured": 857,
+        "floors": 2811,
+        "raster": 141575,
+        "prior": 1517
+      },
+      "height_fraction": {
+        "measured": 0.006,
+        "floors": 0.019,
+        "raster": 0.965,
+        "prior": 0.01
+      },
+      "measured_pct": 0.6,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_la_granja",
+      "name": "La Granja",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1500605,
+      "total_mb": 30.11,
+      "height_mix": {
+        "measured": 598,
+        "floors": 177,
+        "raster": 59413,
+        "prior": 397
+      },
+      "height_fraction": {
+        "measured": 0.01,
+        "floors": 0.003,
+        "raster": 0.981,
+        "prior": 0.007
+      },
+      "measured_pct": 1.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_la_pintana",
+      "name": "La Pintana",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1997205,
+      "total_mb": 39.301,
+      "height_mix": {
+        "measured": 20,
+        "floors": 340,
+        "raster": 82569,
+        "prior": 1330
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.004,
+        "raster": 0.98,
+        "prior": 0.016
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_la_reina",
+      "name": "La Reina",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 2006107,
+      "total_mb": 40.479,
+      "height_mix": {
+        "measured": 25,
+        "floors": 3480,
+        "raster": 84911,
+        "prior": 810
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.039,
+        "raster": 0.952,
+        "prior": 0.009
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_las_condes",
+      "name": "Las Condes",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 2048619,
+      "total_mb": 38.325,
+      "height_mix": {
+        "measured": 45,
+        "floors": 2320,
+        "raster": 78139,
+        "prior": 968
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.028,
+        "raster": 0.959,
+        "prior": 0.012
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_lo_barnechea",
+      "name": "Lo Barnechea",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 995501,
+      "total_mb": 16.423,
+      "height_mix": {
+        "measured": 6,
+        "floors": 164,
+        "raster": 42754,
+        "prior": 682
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.004,
+        "raster": 0.98,
+        "prior": 0.016
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_lo_espejo",
+      "name": "Lo Espejo",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 448106,
+      "total_mb": 8.494,
+      "height_mix": {
+        "measured": 11,
+        "floors": 105,
+        "raster": 22610,
+        "prior": 473
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.005,
+        "raster": 0.975,
+        "prior": 0.02
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_lo_prado",
+      "name": "Lo Prado",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 379007,
+      "total_mb": 7.595,
+      "height_mix": {
+        "measured": 4,
+        "floors": 180,
+        "raster": 20694,
+        "prior": 200
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.009,
+        "raster": 0.982,
+        "prior": 0.009
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_macul",
+      "name": "Macul",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 624798,
+      "total_mb": 12.738,
+      "height_mix": {
+        "measured": 31,
+        "floors": 616,
+        "raster": 34893,
+        "prior": 375
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.017,
+        "raster": 0.972,
+        "prior": 0.01
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_maipu",
+      "name": "Maip\u00fa",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 2293805,
+      "total_mb": 52.656,
+      "height_mix": {
+        "measured": 36,
+        "floors": 162,
+        "raster": 127908,
+        "prior": 1664
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.001,
+        "raster": 0.986,
+        "prior": 0.013
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_nunoa",
+      "name": "\u00d1u\u00f1oa",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1077237,
+      "total_mb": 19.987,
+      "height_mix": {
+        "measured": 13,
+        "floors": 7227,
+        "raster": 45539,
+        "prior": 454
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.136,
+        "raster": 0.855,
+        "prior": 0.009
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_padre_hurtado",
+      "name": "Padre Hurtado",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 535928,
+      "total_mb": 11.778,
+      "height_mix": {
+        "measured": 0,
+        "floors": 23,
+        "raster": 33444,
+        "prior": 632
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.001,
+        "raster": 0.981,
+        "prior": 0.019
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_pedro_aguirre_cerda",
+      "name": "Pedro Aguirre Cerda",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 476814,
+      "total_mb": 9.137,
+      "height_mix": {
+        "measured": 11,
+        "floors": 300,
+        "raster": 24511,
+        "prior": 334
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.012,
+        "raster": 0.974,
+        "prior": 0.013
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_penalolen",
+      "name": "Pe\u00f1alol\u00e9n",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1997692,
+      "total_mb": 40.7,
+      "height_mix": {
+        "measured": 7,
+        "floors": 1352,
+        "raster": 89178,
+        "prior": 904
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.015,
+        "raster": 0.975,
+        "prior": 0.01
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_pirque",
+      "name": "Pirque",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 300700,
+      "total_mb": 6.08,
+      "height_mix": {
+        "measured": 3,
+        "floors": 2,
+        "raster": 17196,
+        "prior": 386
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.978,
+        "prior": 0.022
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_providencia",
+      "name": "Providencia",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 750218,
+      "total_mb": 12.428,
+      "height_mix": {
+        "measured": 52,
+        "floors": 5838,
+        "raster": 25485,
+        "prior": 232
+      },
+      "height_fraction": {
+        "measured": 0.002,
+        "floors": 0.185,
+        "raster": 0.806,
+        "prior": 0.007
+      },
+      "measured_pct": 0.2,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_pudahuel",
+      "name": "Pudahuel",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 951830,
+      "total_mb": 19.954,
+      "height_mix": {
+        "measured": 2,
+        "floors": 387,
+        "raster": 55042,
+        "prior": 906
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.007,
+        "raster": 0.977,
+        "prior": 0.016
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_puente_alto",
+      "name": "Puente Alto",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 2287955,
+      "total_mb": 48.669,
+      "height_mix": {
+        "measured": 29,
+        "floors": 166,
+        "raster": 113367,
+        "prior": 1277
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.001,
+        "raster": 0.987,
+        "prior": 0.011
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_quilicura",
+      "name": "Quilicura",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1615761,
+      "total_mb": 31.991,
+      "height_mix": {
+        "measured": 1,
+        "floors": 311,
+        "raster": 65261,
+        "prior": 1798
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.005,
+        "raster": 0.969,
+        "prior": 0.027
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_quinta_normal",
+      "name": "Quinta Normal",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 712243,
+      "total_mb": 14.287,
+      "height_mix": {
+        "measured": 6,
+        "floors": 99,
+        "raster": 39468,
+        "prior": 264
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.002,
+        "raster": 0.991,
+        "prior": 0.007
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_recoleta",
+      "name": "Recoleta",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1143036,
+      "total_mb": 20.674,
+      "height_mix": {
+        "measured": 76,
+        "floors": 2034,
+        "raster": 53052,
+        "prior": 556
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.037,
+        "raster": 0.952,
+        "prior": 0.01
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_renca",
+      "name": "Renca",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 2487949,
+      "total_mb": 49.479,
+      "height_mix": {
+        "measured": 2,
+        "floors": 492,
+        "raster": 111422,
+        "prior": 1632
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.004,
+        "raster": 0.981,
+        "prior": 0.014
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_san_bernardo",
+      "name": "San Bernardo",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 2144325,
+      "total_mb": 41.527,
+      "height_mix": {
+        "measured": 24,
+        "floors": 135,
+        "raster": 88903,
+        "prior": 1402
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.001,
+        "raster": 0.983,
+        "prior": 0.015
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_san_joaquin",
+      "name": "San Joaqu\u00edn",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 933560,
+      "total_mb": 18.875,
+      "height_mix": {
+        "measured": 469,
+        "floors": 608,
+        "raster": 51213,
+        "prior": 469
+      },
+      "height_fraction": {
+        "measured": 0.009,
+        "floors": 0.012,
+        "raster": 0.971,
+        "prior": 0.009
+      },
+      "measured_pct": 0.9,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_san_jose_de_maipo",
+      "name": "San Jos\u00e9 de Maipo",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 81232,
+      "total_mb": 1.27,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 3395,
+        "prior": 117
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.967,
+        "prior": 0.033
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_san_miguel",
+      "name": "San Miguel",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 746383,
+      "total_mb": 15.365,
+      "height_mix": {
+        "measured": 17,
+        "floors": 287,
+        "raster": 42456,
+        "prior": 318
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.007,
+        "raster": 0.986,
+        "prior": 0.007
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_san_ramon",
+      "name": "San Ram\u00f3n",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 793728,
+      "total_mb": 16.065,
+      "height_mix": {
+        "measured": 47,
+        "floors": 76,
+        "raster": 46988,
+        "prior": 232
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.002,
+        "raster": 0.993,
+        "prior": 0.005
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_santiago",
+      "name": "Santiago",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1149385,
+      "total_mb": 20.485,
+      "height_mix": {
+        "measured": 772,
+        "floors": 2024,
+        "raster": 50548,
+        "prior": 500
+      },
+      "height_fraction": {
+        "measured": 0.014,
+        "floors": 0.038,
+        "raster": 0.939,
+        "prior": 0.009
+      },
+      "measured_pct": 1.4,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "stgo_vitacura",
+      "name": "Vitacura",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 1803734,
+      "total_mb": 31.52,
+      "height_mix": {
+        "measured": 135,
+        "floors": 2997,
+        "raster": 56920,
+        "prior": 794
+      },
+      "height_fraction": {
+        "measured": 0.002,
+        "floors": 0.049,
+        "raster": 0.935,
+        "prior": 0.013
+      },
+      "measured_pct": 0.2,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "sydney_cbd",
+      "name": "Sydney CBD",
+      "tier": "B",
+      "country": "Australia",
+      "n_layers": 7,
+      "total_triangles": 250063,
+      "total_mb": 1.879,
+      "height_mix": {
+        "measured": 185,
+        "floors": 2110,
+        "raster": 0,
+        "prior": 605
+      },
+      "height_fraction": {
+        "measured": 0.064,
+        "floors": 0.728,
+        "raster": 0.0,
+        "prior": 0.209
+      },
+      "measured_pct": 6.4,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "tokyo_full",
+      "name": "Tokyo (metro core)",
+      "tier": "B",
+      "country": "Japan",
+      "n_layers": 7,
+      "total_triangles": 3884947,
+      "total_mb": 68.699,
+      "height_mix": {
+        "measured": 3509,
+        "floors": 11295,
+        "raster": 0,
+        "prior": 158847
+      },
+      "height_fraction": {
+        "measured": 0.02,
+        "floors": 0.065,
+        "raster": 0.0,
+        "prior": 0.915
+      },
+      "measured_pct": 2.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "toronto_downtown",
+      "name": "Toronto Downtown",
+      "tier": "B",
+      "country": "Canada",
+      "n_layers": 7,
+      "total_triangles": 259608,
+      "total_mb": 1.746,
+      "height_mix": {
+        "measured": 539,
+        "floors": 762,
+        "raster": 0,
+        "prior": 839
+      },
+      "height_fraction": {
+        "measured": 0.252,
+        "floors": 0.356,
+        "raster": 0.0,
+        "prior": 0.392
+      },
+      "measured_pct": 25.2,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "valdivia",
+      "name": "Valdivia",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 6,
+      "total_triangles": 289811,
+      "total_mb": 5.995,
+      "height_mix": {
+        "measured": 18,
+        "floors": 429,
+        "raster": 16536,
+        "prior": 237
+      },
+      "height_fraction": {
+        "measured": 0.001,
+        "floors": 0.025,
+        "raster": 0.96,
+        "prior": 0.014
+      },
+      "measured_pct": 0.1,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "valparaiso",
+      "name": "Valparaiso",
+      "tier": "B",
+      "country": "Chile",
+      "n_layers": 4,
+      "total_triangles": 221109,
+      "total_mb": 4.204,
+      "height_mix": {
+        "measured": 321,
+        "floors": 297,
+        "raster": 11465,
+        "prior": 166
+      },
+      "height_fraction": {
+        "measured": 0.026,
+        "floors": 0.024,
+        "raster": 0.936,
+        "prior": 0.014
+      },
+      "measured_pct": 2.6,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "venice",
+      "name": "Venice",
+      "tier": "B",
+      "country": "Italy",
+      "n_layers": 4,
+      "total_triangles": 353810,
+      "total_mb": 3.381,
+      "height_mix": {
+        "measured": 1536,
+        "floors": 1563,
+        "raster": 0,
+        "prior": 2884
+      },
+      "height_fraction": {
+        "measured": 0.257,
+        "floors": 0.261,
+        "raster": 0.0,
+        "prior": 0.482
+      },
+      "measured_pct": 25.7,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "angkor_wat",
+      "name": "Angkor Wat",
+      "tier": "C",
+      "country": "Cambodia",
+      "n_layers": 2,
+      "total_triangles": 12606,
+      "total_mb": 0.058,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "chuquicamata",
+      "name": "Chuquicamata Mine",
+      "tier": "C",
+      "country": "Chile",
+      "n_layers": 2,
+      "total_triangles": 25179,
+      "total_mb": 0.103,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "giza_pyramids",
+      "name": "Giza Pyramids",
+      "tier": "C",
+      "country": "Egypt",
+      "n_layers": 2,
+      "total_triangles": 9882,
+      "total_mb": 0.05,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "grand_canyon",
+      "name": "Grand Canyon (South Rim)",
+      "tier": "C",
+      "country": "USA",
+      "n_layers": 2,
+      "total_triangles": 23151,
+      "total_mb": 0.091,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "great_wall",
+      "name": "Great Wall (Badaling)",
+      "tier": "C",
+      "country": "China",
+      "n_layers": 2,
+      "total_triangles": 25448,
+      "total_mb": 0.103,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "halong_bay",
+      "name": "Ha Long Bay",
+      "tier": "C",
+      "country": "Vietnam",
+      "n_layers": 2,
+      "total_triangles": 2064,
+      "total_mb": 0.011,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "iguazu",
+      "name": "Iguazu Falls",
+      "tier": "C",
+      "country": "Argentina",
+      "n_layers": 2,
+      "total_triangles": 10048,
+      "total_mb": 0.043,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "machu_picchu",
+      "name": "Machu Picchu",
+      "tier": "C",
+      "country": "Peru",
+      "n_layers": 2,
+      "total_triangles": 13943,
+      "total_mb": 0.055,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "matterhorn",
+      "name": "Matterhorn (Zermatt)",
+      "tier": "C",
+      "country": "Switzerland",
+      "n_layers": 2,
+      "total_triangles": 18693,
+      "total_mb": 0.071,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "mont_blanc",
+      "name": "Mont Blanc",
+      "tier": "C",
+      "country": "France",
+      "n_layers": 1,
+      "total_triangles": 17737,
+      "total_mb": 0.065,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "monument_valley",
+      "name": "Monument Valley",
+      "tier": "C",
+      "country": "USA",
+      "n_layers": 2,
+      "total_triangles": 19452,
+      "total_mb": 0.075,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "mount_fuji",
+      "name": "Mount Fuji",
+      "tier": "C",
+      "country": "Japan",
+      "n_layers": 2,
+      "total_triangles": 20558,
+      "total_mb": 0.079,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "petra",
+      "name": "Petra",
+      "tier": "C",
+      "country": "Jordan",
+      "n_layers": 2,
+      "total_triangles": 15632,
+      "total_mb": 0.057,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "torres_paine",
+      "name": "Torres del Paine",
+      "tier": "C",
+      "country": "Chile",
+      "n_layers": 1,
+      "total_triangles": 17764,
+      "total_mb": 0.064,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "uluru",
+      "name": "Uluru",
+      "tier": "C",
+      "country": "Australia",
+      "n_layers": 2,
+      "total_triangles": 5300,
+      "total_mb": 0.023,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "valle_luna",
+      "name": "Valle de la Luna (Atacama)",
+      "tier": "C",
+      "country": "Chile",
+      "n_layers": 2,
+      "total_triangles": 17616,
+      "total_mb": 0.064,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "victoria_falls",
+      "name": "Victoria Falls",
+      "tier": "C",
+      "country": "Zimbabwe",
+      "n_layers": 2,
+      "total_triangles": 16347,
+      "total_mb": 0.071,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
+    },
+    {
+      "slug": "yosemite_valley",
+      "name": "Yosemite Valley",
+      "tier": "C",
+      "country": "USA",
+      "n_layers": 2,
+      "total_triangles": 20456,
+      "total_mb": 0.079,
+      "height_mix": {
+        "measured": 0,
+        "floors": 0,
+        "raster": 0,
+        "prior": 0
+      },
+      "height_fraction": {
+        "measured": 0.0,
+        "floors": 0.0,
+        "raster": 0.0,
+        "prior": 0.0
+      },
+      "measured_pct": 0.0,
+      "any_noncommercial": false,
+      "ground_truth": null
     }
   ]
 }
