@@ -36,13 +36,13 @@ export const ATTRIBUTES: AttrSpec[] = [
   { key: 'height', en: 'Height', es: 'Altura', kind: 'numeric', unit: 'm', value: (f) => f.height_m },
   { key: 'provenance', en: 'Height provenance', es: 'Procedencia', kind: 'categorical', value: (f) => f.height_source },
   { key: 'floors', en: 'Floors', es: 'Pisos', kind: 'numeric', value: (f) => f.num_floors ?? null },
-  { key: 'area', en: 'Footprint area', es: 'Area de huella', kind: 'numeric', unit: 'm2', value: (f) => f.area_m2 ?? null },
-  { key: 'use', en: 'Function', es: 'Funcion', kind: 'categorical', value: (f) => f.use ?? null },
+  { key: 'area', en: 'Footprint area', es: 'Área de huella', kind: 'numeric', unit: 'm2', value: (f) => f.area_m2 ?? null },
+  { key: 'use', en: 'Function', es: 'Función', kind: 'categorical', value: (f) => f.use ?? null },
   { key: 'landuse', en: 'Land cover', es: 'Cobertura', kind: 'categorical', value: (f) => (f.class != null ? String(f.class) : null) },
   // Fused topic modalities (shown only where the source covers the place - attributes() filters no-data specs).
   { key: 'solar', en: 'Solar (GHI)', es: 'Solar (GHI)', kind: 'numeric', unit: 'kWh/m2/d', value: (f) => f.solar_ghi ?? null, modality: true },
   { key: 'soil', en: 'Soil carbon', es: 'Carbono suelo', kind: 'numeric', unit: 'g/kg', value: (f) => f.soil_soc ?? null, modality: true },
-  { key: 'ndvi', en: 'Vegetation (NDVI)', es: 'Vegetacion (NDVI)', kind: 'numeric', unit: '', value: (f) => f.ndvi ?? null, modality: true },
+  { key: 'ndvi', en: 'Vegetation (NDVI)', es: 'Vegetación (NDVI)', kind: 'numeric', unit: '', value: (f) => f.ndvi ?? null, modality: true },
   { key: 'ndwi', en: 'Water (NDWI)', es: 'Agua (NDWI)', kind: 'numeric', unit: '', value: (f) => f.ndwi ?? null, modality: true },
   { key: 'ndbi', en: 'Built-up (NDBI)', es: 'Construido (NDBI)', kind: 'numeric', unit: '', value: (f) => f.ndbi ?? null, modality: true },
 ];

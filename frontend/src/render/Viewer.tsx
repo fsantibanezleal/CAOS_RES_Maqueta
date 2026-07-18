@@ -270,7 +270,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
             <p className="mq-sub">
               {t(
                 'Solar-energy potential and climate normals sampled at this place. These are near-constant across the area; aggregate them by sub-area below to compare comunas.',
-                'Potencial de energía solar y normales climaticas muestreadas en este lugar. Son casi constantes en el area; agregalas por sub-area mas abajo para comparar comunas.',
+                'Potencial de energía solar y normales climáticas muestreadas en este lugar. Son casi constantes en el área; agregarlas por subárea más abajo permite comparar comunas.',
               )}
             </p>
             <div className="mq-envgrid">
@@ -339,16 +339,16 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
           })}
         </Section>
 
-        <Section title={t('Area statistics', 'Estadisticas de area')} defaultOpen={false}>
+        <Section title={t('Area statistics', 'Estadísticas de área')} defaultOpen={false}>
           <p className="mq-sub">
             {t(
               'Summarize the fused building attributes over any sub-area: draw a polygon (a barrio, a block, a corridor) or take the whole place.',
-              'Resume los atributos fusionados de los edificios en cualquier sub-area: dibuja un poligono (un barrio, una manzana, un corredor) o toma todo el lugar.',
+              'Resumir los atributos fusionados de los edificios en cualquier subárea: dibujar un polígono (un barrio, una manzana, un corredor) o tomar todo el lugar.',
             )}
           </p>
           <div className="mq-seg">
             {!areaMode ? (
-              <button onClick={startArea}>{t('Draw area', 'Dibujar area')}</button>
+              <button onClick={startArea}>{t('Draw area', 'Dibujar área')}</button>
             ) : (
               <button className="on" onClick={finishArea} disabled={areaCount < 3}>
                 {t('Finish', 'Terminar')} ({areaCount})
@@ -361,18 +361,18 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
             <p className="mq-sub mq-warn">
               {t(
                 'Click on the map to drop points around the area, then Finish (min 3 points). Zoom with the wheel.',
-                'Haz clic en el mapa para marcar puntos alrededor del area, luego Terminar (min 3 puntos). Zoom con la rueda.',
+                'Hacer clic en el mapa para marcar puntos alrededor del área, luego Terminar (mín. 3 puntos). Zoom con la rueda.',
               )}
             </p>
           )}
         </Section>
 
         {adminUnits.length > 0 && (
-          <Section title={t('Aggregate by admin area', 'Agregar por area administrativa')} defaultOpen={false}>
+          <Section title={t('Aggregate by admin area', 'Agregar por área administrativa')} defaultOpen={false}>
             <p className="mq-sub">
               {t(
                 `${adminUnits.length} sub-areas (comunas / districts). Choose a layer to colour every unit and read the ranked table: building averages, geophysical environment (solar / climate), or socio-economic indicators.`,
-                `${adminUnits.length} sub-areas (comunas / distritos). Seleccionar una capa para colorear cada unidad y leer la tabla ordenada: promedios de edificios, ambiente geofisico (solar / clima), o indicadores socioeconomicos.`,
+                `${adminUnits.length} subáreas (comunas / distritos). Seleccionar una capa para colorear cada unidad y leer la tabla ordenada: promedios de edificios, ambiente geofísico (solar / clima), o indicadores socioeconómicos.`,
               )}
             </p>
             <span className="mq-sub mq-agg-group">{t('Building averages', 'Promedios de edificios')}</span>
@@ -417,7 +417,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
                 <table className="mq-admin-table">
                   <thead>
                     <tr>
-                      <th>{t('Area', 'Area')}</th>
+                      <th>{t('Area', 'Área')}</th>
                       <th>{adminAttrMeta(adminAttr).label} {adminAttrMeta(adminAttr).unit}</th>
                       <th>n</th>
                     </tr>
@@ -447,12 +447,12 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
             <input type="checkbox" checked={imagery} onChange={(e) => { setImagery(e.target.checked); sceneRef.current?.setTerrainImagery(e.target.checked); }} />
             {t('Satellite imagery (Sentinel-2)', 'Imagen satelital (Sentinel-2)')}
           </label>
-          <label className="mq-slider">{t('Neon / glow', 'Neon / brillo')}
+          <label className="mq-slider">{t('Neon / glow', 'Neón / brillo')}
             <input type="range" min={0} max={2} step={0.05} value={neon} onChange={(e) => { setNeon(+e.target.value); sceneRef.current?.setNeon(+e.target.value); }} />
           </label>
-          <label className="mq-chip"><input type="checkbox" checked={animate} onChange={(e) => { setAnimate(e.target.checked); sceneRef.current?.setAnimate(e.target.checked); }} />{t('Pulse animation', 'Animacion de pulso')}</label>
+          <label className="mq-chip"><input type="checkbox" checked={animate} onChange={(e) => { setAnimate(e.target.checked); sceneRef.current?.setAnimate(e.target.checked); }} />{t('Pulse animation', 'Animación de pulso')}</label>
           <label className="mq-chip"><input type="checkbox" checked={edges} onChange={(e) => { setEdgesState(e.target.checked); sceneRef.current?.setEdges(e.target.checked); }} />{t('Wireframe (building edges)', 'Malla (bordes de edificios)')}</label>
-          {edgesLarge && <p className="mq-sub">{t('Large scene: edges are off by default for a fast load; enable to read building shape (may take a moment).', 'Escena grande: la malla viene apagada para cargar rápido; actívala para ver la forma de los edificios (puede tardar un momento).')}</p>}
+          {edgesLarge && <p className="mq-sub">{t('Large scene: edges are off by default for a fast load; enable to read building shape (may take a moment).', 'Escena grande: la malla viene apagada para cargar rápido; activarla muestra la forma de los edificios (puede tardar un momento).')}</p>}
         </Section>
       </aside>
       )}
@@ -564,29 +564,29 @@ function AreaStatsPanel({ stats, scope, onClose, lang }: { stats: AreaStats; sco
   return (
     <div className="mq-areastats">
       <div className="mq-as-head">
-        <b>{scope === 'place' ? t('Whole place', 'Todo el lugar') : t('Drawn area', 'Area dibujada')}</b>
+        <b>{scope === 'place' ? t('Whole place', 'Todo el lugar') : t('Drawn area', 'Área dibujada')}</b>
         <span className="mq-as-count">{fmtInt(stats.count)} {t('buildings', 'edificios')}</span>
         <button className="mq-as-close" onClick={onClose} title={t('Clear', 'Limpiar')}>✕</button>
       </div>
       {stats.count === 0 ? (
-        <p className="mq-sub">{t('No buildings inside this area.', 'No hay edificios dentro de esta area.')}</p>
+        <p className="mq-sub">{t('No buildings inside this area.', 'No hay edificios dentro de esta área.')}</p>
       ) : (
         <>
           <div className="mq-as-grid">
-            {scope === 'polygon' && <Stat label={t('Area', 'Area')} value={fmtArea(stats.polygonAreaM2)} />}
+            {scope === 'polygon' && <Stat label={t('Area', 'Área')} value={fmtArea(stats.polygonAreaM2)} />}
             <Stat label={t('Footprint', 'Huella')} value={fmtArea(stats.footprintAreaM2)} />
             {scope === 'polygon' && <Stat label={t('Built cover', 'Cobertura')} value={`${Math.round(stats.coverageRatio * 100)}%`} />}
             {scope === 'polygon' && <Stat label={t('Density', 'Densidad')} value={`${fmtInt(stats.densityPerKm2)}/km2`} />}
             <Stat label={t('Built volume', 'Volumen')} value={`${fmtInt(stats.builtVolumeM3 / 1e6)} Mm3`} />
             {stats.height && <Stat label={t('Mean height', 'Altura media')} value={`${stats.height.mean.toFixed(1)} m`} />}
             {stats.height && <Stat label={t('Median h.', 'Mediana h.')} value={`${stats.height.median.toFixed(1)} m`} />}
-            {stats.height && <Stat label={t('Tallest', 'Mas alto')} value={`${stats.height.max.toFixed(0)} m`} />}
+            {stats.height && <Stat label={t('Tallest', 'Más alto')} value={`${stats.height.max.toFixed(0)} m`} />}
             {stats.floors && <Stat label={t('Mean floors', 'Pisos medio')} value={stats.floors.mean.toFixed(1)} />}
           </div>
 
           {stats.height && (
             <div className="mq-as-block">
-              <span className="mq-sub">{t('Height distribution (m)', 'Distribucion de altura (m)')}</span>
+              <span className="mq-sub">{t('Height distribution (m)', 'Distribución de altura (m)')}</span>
               <div className="mq-as-hist">
                 {stats.heightHist.map((b) => (
                   <div key={b.label} className="mq-as-bar" title={`${b.label} m: ${b.count}`}>
@@ -599,7 +599,7 @@ function AreaStatsPanel({ stats, scope, onClose, lang }: { stats: AreaStats; sco
           )}
 
           <div className="mq-as-block">
-            <span className="mq-sub">{t('Function', 'Funcion')}</span>
+            <span className="mq-sub">{t('Function', 'Función')}</span>
             <MixBar bins={stats.functionMix} total={stats.count} />
           </div>
           <div className="mq-as-block">

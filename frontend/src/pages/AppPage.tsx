@@ -28,11 +28,11 @@ function placeKind(p: PlaceEntry): string {
 }
 const KIND_ORDER = ['metrocore', 'santiago', 'metro', 'city', 'mining', 'landscape'];
 const KIND_LABEL: Record<string, [string, string]> = {
-  metrocore: ['Metro cores (aggregate by sub-area)', 'Nucleos metro (agregar por sub-area)'],
+  metrocore: ['Metro cores (aggregate by sub-area)', 'Núcleos metro (agregar por subárea)'],
   santiago: ['Santiago (comunas)', 'Santiago (comunas)'],
   metro: ['Major cities', 'Grandes ciudades'],
   city: ['Cities', 'Ciudades'],
-  mining: ['Mining', 'Mineria'],
+  mining: ['Mining', 'Minería'],
   landscape: ['Terrain & landscapes', 'Terreno y paisajes'],
 };
 
@@ -99,7 +99,7 @@ export default function AppPage() {
           <p className="mq-error">
             {t('Could not load this place.', 'No se pudo cargar este lugar.')} <code>{manifestErr}</code>
           </p>
-          <p className="mq-sub">{t('Pick another place from the selector above.', 'Elige otro lugar en el selector de arriba.')}</p>
+          <p className="mq-sub">{t('Pick another place from the selector above.', 'Seleccionar otro lugar en el selector de arriba.')}</p>
         </div>
       ) : (
         <div className="mq-canvas mq-canvas-empty">{t('Loading...', 'Cargando...')}</div>
@@ -167,7 +167,7 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && filtered[0]) pick(filtered[0].slug); }}
-            placeholder={t(`Search ${places.length} places (city, country, landmark)`, `Buscar ${places.length} lugares (ciudad, pais, hito)`)}
+            placeholder={t(`Search ${places.length} places (city, country, landmark)`, `Buscar ${places.length} lugares (ciudad, país, hito)`)}
           />
           <div className="mq-picker-list">
             {conts.length === 0 && <p className="mq-picker-empty">{t('No match', 'Sin coincidencias')}</p>}
@@ -217,7 +217,7 @@ function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en'
       <p>
         {t(
           `A real reconstruction of ${a.name}, ${a.size_m[0].toFixed(0)} x ${a.size_m[1].toFixed(0)} m (origin ${a.origin_wgs84[1].toFixed(4)}, ${a.origin_wgs84[0].toFixed(4)}), fused offline from open public geodata. Every layer records its source, license and fetch date; every building records where its height came from. Use the panel to toggle each source layer, recolour buildings by height / provenance / land use, filter by height or provenance, and click a building to select it.`,
-          `Una reconstrucción real de ${a.name}, ${a.size_m[0].toFixed(0)} x ${a.size_m[1].toFixed(0)} m (origen ${a.origin_wgs84[1].toFixed(4)}, ${a.origin_wgs84[0].toFixed(4)}), fusionada offline a partir de geodatos públicos abiertos. Cada capa registra su fuente, licencia y fecha; cada edificio registra de dónde viene su altura. Usa el panel para activar cada capa fuente, recolorear edificios por altura / procedencia / uso de suelo, filtrar por altura o procedencia, y hacer clic en un edificio para seleccionarlo.`,
+          `Una reconstrucción real de ${a.name}, ${a.size_m[0].toFixed(0)} x ${a.size_m[1].toFixed(0)} m (origen ${a.origin_wgs84[1].toFixed(4)}, ${a.origin_wgs84[0].toFixed(4)}), fusionada offline a partir de geodatos públicos abiertos. Cada capa registra su fuente, licencia y fecha; cada edificio registra de dónde viene su altura. El panel permite activar cada capa fuente, recolorear edificios por altura / procedencia / uso de suelo, filtrar por altura o procedencia, y hacer clic en un edificio para seleccionarlo.`,
         )}
       </p>
       <div className="mq-ctx-stats">
@@ -287,18 +287,18 @@ function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en'
           <span key={s}><i style={{ background: rgbCss(PROVENANCE[s].rgb) }} />{PROVENANCE[s][lang]}: <b>{((mix[s] ?? 0) / totalB * 100).toFixed(0)}%</b> <span className="mq-muted">({mix[s] ?? 0})</span></span>
         ))}
       </div>
-      <p className="mq-muted">{t('Colour buildings by "Provenance" in the panel to see this in 3D: green = measured, blue = from floor count, amber = height raster, grey = default. Measured and inferred are never conflated.', 'Colorea los edificios por "Procedencia" en el panel para verlo en 3D: verde = medido, azul = por pisos, ámbar = raster, gris = por defecto. Lo medido y lo inferido nunca se confunden.')}</p>
+      <p className="mq-muted">{t('Colour buildings by "Provenance" in the panel to see this in 3D: green = measured, blue = from floor count, amber = height raster, grey = default. Measured and inferred are never conflated.', 'Colorear los edificios por "Procedencia" en el panel lo muestra en 3D: verde = medido, azul = por pisos, ámbar = raster, gris = por defecto. Lo medido y lo inferido nunca se confunden.')}</p>
     </div>
   );
   const howto = (
     <div className="mq-ctx-body">
       <ul className="mq-howto">
-        <li>{t('Drag to orbit, scroll to zoom; use the Aerial / Oblique / Street camera presets.', 'Arrastrar para orbitar, rueda para acercar; usa los presets Cenital / Oblicua / Calle.')}</li>
-        <li>{t('Toggle each fused source layer (terrain, buildings, roads, water, green, rail, population).', 'Activa cada capa fuente (relieve, edificios, calles, agua, verde, vías, población).')}</li>
-        <li>{t('Recolour buildings by Height, Provenance or Land use; the legend updates.', 'Recolorea edificios por Altura, Procedencia o Uso de suelo; la leyenda se actualiza.')}</li>
-        <li>{t('Filter buildings by a height range, or by which sources their height came from.', 'Filtra edificios por rango de altura, o por la fuente de su altura.')}</li>
-        <li>{t('Click a building: it highlights in cyan and the detail panel shows its height, provenance and land use.', 'Haz clic en un edificio: se resalta en cian y el panel muestra su altura, procedencia y uso de suelo.')}</li>
-        <li>{t('Raise Neon / glow and enable the pulse for the animated identity.', 'Sube Neón / brillo y activa el pulso para la identidad animada.')}</li>
+        <li>{t('Drag to orbit, scroll to zoom; use the Aerial / Oblique / Street camera presets.', 'Arrastrar para orbitar, rueda para acercar; usar los presets Cenital / Oblicua / Calle.')}</li>
+        <li>{t('Toggle each fused source layer (terrain, buildings, roads, water, green, rail, population).', 'Activar cada capa fuente (relieve, edificios, calles, agua, verde, vías, población).')}</li>
+        <li>{t('Recolour buildings by Height, Provenance or Land use; the legend updates.', 'Recolorear edificios por Altura, Procedencia o Uso de suelo; la leyenda se actualiza.')}</li>
+        <li>{t('Filter buildings by a height range, or by which sources their height came from.', 'Filtrar edificios por rango de altura, o por la fuente de su altura.')}</li>
+        <li>{t('Click a building: it highlights in cyan and the detail panel shows its height, provenance and land use.', 'Al hacer clic en un edificio se resalta en cian y el panel muestra su altura, procedencia y uso de suelo.')}</li>
+        <li>{t('Raise Neon / glow and enable the pulse for the animated identity.', 'Subir Neón / brillo y activar el pulso para la identidad animada.')}</li>
       </ul>
     </div>
   );
