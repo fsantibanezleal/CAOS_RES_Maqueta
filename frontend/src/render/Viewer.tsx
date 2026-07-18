@@ -270,7 +270,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
             <p className="mq-sub">
               {t(
                 'Solar-energy potential and climate normals sampled at this place. These are near-constant across the area; aggregate them by sub-area below to compare comunas.',
-                'Potencial de energia solar y normales climaticas muestreadas en este lugar. Son casi constantes en el area; agregalas por sub-area mas abajo para comparar comunas.',
+                'Potencial de energía solar y normales climaticas muestreadas en este lugar. Son casi constantes en el area; agregalas por sub-area mas abajo para comparar comunas.',
               )}
             </p>
             <div className="mq-envgrid">
@@ -372,7 +372,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
             <p className="mq-sub">
               {t(
                 `${adminUnits.length} sub-areas (comunas / districts). Choose a layer to colour every unit and read the ranked table: building averages, geophysical environment (solar / climate), or socio-economic indicators.`,
-                `${adminUnits.length} sub-areas (comunas / distritos). Elige una capa para colorear cada unidad y leer la tabla ordenada: promedios de edificios, ambiente geofisico (solar / clima), o indicadores socioeconomicos.`,
+                `${adminUnits.length} sub-areas (comunas / distritos). Seleccionar una capa para colorear cada unidad y leer la tabla ordenada: promedios de edificios, ambiente geofisico (solar / clima), o indicadores socioeconomicos.`,
               )}
             </p>
             <span className="mq-sub mq-agg-group">{t('Building averages', 'Promedios de edificios')}</span>
@@ -452,7 +452,7 @@ export function Viewer({ baseUrl, manifest, lang }: { baseUrl: string; manifest:
           </label>
           <label className="mq-chip"><input type="checkbox" checked={animate} onChange={(e) => { setAnimate(e.target.checked); sceneRef.current?.setAnimate(e.target.checked); }} />{t('Pulse animation', 'Animacion de pulso')}</label>
           <label className="mq-chip"><input type="checkbox" checked={edges} onChange={(e) => { setEdgesState(e.target.checked); sceneRef.current?.setEdges(e.target.checked); }} />{t('Wireframe (building edges)', 'Malla (bordes de edificios)')}</label>
-          {edgesLarge && <p className="mq-sub">{t('Large scene: edges are off by default for a fast load; enable to read building shape (may take a moment).', 'Escena grande: la malla viene apagada para cargar rapido; actívala para ver la forma de los edificios (puede tardar un momento).')}</p>}
+          {edgesLarge && <p className="mq-sub">{t('Large scene: edges are off by default for a fast load; enable to read building shape (may take a moment).', 'Escena grande: la malla viene apagada para cargar rápido; actívala para ver la forma de los edificios (puede tardar un momento).')}</p>}
         </Section>
       </aside>
       )}

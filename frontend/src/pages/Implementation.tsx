@@ -37,10 +37,10 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
         <Cite id="overture" /> <Cite id="sentinel2" /> <Cite id="pvgis" /> <Cite id="geoboundaries" />
       </p>
       <Figure caption={t('Two lanes: a heavy offline bake (fetch, fuse, mesh, analytical layers, meshopt) and a light static replay. The manifest is the contract between them.',
-        'Dos carriles: un horneado offline pesado (descarga, fusion, malla, capas analiticas, meshopt) y una reproduccion estatica ligera. El manifiesto es el contrato entre ambos.')}>
+        'Dos carriles: un precálculo offline pesado (descarga, fusion, malla, capas analiticas, meshopt) y una reproduccion estatica ligera. El manifiesto es el contrato entre ambos.')}>
         <svg className="mq-fig-svg" viewBox="0 0 640 200" role="img" preserveAspectRatio="xMidYMid meet">
           <rect className="f-grid" x="8" y="12" width="624" height="86" rx="8" />
-          <text className="f-mu" x="18" y="28">{t('offline bake lane (geoscena + maquetalab)', 'carril de horneado offline (geoscena + maquetalab)')}</text>
+          <text className="f-mu" x="18" y="28">{t('offline bake lane (geoscena + maquetalab)', 'carril de precálculo offline (geoscena + maquetalab)')}</text>
           {[
             { x: 18, en: 'fetch modalities', es: 'descarga modalidades' },
             { x: 152, en: 'fuse (height ladder)', es: 'fusion (escalera)' },
@@ -69,22 +69,22 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
 
   const CONTRACTS: ReactNode = (
     <div className="mq-method">
-      <p>{t('Two contracts keep every number auditable end to end.', 'Dos contratos mantienen cada numero auditable de extremo a extremo.')}</p>
+      <p>{t('Two contracts keep every number auditable end to end.', 'Dos contratos mantienen cada número auditable de extremo a extremo.')}</p>
       <ul>
         <li>
           <b>{t('Ingestion (source -> pipeline)', 'Ingesta (fuente -> pipeline)')}</b>:{' '}
           {t('each fetcher returns geometry/raster PLUS a LayerProvenance (source, URL, license, fetch date, method). No layer, and no analytical value, enters without it.',
-            'cada fetcher devuelve geometria/raster MAS una LayerProvenance (fuente, URL, licencia, fecha, metodo). Ninguna capa, ni valor analitico, entra sin ella.')}
+            'cada fetcher devuelve geometría/raster MAS una LayerProvenance (fuente, URL, licencia, fecha, método). Ninguna capa, ni valor analitico, entra sin ella.')}
         </li>
         <li>
           <b>{t('Artifact (pipeline -> web)', 'Artefacto (pipeline -> web)')}</b>:{' '}
           {t('the SceneBundle manifest.json, a versioned schema carrying layers, modalities, the environment block and credits. A TypeScript type mirrors it in the frontend, so a schema drift fails the web build.',
-            'el manifest.json del SceneBundle, un esquema versionado que lleva capas, modalidades, el bloque de ambiente y creditos. Un tipo TypeScript lo espeja en el frontend, asi una deriva de esquema rompe el build.')}
+            'el manifest.json del SceneBundle, un esquema versionado que lleva capas, modalidades, el bloque de ambiente y creditos. Un tipo TypeScript lo espeja en el frontend, así una deriva de esquema rompe el build.')}
         </li>
       </ul>
       <Callout variant="strong" title={t('Honesty by construction', 'Honestidad por construccion')}>
         {t('Because the web can only read a shape the pipeline actually produces, and every value carries its source, the app can never silently ship a fabricated or unsourced number.',
-          'Como la web solo puede leer una forma que el pipeline realmente produce, y cada valor lleva su fuente, la app nunca puede publicar en silencio un numero inventado o sin fuente.')}
+          'Como la web solo puede leer una forma que el pipeline realmente produce, y cada valor lleva su fuente, la app nunca puede publicar en silencio un número inventado o sin fuente.')}
       </Callout>
     </div>
   );
@@ -94,7 +94,7 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
       <p>
         {t(
           'The frontend (React + Three.js over the shared @fasl-work/caos-app-shell) is a read-only projection of the audited baked bundles. It loads each .glb with GLTFLoader, registers the meshopt decoder, applies the scene materials, and picks by raycast reading the _featureid vertex attribute to resolve a building and read its fused attributes. The control panel drives colour-by, per-attribute filters, the area-statistics tool, the satellite drape, and the aggregate-by-admin-area choropleth. The render loop is paused by default and halts on a hidden tab, so there is no compute bomb.',
-          'El frontend (React + Three.js sobre el shell compartido @fasl-work/caos-app-shell) es una proyeccion de solo lectura de los bundles horneados y auditados. Carga cada .glb con GLTFLoader, registra el decodificador meshopt, aplica los materiales de la escena, y hace picking por raycast leyendo el atributo de vertice _featureid para resolver un edificio y leer sus atributos fusionados. El panel de control maneja el coloreo, los filtros por atributo, la herramienta de estadisticas de area, el drapeado satelital, y el coropleto de agregar por area administrativa. El bucle de render esta pausado por defecto y se detiene con la pestana oculta, asi no hay bomba de computo.',
+          'El frontend (React + Three.js sobre el shell compartido @fasl-work/caos-app-shell) es una proyeccion de solo lectura de los bundles precalculados y auditados. Carga cada .glb con GLTFLoader, registra el decodificador meshopt, aplica los materiales de la escena, y hace picking por raycast leyendo el atributo de vertice _featureid para resolver un edificio y leer sus atributos fusionados. El panel de control maneja el coloreo, los filtros por atributo, la herramienta de estadisticas de area, el drapeado satelital, y el coropleto de agregar por area administrativa. El bucle de render esta pausado por defecto y se detiene con la pestana oculta, así no hay bomba de computo.',
         )}{' '}
         <Cite id="gltf" />
       </p>
@@ -107,7 +107,7 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
       <p>
         {t(
           'Static product: the pipeline bakes every place offline on the local machine (raw data on an out-of-git volume, with an on-disk fetch cache so re-bakes are fast), and the site is served as pure static files by nginx over HTTPS. Because the baked bundles are large (metro cores reach tens of MB each), Maqueta lives on the ml/heavy box (more disk), not the memory-bound production box, and deploys via a staging directory plus atomic swap so the live site is never half-written.',
-          'Producto estatico: el pipeline hornea cada lugar offline en la maquina local (datos crudos en un volumen fuera de git, con un cache de descarga en disco para que los re-horneados sean rapidos), y el sitio se sirve como archivos estaticos puros por nginx sobre HTTPS. Como los bundles horneados son grandes (los nucleos metropolitanos llegan a decenas de MB cada uno), Maqueta vive en el box ml/heavy (mas disco), no en el box de produccion limitado por memoria, y despliega via un directorio de staging mas un intercambio atomico para que el sitio en vivo nunca quede a medio escribir.',
+          'Producto estático: el pipeline hornea cada lugar offline en la maquina local (datos crudos en un volumen fuera de git, con un cache de descarga en disco para que los re-precalculados sean rapidos), y el sitio se sirve como archivos estaticos puros por nginx sobre HTTPS. Como los bundles precalculados son grandes (los nucleos metropolitanos llegan a decenas de MB cada uno), Maqueta vive en el box ml/heavy (mas disco), no en el box de produccion limitado por memoria, y despliega via un directorio de staging mas un intercambio atómico para que el sitio en vivo nunca quede a medio escribir.',
         )}
       </p>
     </div>
@@ -118,7 +118,7 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
       <h2>{t('Implementation', 'Implementacion')}</h2>
       <p className="mq-lead">
         {t('The concrete system: a reusable geoscena package and a maquetalab pipeline that bakes every place offline into an audited SceneBundle, two data contracts that keep every value sourced, a read-only web app that only replays those bundles, and a static deploy.',
-          'El sistema concreto: un paquete geoscena reutilizable y un pipeline maquetalab que hornea cada lugar offline en un SceneBundle auditado, dos contratos de datos que mantienen cada valor con fuente, una app web de solo lectura que solo reproduce esos bundles, y un despliegue estatico.')}
+          'El sistema concreto: un paquete geoscena reutilizable y un pipeline maquetalab que hornea cada lugar offline en un SceneBundle auditado, dos contratos de datos que mantienen cada valor con fuente, una app web de solo lectura que solo reproduce esos bundles, y un despliegue estático.')}
       </p>
       <SubTabs
         ariaLabel={t('Implementation topics', 'Temas de implementacion')}

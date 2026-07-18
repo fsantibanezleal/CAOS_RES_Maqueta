@@ -71,7 +71,7 @@ export default function AppPage() {
   if (err)
     return (
       <div className="mq-page">
-        <p className="mq-error">{t('Could not load baked places.', 'No se pudieron cargar los lugares horneados.')} <code>{err}</code></p>
+        <p className="mq-error">{t('Could not load baked places.', 'No se pudieron cargar los lugares precalculados.')} <code>{err}</code></p>
       </div>
     );
 
@@ -84,7 +84,7 @@ export default function AppPage() {
         </div>
         {current && index && (
           <span className="mq-app-meta">
-            {index.n_places}/{index.places.length ? index.tiers.A.length + index.tiers.B.length + index.tiers.C.length : 40} {t('places baked', 'lugares horneados')} · {current.category} · {current.n_layers} {t('layers', 'capas')} · {(current.total_bytes / 1e6).toFixed(1)} MB
+            {index.n_places}/{index.places.length ? index.tiers.A.length + index.tiers.B.length + index.tiers.C.length : 40} {t('places baked', 'lugares precalculados')} · {current.category} · {current.n_layers} {t('layers', 'capas')} · {(current.total_bytes / 1e6).toFixed(1)} MB
           </span>
         )}
       </div>
@@ -156,7 +156,7 @@ function PlacePicker({ places, slug, onSelect, lang }: { places: PlaceEntry[]; s
   return (
     <div className="mq-picker" ref={ref}>
       <button className="mq-picker-btn" onClick={() => setOpen((o) => !o)} title={t('Change place', 'Cambiar lugar')}>
-        <span className="mq-picker-cur">{current ? `${current.country} · ${current.city}` : t('Select a place', 'Elige un lugar')}</span>
+        <span className="mq-picker-cur">{current ? `${current.country} · ${current.city}` : t('Select a place', 'Seleccionar un lugar')}</span>
         <span className="mq-picker-chev">{open ? '▲' : '▼'}</span>
       </button>
       {open && (
@@ -293,7 +293,7 @@ function PlaceContext({ manifest, lang }: { manifest: BundleManifest; lang: 'en'
   const howto = (
     <div className="mq-ctx-body">
       <ul className="mq-howto">
-        <li>{t('Drag to orbit, scroll to zoom; use the Aerial / Oblique / Street camera presets.', 'Arrastra para orbitar, rueda para acercar; usa los presets Cenital / Oblicua / Calle.')}</li>
+        <li>{t('Drag to orbit, scroll to zoom; use the Aerial / Oblique / Street camera presets.', 'Arrastrar para orbitar, rueda para acercar; usa los presets Cenital / Oblicua / Calle.')}</li>
         <li>{t('Toggle each fused source layer (terrain, buildings, roads, water, green, rail, population).', 'Activa cada capa fuente (relieve, edificios, calles, agua, verde, vías, población).')}</li>
         <li>{t('Recolour buildings by Height, Provenance or Land use; the legend updates.', 'Recolorea edificios por Altura, Procedencia o Uso de suelo; la leyenda se actualiza.')}</li>
         <li>{t('Filter buildings by a height range, or by which sources their height came from.', 'Filtra edificios por rango de altura, o por la fuente de su altura.')}</li>

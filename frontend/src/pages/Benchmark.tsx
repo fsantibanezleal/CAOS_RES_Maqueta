@@ -29,7 +29,7 @@ export default function Benchmark() {
       <p className="mq-lead">
         {t(
           'The point of Maqueta is honesty at scale. Across every baked place (100+ cities, comunas, metro cores and terrain areas), this page reports how much of the reconstruction is measured vs inferred, the size/complexity budgets by tier, and the fused-vs-authoritative comparison against open LoD2 models where one exists. Every number is read straight from the committed benchmark.json.',
-          'El sentido de Maqueta es la honestidad a escala. Sobre cada lugar horneado (mas de 100 ciudades, comunas, nucleos metropolitanos y areas de relieve), esta pagina reporta cuanto de la reconstruccion es medido vs inferido, los presupuestos de tamano/complejidad por tier, y la comparacion fusion-vs-autoritativo contra modelos LoD2 abiertos donde exista. Cada numero se lee directo del benchmark.json versionado.',
+          'El sentido de Maqueta es la honestidad a escala. Sobre cada lugar precalculado (mas de 100 ciudades, comunas, nucleos metropolitanos y areas de relieve), esta página reporta cuanto de la reconstrucción es medido vs inferido, los presupuestos de tamaño/complejidad por tier, y la comparación fusion-vs-autoritativo contra modelos LoD2 abiertos donde exista. Cada número se lee directo del benchmark.json versionado.',
         )}
       </p>
 
@@ -103,7 +103,7 @@ export default function Benchmark() {
           <p>
             {t(
               'For places with an open LoD2 model (currently 3D BAG for the Netherlands), the baked benchmark carries the fused-vs-authoritative height error: RMSE, MAE, bias and match coverage. This is the honest test of the fusion.',
-              'Para lugares con un modelo LoD2 abierto (actualmente 3D BAG para Países Bajos), el benchmark horneado lleva el error de altura fusión-vs-autoritativo: RMSE, MAE, sesgo y cobertura de emparejamiento. Es la prueba honesta de la fusión.',
+              'Para lugares con un modelo LoD2 abierto (actualmente 3D BAG para Países Bajos), el benchmark precalculado lleva el error de altura fusión-vs-autoritativo: RMSE, MAE, sesgo y cobertura de emparejamiento. Es la prueba honesta de la fusión.',
             )}{' '}
             <Cite id="3dbag" /> <Cite id="usgs3dep" />
           </p>
@@ -137,7 +137,7 @@ export default function Benchmark() {
                 </table>
               </div>
             ) : (
-              <p className="mq-muted">{t('(Ground-truth rows appear once the Netherlands tier-A places are baked with the 3D BAG comparison.)', '(Las filas de verdad de terreno aparecen cuando los lugares tier-A de Países Bajos se hornean con la comparación 3D BAG.)')}</p>
+              <p className="mq-muted">{t('(Ground-truth rows appear once the Netherlands tier-A places are baked with the 3D BAG comparison.)', '(Las filas de verdad de terreno aparecen cuando los lugares tier-A de Países Bajos se precalculan con la comparación 3D BAG.)')}</p>
             );
           })()}
 

@@ -191,9 +191,9 @@ export const architecture: ArchitectureConfig = {
       es: 'Los carriles',
       svg: LANES,
       body_en:
-        'Two lanes with separate dependencies. OFFLINE: the maquetalab pipeline runs on the local machine with heavy geo libraries, fetching from keyless public buckets and Overpass, meshing, and committing compact bundles; raw data stays on an out-of-git volume. WEB: the static site (nginx on the ml box) loads the committed .glb and replays them. No provider is contacted from the browser (ADR-0054), and the render loop is paused by default.',
+        'Two lanes with separate dependencies. offline: the maquetalab pipeline runs on the local machine with heavy geo libraries, fetching from keyless public buckets and Overpass, meshing, and committing compact bundles; raw data stays on an out-of-git volume. WEB: the static site (nginx on the ml box) loads the committed .glb and replays them. No provider is contacted from the browser (ADR-0054), and the render loop is paused by default.',
       body_es:
-        'Dos carriles con dependencias separadas. OFFLINE: el pipeline maquetalab corre en la máquina local con librerías geo pesadas, descargando de buckets públicos sin credenciales y de Overpass, malleando y comprometiendo bundles compactos; los datos crudos quedan fuera de git. WEB: el sitio estático (nginx en el box ml) carga los .glb comprometidos y los reproduce. No se contacta ningún proveedor desde el navegador (ADR-0054), y el bucle de render está pausado por defecto.',
+        'Dos carriles con dependencias separadas. offline: el pipeline maquetalab corre en la máquina local con librerías geo pesadas, descargando de buckets públicos sin credenciales y de Overpass, malleando y comprometiendo bundles compactos; los datos crudos quedan fuera de git. WEB: el sitio estático (nginx en el box ml) carga los .glb comprometidos y los reproduce. No se contacta ningún proveedor desde el navegador (ADR-0054), y el bucle de render está pausado por defecto.',
     },
     {
       id: 'web',

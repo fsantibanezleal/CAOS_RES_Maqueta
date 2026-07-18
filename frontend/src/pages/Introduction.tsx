@@ -12,7 +12,7 @@ export default function Introduction() {
       <p className="mq-lead">
         {t(
           'Maqueta is a multi-modal fusion tool: it reconstructs real-world areas in interactive 3D by mixing every available modality of open public geodata per place, and then lets you interrogate them, filter and colour buildings by any variable, and aggregate any variable by administrative sub-area. The building height is the entry point, the 3D scaffold the other modalities register onto: terrain, land cover, roads and rail, water, population, and the analytical layers, satellite multispectral indices (vegetation / water / built-up), solar-energy potential, climate normals, and socio-economic indicators. An offline pipeline downloads, fuses, meshes and bakes each place into a static, versioned scene bundle; the web app replays it as an interrogable workbench.',
-          'Maqueta es una herramienta de fusion multi-modal: reconstruye areas reales del mundo en 3D interactivo mezclando cada modalidad disponible de geodatos publicos abiertos por lugar, y luego permite interrogarlas, filtrar y colorear edificios por cualquier variable, y agregar cualquier variable por sub-area administrativa. La altura del edificio es el punto de entrada, el andamio 3D sobre el que se registran las demas modalidades: relieve, cobertura de suelo, calles y vias, agua, poblacion, y las capas analiticas, indices multiespectrales satelitales (vegetacion / agua / construido), potencial de energia solar, normales climaticas, e indicadores socioeconomicos. Un pipeline offline descarga, fusiona, mallea y hornea cada lugar en un paquete de escena estatico y versionado; la app web lo reproduce como un banco de trabajo interrogable.',
+          'Maqueta es una herramienta de fusion multi-modal: reconstruye areas reales del mundo en 3D interactivo mezclando cada modalidad disponible de geodatos publicos abiertos por lugar, y luego permite interrogarlas, filtrar y colorear edificios por cualquier variable, y agregar cualquier variable por sub-area administrativa. La altura del edificio es el punto de entrada, el andamio 3D sobre el que se registran las demas modalidades: relieve, cobertura de suelo, calles y vias, agua, poblacion, y las capas analiticas, indices multiespectrales satelitales (vegetacion / agua / construido), potencial de energía solar, normales climaticas, e indicadores socioeconomicos. Un pipeline offline descarga, fusiona, mallea y hornea cada lugar en un paquete de escena estático y versionado; la app web lo reproduce como un banco de trabajo interrogable.',
         )}
       </p>
 
@@ -37,7 +37,7 @@ export default function Introduction() {
           <rect className="f-bx-a" x="394" y="66" width="110" height="68" rx="8" />
           <text className="f-tx-b" x="406" y="92">geoscena</text>
           <text className="f-mu" x="406" y="110">{t('fuse · mesh', 'fusion · malla')}</text>
-          <text className="f-mu" x="406" y="126">{t('· bake', '· horneado')}</text>
+          <text className="f-mu" x="406" y="126">{t('· bake', '· precalculado')}</text>
           <path className="f-ln-a" d="M504 100 L536 100" markerEnd="url(#iar)" />
           <rect className="f-bx" x="538" y="66" width="92" height="68" rx="8" />
           <text className="f-tx" x="548" y="92">SceneBundle</text>
@@ -64,7 +64,7 @@ export default function Introduction() {
       </p>
       <p>
         {t('The second problem is honesty. Most footprints carry no measured height. Guessing one number per building and presenting it confidently turns a scene into part fiction. Maqueta resolves each height from the best available source and RECORDS which one was used, so the provenance mix is reported, not hidden, and the same discipline applies to every inferred layer.',
-          'El segundo problema es la honestidad. La mayoria de las huellas no traen altura medida. Adivinar un numero por edificio y presentarlo con confianza convierte una escena en parte ficcion. Maqueta resuelve cada altura con la mejor fuente disponible y REGISTRA cual se uso, para reportar la mezcla en vez de esconderla, y la misma disciplina aplica a cada capa inferida.')}
+          'El segundo problema es la honestidad. La mayoria de las huellas no traen altura medida. Adivinar un número por edificio y presentarlo con confianza convierte una escena en parte ficcion. Maqueta resuelve cada altura con la mejor fuente disponible y REGISTRA cual se uso, para reportar la mezcla en vez de esconderla, y la misma disciplina aplica a cada capa inferida.')}
       </p>
 
       <h3>{t('The three place tiers', 'Los tres tiers de lugares')}</h3>
@@ -89,7 +89,7 @@ export default function Introduction() {
 
       <Callout variant="honest" title={t('Honest scope', 'Alcance honesto')}>
         {t('Maqueta does no photogrammetry or neural reconstruction (NeRF, Gaussian splatting): it is fusion of public vector/raster data. Terrain is a global 30 m DSM that includes buildings and vegetation, so dense cores sit slightly high (the tier-A lidar places show the delta). The satellite indices are single-scene surface proxies; solar and climate are ERA5-resolution (near-constant per AOI, so aggregated per comuna); Data Observatory indicators are Chile-only raw counts. Non-commercial-licensed layers are avoided by default or flagged per scene.',
-          'Maqueta no hace fotogrametria ni reconstruccion neural (NeRF, Gaussian splatting): es fusion de datos vectoriales/raster publicos. El relieve es un DSM global de 30 m que incluye edificios y vegetacion, asi que los centros densos quedan algo altos (los lugares tier-A con lidar muestran la diferencia). Los indices satelitales son proxies de superficie de una sola escena; solar y clima son de resolucion ERA5 (casi constantes por AOI, por eso se agregan por comuna); los indicadores del Observatorio de Datos son conteos crudos solo de Chile. Las capas con licencia no comercial se evitan por defecto o se marcan por escena.')}{' '}
+          'Maqueta no hace fotogrametria ni reconstrucción neural (NeRF, Gaussian splatting): es fusion de datos vectoriales/raster publicos. El relieve es un DSM global de 30 m que incluye edificios y vegetacion, así que los centros densos quedan algo altos (los lugares tier-A con lidar muestran la diferencia). Los indices satelitales son proxies de superficie de una sola escena; solar y clima son de resolucion ERA5 (casi constantes por AOI, por eso se agregan por comuna); los indicadores del Observatorio de Datos son conteos crudos solo de Chile. Las capas con licencia no comercial se evitan por defecto o se marcan por escena.')}{' '}
         <Cite id="demcompare" />
       </Callout>
 
