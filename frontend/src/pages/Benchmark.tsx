@@ -28,14 +28,14 @@ export default function Benchmark() {
       <h2>Benchmark</h2>
       <p className="mq-lead">
         {t(
-          'The point of Maqueta is honesty at scale. Across every baked place (100+ cities, comunas, metro cores and terrain areas), this page reports how much of the reconstruction is measured vs inferred, the size/complexity budgets by tier, and the fused-vs-authoritative comparison against open LoD2 models where one exists. Every number is read straight from the committed benchmark.json.',
-          'El sentido de Maqueta es la honestidad a escala. Sobre cada lugar precalculado (mas de 100 ciudades, comunas, nucleos metropolitanos y areas de relieve), esta página reporta cuanto de la reconstrucción es medido vs inferido, los presupuestos de tamaño/complejidad por tier, y la comparación fusion-vs-autoritativo contra modelos LoD2 abiertos donde exista. Cada número se lee directo del benchmark.json versionado.',
+          'Across every baked place (100+ cities, comunas, metro cores and terrain areas), this page reports how much of the reconstruction is measured vs inferred, the size/complexity budgets by tier, and the fused-vs-authoritative comparison against open LoD2 models where one exists. Every number is read straight from the committed benchmark.json.',
+          'Sobre cada lugar precalculado (más de 100 ciudades, comunas, núcleos metropolitanos y áreas de relieve), esta página reporta cuánto de la reconstrucción es medido vs inferido, los presupuestos de tamaño/complejidad por tier, y la comparación fusión-vs-autoritativo contra modelos LoD2 abiertos donde exista. Cada número se lee directo del benchmark.json versionado.',
         )}
       </p>
 
       {err && (
         <p className="mq-error">
-          {t('Run the pipeline (all places) to populate the benchmark.', 'Ejecuta el pipeline (todos los lugares) para poblar el benchmark.')}{' '}
+          {t('Run the pipeline (all places) to populate the benchmark.', 'Ejecutar el pipeline (todos los lugares) para poblar el benchmark.')}{' '}
           <code>{err}</code>
         </p>
       )}
