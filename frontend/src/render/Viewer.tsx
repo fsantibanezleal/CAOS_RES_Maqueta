@@ -627,7 +627,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 function SelectionPanel({ pick, lang, scene, colorMode, adminAttr }: { pick: PickInfo | null; lang: Lang; scene: MaquetaScene | null; colorMode: string; adminAttr: string | null }) {
   const t = (en: string, es: string) => (lang === 'es' ? es : en);
   if (!pick)
-    return <div className="mq-select-hint">{t('Click any building to select it (it highlights in 3D) and read all its fused attributes.', 'Haz clic en un edificio para seleccionarlo (se resalta en 3D) y ver todos sus atributos fusionados.')}</div>;
+    return <div className="mq-select-hint">{t('Click any building to select it (it highlights in 3D) and read all its fused attributes.', 'Al hacer clic en un edificio se selecciona (se resalta en 3D) y se ven todos sus atributos fusionados.')}</div>;
   const f = pick.feature;
   const p = PROVENANCE[f.height_source];
   // The value of whatever metric is currently active (the aggregate-by-area layer wins over the colour-by
