@@ -56,15 +56,15 @@ export default function Introduction() {
           'Maqueta comparte el impacto visual pero cambia la tesis: no es una extrusión de una fuente para una ciudad, sino una fusión multi-modal para más de 100 lugares curados, con relieve real, cobertura de suelo, una escalera honesta de procedencia de alturas, un benchmark contra modelos LoD2 autoritativos, y capas analíticas que se pueden filtrar y agregar. Donde Janosov extruye una modalidad, Maqueta usa esa altura como ancla y registra encima todas las demás modalidades que el lugar tenga.')}
       </p>
 
-      <h3>{t('The problem', 'El problema')}</h3>
+      <h3>{t('Fusing scattered open geodata', 'Fusionar geodatos abiertos dispersos')}</h3>
       <p>
         {t('Extraordinary open geodata exists today but scattered across formats and licenses: Overture conflates 2.5 billion buildings; Copernicus GLO-30 gives global terrain; ESA WorldCover gives 10 m land cover; Sentinel-2 gives multispectral bands; PVGIS and ERA5 give solar and climate. Nobody fuses them into one coherent 3D scene with each datum’s provenance preserved and every variable made filterable and aggregatable.',
           'Hoy existen geodatos abiertos extraordinarios pero dispersos en formatos y licencias distintas: Overture unifica 2.5 mil millones de edificios; Copernicus GLO-30 da relieve global; ESA WorldCover da cobertura a 10 m; Sentinel-2 da bandas multiespectrales; PVGIS y ERA5 dan solar y clima. Nadie los junta en una escena 3D coherente con la procedencia de cada dato preservada y cada variable filtrable y agregable.')}{' '}
         <Cite id="overture" /> <Cite id="glo30" /> <Cite id="worldcover" /> <Cite id="sentinel2" />
       </p>
       <p>
-        {t('The second problem is honesty. Most footprints carry no measured height. Guessing one number per building and presenting it confidently turns a scene into part fiction. Maqueta resolves each height from the best available source and records which one was used, so the provenance mix is reported, not hidden, and the same discipline applies to every inferred layer.',
-          'El segundo problema es la honestidad. La mayoría de las huellas no traen altura medida. Adivinar un número por edificio y presentarlo con confianza convierte una escena en parte ficción. Maqueta resuelve cada altura con la mejor fuente disponible y registra cuál se usó, para reportar la mezcla en vez de esconderla, y la misma disciplina aplica a cada capa inferida.')}
+        {t('The second issue is honesty. Most footprints carry no measured height. Guessing one number per building and presenting it confidently turns a scene into part fiction. Maqueta resolves each height from the best available source and records which one was used, so the provenance mix is reported, not hidden, and the same discipline applies to every inferred layer.',
+          'El segundo punto es la honestidad. La mayoría de las huellas no traen altura medida. Adivinar un número por edificio y presentarlo con confianza convierte una escena en parte ficción. Maqueta resuelve cada altura con la mejor fuente disponible y registra cuál se usó, para reportar la mezcla en vez de esconderla, y la misma disciplina aplica a cada capa inferida.')}
       </p>
 
       <h3>{t('The three place tiers', 'Los tres tiers de lugares')}</h3>
