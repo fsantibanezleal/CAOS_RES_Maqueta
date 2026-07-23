@@ -1,0 +1,193 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{orcidlink}
+\usepackage{balance}
+
+\graphicspath{{../figures/}}
+
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.75}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.80}
+
+\begin{document}
+
+\title{Maqueta: Honest Height Provenance in\\ Open-Data 3D Urban Reconstruction\\ Across 118 Places}
+
+\author{Felipe~Santiba\~nez-Leal~\orcidlink{0000-0002-0150-3246}%
+\thanks{F. Santiba\~nez-Leal is with the CAOS open-research programme, Santiago, Chile
+(e-mail: fsantibanez@gmail.com; ORCID 0000-0002-0150-3246).}%
+\thanks{Technical report, 2026. Interactive tool and reproducible pipeline (MIT) at
+\url{https://github.com/fsantibanezleal/CAOS_RES_Maqueta}; the \texttt{geoscena} fusion core at
+\url{https://github.com/fsantibanezleal/CAOS_GeoScena}.}}
+
+\markboth{Technical Report, 2026}%
+{Santiba\~nez-Leal: Honest height provenance in open-data 3D urban reconstruction}
+
+\maketitle
+
+\begin{abstract}
+A 3D city model is only as truthful as its building heights, and a model built from open public data usually gets
+those heights not by measuring them but by inferring them, from a digital surface model, a floor count, or a
+blanket prior, while presenting the result as if it were surveyed. Maqueta is a multi-modal geospatial fusion tool
+that reconstructs real-world areas from open data (building footprints and roads from Overture, terrain from the
+Copernicus digital surface model, land cover from ESA WorldCover, water and green from OpenStreetMap, population
+from GHS-POP, and 2.5D building heights from Google Open Buildings), and its distinguishing choice is that every
+building carries an explicit \emph{height provenance}: whether its height was measured, inferred from floors,
+derived from the raster surface model, or assumed. This report reports that provenance across the 118 baked
+places, and the result is a useful corrective to how open 3D city data is usually presented: only $8.8\%$ of
+building heights are authoritative measurements, while $73.2\%$ are raster-derived, $11.6\%$ are blanket priors,
+and $6.4\%$ are floor-count inferences, so more than nine in ten heights in an open-data city model are inferred,
+not measured. Where authoritative LoD2 ground truth exists to check against, the fused heights carry a
+building-height root-mean-square error of $3$ to $8$~metres with a downward bias, but such ground truth is itself
+scarce: only two of the $118$ places have public LoD2 models to validate against. Making the provenance explicit
+per building, rather than laundering inference into apparent measurement, is the report's contribution; every
+number and figure regenerates from the committed benchmark.
+\end{abstract}
+
+\begin{IEEEkeywords}
+3D city models, geospatial data fusion, building height, LoD2, open data, provenance, digital surface model,
+reproducibility.
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+\IEEEPARstart{A} 3D city model is used for solar-potential studies, flood and wind simulation, visibility and
+noise analysis, and urban planning~\cite{biljecki15}, and every one of those uses depends on the building heights
+being right. Authoritative models at level-of-detail~2 (LoD2), reconstructed from airborne lidar, exist for a
+handful of well-mapped countries~\cite{peters}, but for most of the world the heights are not surveyed; they are
+\emph{inferred}, from a digital surface model, from a mapped floor count, or from a blanket assumption, and the
+literature is clear that generating 3D city models without elevation data is a matter of estimation, not
+measurement~\cite{biljecki17}. The problem in practice is not that heights are inferred, which is unavoidable at
+global scale, but that the inference is usually hidden: a single-source extrusion is rendered as a crisp 3D city
+and presented as if every height were known.
+
+Maqueta takes the opposite stance. It is a multi-modal fusion tool that reconstructs an area from many open
+sources, building footprints and roads from Overture Maps, terrain from the Copernicus GLO-30 surface model, land
+cover from ESA WorldCover~\cite{worldcover}, water, green and rail from OpenStreetMap, population from GHS-POP, and
+2.5D building heights from Google Open Buildings~\cite{sirko}, each layer carrying its source, licence and fetch
+date, and it registers them onto the height map as the 3D scaffold. Its distinguishing choice is that every
+building records \emph{how} its height was obtained, measured, floor-inferred, raster-derived or assumed, so the
+model is honest about its own uncertainty. This report reads that provenance across the 118 baked places and
+benchmarks the heights where authoritative ground truth exists. The contribution is not a new reconstruction
+algorithm; it is the explicit, quantified provenance, and the corrective it provides to how open 3D city data is
+usually presented.
+
+\section{Height Provenance Across 118 Places}\label{sec:provenance}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.99\columnwidth]{fig-provenance.pdf}
+\caption{The provenance of building heights across the 118 fused places. Only $8.8\%$ are authoritative
+measurements; $73.2\%$ are derived from the raster digital surface model, $11.6\%$ are blanket priors, and
+$6.4\%$ are inferred from a mapped floor count. More than nine in ten heights in an open-data city model are
+inferred rather than measured, which the tool records per building rather than hiding.}
+\label{fig:provenance}
+\end{figure}
+
+The core result is Fig.~\ref{fig:provenance}, and it is a plain statement of what an open-data 3D city model
+actually is. Aggregated over the $118$ places and their millions of buildings, the height provenance breaks down
+as: $8.8\%$ measured (an authoritative source gives the height directly), $6.4\%$ inferred from a mapped floor
+count, $73.2\%$ derived from the Copernicus raster surface model (the difference between the surface and the
+terrain, over the footprint), and $11.6\%$ a blanket prior where nothing better exists. The dominant source, by
+far, is the raster surface model, which is an \emph{estimate} of height, not a measurement, and which is known to
+carry metre-scale error and a systematic bias. The honest reading is that an open-data 3D city is overwhelmingly
+inferred: fewer than one building in ten has a measured height. This is not a deficiency unique to Maqueta, it is
+the reality of global open geodata, but Maqueta's choice to record the provenance per building means a downstream
+user can filter, weight or distrust a height according to how it was obtained, rather than treating a raster
+inference and a survey measurement as equally solid.
+
+\section{Benchmark Where Ground Truth Exists}\label{sec:benchmark}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.92\columnwidth]{fig-benchmark.pdf}
+\caption{Fused-height error against authoritative LoD2 ground truth, for the two of the $118$ places that have a
+public LoD2 model (both in the Netherlands, from the 3D BAG). The root-mean-square error is $3.1$~m for Delft and
+$8.3$~m for Amsterdam, both with a downward bias (heights under-estimated). That only two places can be validated
+at all is itself the point: authoritative 3D ground truth is scarce, so the provenance record matters more.}
+\label{fig:benchmark}
+\end{figure}
+
+Where an authoritative LoD2 model exists, the fused heights can be checked against it (Fig.~\ref{fig:benchmark}).
+Two of the $118$ places have a public LoD2 reference, both in the Netherlands, whose national 3D BAG reconstructs
+LoD2 models for all buildings from lidar~\cite{peters}. Against it, Maqueta's fused heights carry a
+root-mean-square error of $3.1$~metres at Delft and $8.3$~metres at Amsterdam, with a mean absolute error of
+$2.5$ and $7.5$~metres and a downward bias in both (the inferred heights systematically under-estimate the true
+ones, by $0.1$~m at Delft and $6.6$~m at Amsterdam). The variation between the two, Delft accurate to a few
+metres, Amsterdam off by more, tracks how much each relied on inference versus better sources, exactly the
+distinction the provenance record captures. But the more important number is the denominator: only $2$ of $118$
+places can be validated against authoritative ground truth at all, because LoD2 models are published for so few
+places. That scarcity is why the provenance matters: for the other $116$ places there is no ground truth to
+appeal to, and the honest thing a model can do is say, per building, how confident it should be.
+
+\section{Discussion and Scope}\label{sec:discuss}
+
+Maqueta's value is honesty about a fact the field usually elides: an open-data 3D city model is mostly inferred,
+and the tool makes that inference explicit and auditable per building rather than rendering it as crisp truth.
+The fusion itself is real and multi-modal, eight open layers registered onto a common height scaffold with full
+source-and-licence provenance, and the benchmark, where it can run, quantifies the metre-scale height error. The
+scope is stated plainly. The heights are inferred for over ninety percent of buildings, and the report says so;
+the two LoD2 benchmarks are a thin validation set, not because the tool was tested lightly but because
+authoritative 3D ground truth genuinely exists for almost nowhere, which is itself a finding. The reconstructed
+scenes are for visualisation, teaching and planning context, not survey-grade models, and each carries an honest
+height-provenance and source manifest so no layer is mistaken for more than it is. The reusable fusion core,
+\texttt{geoscena}, turns any area of interest into a provenance-tracked scene bundle, and the product pipeline
+bakes a curated registry of places on top of it. None of this is hidden; the interface shows the provenance of
+every selected building.
+
+\section{Conclusion}
+
+Maqueta reconstructs 3D scenes of $118$ real places by fusing eight open geospatial modalities, and its honest
+height provenance shows what such a model is made of: only $8.8\%$ of building heights are authoritative
+measurements, the rest inferred from a raster surface model, a floor count or a prior. Where authoritative LoD2
+ground truth exists, at just two of the $118$ places, the fused heights carry a $3$-to-$8$-metre error with a
+downward bias. Recording that provenance per building, and reporting how scarce ground truth actually is, rather
+than laundering inference into apparent measurement, is the report's discipline, and the reproducible fusion tool
+that does it is its contribution.
+
+\appendices
+\section{Reproduction}\label{app:repro}
+
+The committed benchmark (\texttt{data/derived/benchmark.json}) carries, per place, the layer counts, triangle
+and size totals, the height-provenance mix (measured / floors / raster / prior) and, where a LoD2 reference
+exists, the fused-versus-truth root-mean-square error, mean absolute error and bias. The figure scripts under
+\texttt{manuscripts/geo-reconstruction/figures/} aggregate it into the global provenance mix and the LoD2
+benchmark. The \texttt{geoscena} fusion core and the \texttt{maquetalab} pipeline are seeded and versioned, so a
+place re-bakes deterministically; the open source layers are fetched under their respective licences and are not
+re-hosted.
+
+\balance
+
+\begin{thebibliography}{00}
+
+\bibitem{biljecki15} F.~Biljecki, J.~Stoter, H.~Ledoux, S.~Zlatanova, and A.~\c{C}\"oltekin, ``Applications of 3D
+city models: State of the art review,'' \emph{ISPRS International Journal of Geo-Information}, vol.~4, no.~4,
+pp.~2842--2889, 2015. doi:10.3390/ijgi4042842.
+
+\bibitem{biljecki17} F.~Biljecki, H.~Ledoux, and J.~Stoter, ``Generating 3D city models without elevation data,''
+\emph{Computers, Environment and Urban Systems}, vol.~64, pp.~1--18, 2017.
+doi:10.1016/j.compenvurbsys.2017.01.001.
+
+\bibitem{peters} R.~Peters, B.~Dukai, S.~Vitalis, J.~van~Liempt, and J.~Stoter, ``Automated 3D reconstruction of
+LoD2 and LoD1 models for all 10 million buildings of the Netherlands,'' \emph{Photogrammetric Engineering \&
+Remote Sensing}, vol.~88, no.~3, pp.~165--170, 2022. doi:10.14358/PERS.21-00032R2.
+
+\bibitem{sirko} W.~Sirko \emph{et al.}, ``Continental-scale building detection from high resolution satellite
+imagery,'' 2021. arXiv:2107.12283.
+
+\bibitem{worldcover} D.~Zanaga \emph{et al.}, ``ESA WorldCover 10 m 2021 v200,'' Zenodo, 2022.
+doi:10.5281/zenodo.7254221.
+
+\end{thebibliography}
+
+\end{document}

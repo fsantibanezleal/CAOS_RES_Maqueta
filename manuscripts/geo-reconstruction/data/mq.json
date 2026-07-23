@@ -1,0 +1,38 @@
+{
+ "global_mix": {
+  "measured": 0.088,
+  "floors": 0.064,
+  "raster": 0.732,
+  "prior": 0.116
+ },
+ "n_places": 118,
+ "tiers": {
+  "B": 90,
+  "A": 10,
+  "C": 18
+ },
+ "ground_truth": [
+  {
+   "slug": "amsterdam_center",
+   "name": "Amsterdam Centrum",
+   "country": "Netherlands",
+   "rmse": 8.32,
+   "mae": 7.48,
+   "bias": -6.57,
+   "n_truth": 50,
+   "coverage": 1.0,
+   "measured_pct": 0.9
+  },
+  {
+   "slug": "delft",
+   "name": "Delft",
+   "country": "Netherlands",
+   "rmse": 3.06,
+   "mae": 2.47,
+   "bias": -0.13,
+   "n_truth": 397,
+   "coverage": 17.1,
+   "measured_pct": 0.3
+  }
+ ]
+}
