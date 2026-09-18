@@ -21,7 +21,7 @@ removed on 2026-09-18, and `scripts/check_template_residue.py` fails the build i
 
 ## Deploy flow
 
-1. **Bake** locally: `python -m maquetalab.pipeline --fetched <date>` -> `data/derived/` bundles.
+1. **Bake** locally: `python data-pipeline/run.py bake --fetched <date>` -> `data/derived/` bundles.
 2. **Build** the frontend: `cd frontend && npm run build` (its `copy-data.mjs` pulls `data/derived` into
    `public/data`, then Vite builds `dist/`).
 3. **Serve** `frontend/dist/` from your static host, and point your domain at it. Because the baked

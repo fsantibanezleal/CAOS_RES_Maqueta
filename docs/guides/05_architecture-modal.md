@@ -8,7 +8,7 @@ The header's info button opens the "Architecture / How it was built" modal (ADR-
 
 | id | Tab | Shows |
 |---|---|---|
-| `app` | The app | how geoscena and maquetalab turn open sources into a SceneBundle the app replays |
+| `app` | The app | how geoscena and the pipeline turn open sources into a SceneBundle the app replays, and which geoscena source the bundles were baked from |
 | `lanes` | The lanes | the offline bake (local, heavy geo libraries, network) versus the static web replay |
 | `web` | Web flow | index, then manifest, then layers; the scene materials; picking and the analysis tools |
 | `science` | The science | the height-provenance ladder and the meshing |

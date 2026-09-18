@@ -5,11 +5,12 @@ For each place we take the country's finest admin level with >=2 units intersect
 ADM1), clip to the AOI, and write the unit boundaries in the local world frame (x=east m, z=-north m) so the
 frontend point-in-polygons building centroids against it directly.
 
-Run AFTER a full bake (writing into each bundle dir):  python -m maquetalab.gen_admin
+Run AFTER a full bake (writing into each bundle dir):  python data-pipeline/run.py gen-admin
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -18,12 +19,19 @@ import geopandas as gpd
 import requests
 from shapely.geometry import box
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "CAOS_GeoScena" / "src"))
+# Prefer the source of a CAOS_GeoScena checkout sitting next to this repository, when there is one: the
+# bundles were baked from geoscena source newer than its PyPI release (see data-pipeline/README.md). The
+# folders up from this file are [0] its package folder, [1] data-pipeline, [2] this repository and [3] the
+# folder that holds the repository and its siblings; the path used to be built from [2], inside this
+# repository, where no such folder exists, so the insert never took effect. No-op without a sibling checkout.
+_SIBLING_GEOSCENA_SRC = Path(__file__).resolve().parents[3] / "CAOS_GeoScena" / "src"
+if _SIBLING_GEOSCENA_SRC.is_dir():
+    sys.path.insert(0, str(_SIBLING_GEOSCENA_SRC))
 from geoscena.aoi import AOI  # noqa: E402
 from geoscena.fetch.environment import ENV_META, fetch_environment  # noqa: E402
 
-from maquetalab import places as places_mod  # noqa: E402
-from maquetalab.do_indicators import INDICATOR_META, indicators_for  # noqa: E402
+from . import places as places_mod  # noqa: E402
+from .do_indicators import INDICATOR_META, indicators_for  # noqa: E402
 
 DERIVED = Path(__file__).resolve().parents[2] / "data" / "derived"
 GEOB = "https://www.geoboundaries.org/api/current/gbOpen/{iso3}/{adm}/"
@@ -153,7 +161,12 @@ def gen_for_place(p) -> int:
     return len(best)
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
+    argparse.ArgumentParser(
+        prog="run.py gen-admin",
+        description="Write admin.json (geoBoundaries sub-areas + environment + indicators) for every baked place "
+        "with buildings.",
+    ).parse_args(argv)
     ok = 0
     for p in places_mod.list_places():
         n = gen_for_place(p)
@@ -162,7 +175,3 @@ def main() -> None:
             if n > 0:
                 ok += 1
     print(f"\nwrote admin.json for {ok} places", flush=True)
-
-
-if __name__ == "__main__":
-    main()

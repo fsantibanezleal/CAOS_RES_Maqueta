@@ -2,7 +2,7 @@
 
 Maqueta trains no model. What it evaluates is how much of each reconstruction is measured, and how close the
 fused heights come to authoritative ones where those exist. Both are baked into
-`data/derived/benchmark.json` by `maquetalab.benchmark` and shown on the Benchmark page; the figures below
+`data/derived/benchmark.json` by `pipeline.benchmark` and shown on the Benchmark page; the figures below
 are read from that file and from the manifests.
 
 ## Height provenance, every building of every place

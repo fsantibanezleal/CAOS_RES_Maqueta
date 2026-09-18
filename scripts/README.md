@@ -5,9 +5,9 @@ idempotent and use only the repository's own virtual environments, never a globa
 
 | Script | What it does |
 |---|---|
-| `setup.sh` / `setup.ps1` | Creates `.venv-pipeline` (pipeline lane, dev tools and the editable `maquetalab` package) and `.venv` (the archetype's runtime lane). Baking also needs the geoscena core, see [data-pipeline/README.md](../data-pipeline/README.md). |
-| `precompute.sh` / `precompute.ps1` | Runs `python -m maquetalab.pipeline` with your arguments, e.g. `./scripts/precompute.sh berlin_mitte --fetched 2026-07-12`. |
-| `smoke.sh` / `smoke.ps1` | The two data checks CI runs: `maquetalab.regen_index --check`, then `check_artifacts.py`. |
+| `setup.sh` / `setup.ps1` | Creates `.venv-pipeline` (pipeline lane and dev tools) and `.venv` (the archetype's runtime lane). Nothing is installed as a package; the pipeline runs by path. Baking also needs the bake lane, `data-pipeline/requirements-bake.txt`, see [data-pipeline/README.md](../data-pipeline/README.md). |
+| `precompute.sh` / `precompute.ps1` | Runs `python data-pipeline/run.py bake` with your arguments, e.g. `./scripts/precompute.sh berlin_mitte --fetched 2026-07-12`. |
+| `smoke.sh` / `smoke.ps1` | The two data checks CI runs: `data-pipeline/run.py regen-index --check`, then `check_artifacts.py`. |
 | `dev.sh` / `dev.ps1` | Copies the bundles into `frontend/public/data` and starts the frontend dev server. |
 
 ## Guards (run in CI, runnable locally)

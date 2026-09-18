@@ -18,7 +18,7 @@ Then, for places with buildings, refresh the sub-areas (it walks every place and
 geoBoundaries and the environment APIs):
 
 ```bash
-.venv-pipeline/bin/python -m maquetalab.gen_admin
+.venv-pipeline/bin/python data-pipeline/run.py gen-admin
 ```
 
 Check and commit:

@@ -5,7 +5,7 @@ Set-Location (Join-Path $PSScriptRoot "..")
 $py = Join-Path ".venv-pipeline" "Scripts\python.exe"
 if (-not (Test-Path $py)) { $py = Join-Path ".venv-pipeline" "bin/python" }
 if (-not (Test-Path $py)) { $py = if ($env:PYTHON) { $env:PYTHON } else { "python" } }
-& $py -m maquetalab.regen_index --check
+& $py data-pipeline/run.py regen-index --check
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & $py scripts/check_artifacts.py
 exit $LASTEXITCODE

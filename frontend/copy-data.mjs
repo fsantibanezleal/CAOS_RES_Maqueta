@@ -15,5 +15,5 @@ if (existsSync(derived)) {
   cpSync(derived, join(PUB, 'data'), { recursive: true });
   console.log('[copy-data] data/derived -> public/data');
 } else {
-  console.warn('[copy-data] no data/derived - run the maquetalab pipeline first');
+  console.warn('[copy-data] no data/derived - bake the places first: python data-pipeline/run.py bake');
 }

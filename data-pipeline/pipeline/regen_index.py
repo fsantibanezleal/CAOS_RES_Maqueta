@@ -7,10 +7,10 @@ manifest.json plus the place registry; directories that are not registered place
 cannot be read, are skipped. The output is a pure function of the committed bundles, which is what the
 CI smoke checks.
 
-    python -m maquetalab.regen_index                # rewrite data/derived/index.json + benchmark.json
-    python -m maquetalab.regen_index --output DIR   # write the two files into DIR instead (a sandbox)
-    python -m maquetalab.regen_index --check        # write nothing; exit 1 unless the committed files
-                                                    # already equal the regeneration
+    python data-pipeline/run.py regen-index                # rewrite data/derived/index.json + benchmark.json
+    python data-pipeline/run.py regen-index --output DIR   # write the two files into DIR instead (a sandbox)
+    python data-pipeline/run.py regen-index --check        # write nothing; exit 1 unless the committed
+                                                           # files already equal the regeneration
 """
 
 from __future__ import annotations
@@ -18,7 +18,6 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
-import sys
 from pathlib import Path
 
 from . import places
@@ -113,7 +112,9 @@ def write(out_dir: Path = DERIVED, derived: Path = DERIVED) -> int:
     summaries = collect_summaries(derived)
     out_dir.mkdir(parents=True, exist_ok=True)
     for name, text in render(summaries).items():
-        (out_dir / name).write_text(text, encoding="utf-8")
+        # newline="\n": LF on every OS, so a regeneration on Windows is byte-identical to the committed files
+        # (git keeps them LF) and to a regeneration in CI; a CRLF copy used to reach the live host this way.
+        (out_dir / name).write_text(text, encoding="utf-8", newline="\n")
     return len(summaries)
 
 
@@ -145,7 +146,7 @@ def check(derived: Path = DERIVED) -> tuple[int, list[str]]:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
-        prog="maquetalab.regen_index",
+        prog="run.py regen-index",
         description="Regenerate data/derived/index.json + benchmark.json from the bundles on disk.",
     )
     mode = ap.add_mutually_exclusive_group()
@@ -161,17 +162,13 @@ def main(argv: list[str] | None = None) -> int:
         if drift:
             print(
                 f"DRIFT: {', '.join(drift)} no longer match(es) the {n} bundles in {DERIVED}. "
-                "Run `python -m maquetalab.regen_index` and commit the result."
+                "Run `python data-pipeline/run.py regen-index` and commit the result."
             )
             return 1
-        print(f"regen_index --check OK: {', '.join(OUTPUTS)} reproduce from the {n} bundles in {DERIVED}.")
+        print(f"regen-index --check OK: {', '.join(OUTPUTS)} reproduce from the {n} bundles in {DERIVED}.")
         return 0
 
     out_dir = args.output or DERIVED
     n = write(out_dir)
     print(f"regenerated index.json + benchmark.json for {n} places -> {out_dir}")
     return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

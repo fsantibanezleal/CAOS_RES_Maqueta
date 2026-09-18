@@ -7,7 +7,7 @@ Windows):
 PY=.venv-pipeline/bin/python
 $PY -m ruff check data-pipeline tests scripts      # lint
 $PY -m pytest                                      # tests, including the guards' fault-injection tests
-$PY -m maquetalab.regen_index --check              # index + benchmark reproduce from the bundles
+$PY data-pipeline/run.py regen-index --check              # index + benchmark reproduce from the bundles
 $PY scripts/check_artifacts.py                     # CONTRACT 2 in both directions
 $PY scripts/check_template_residue.py              # no archetype residue, no Pages workflow
 $PY scripts/check_content_standards.py             # no em-dash, no emoji

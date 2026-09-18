@@ -6,7 +6,7 @@ listed at the end.
 
 ## How the parts fit
 
-The offline pipeline (`data-pipeline/maquetalab`, over the `geoscena` fusion core) bakes each registered
+The offline pipeline (`data-pipeline/pipeline`, over the `geoscena` fusion core) bakes each registered
 place into a SceneBundle under `data/derived/<slug>/`: one `.glb` per layer plus a `manifest.json` that
 records every layer's source, license and fetch date. `regen_index` summarises the bundles into
 `data/derived/index.json` and `data/derived/benchmark.json`, and `gen_admin` adds `admin.json` sub-areas.
@@ -18,19 +18,22 @@ Details: [docs/architecture/01_overview.md](docs/architecture/01_overview.md).
 ```
 CAOS_RES_Maqueta/
 ├─ README.md · CHANGELOG.md · LICENSE (MIT) · STRUCTURE.md · CONTRIBUTING.md · CODE_OF_CONDUCT.md · SECURITY.md
-├─ pyproject.toml                 the maquetalab pipeline package (installed editable for tests and CI)
+├─ VERSION                        the product version, display form (the single source of truth)
+├─ pyproject.toml                 tool configuration only (pytest, ruff); the repo declares no package
 ├─ requirements.txt · requirements-dev.txt · requirements-api.txt
-├─ data-pipeline/
-│  ├─ maquetalab/
+├─ data-pipeline/                 plain code, never installed
+│  ├─ run.py                      the entry point, by path: bake | regen-index | gen-admin
+│  ├─ pipeline/
 │  │  ├─ places.py                the place registry: 118 areas of interest, tier, hierarchy, notes
 │  │  ├─ build.py                 bake one place with geoscena and write its bundle
-│  │  ├─ pipeline.py              CLI: bake, meshopt-compress, regenerate the index
+│  │  ├─ pipeline.py              the bake command: bake, meshopt-compress, regenerate the index
 │  │  ├─ regen_index.py           the single writer of index.json + benchmark.json (and --check)
 │  │  ├─ benchmark.py             cross-place summary: height-provenance mix, budgets, LoD2 rows
 │  │  ├─ gen_admin.py             admin.json per place: geoBoundaries units + environment + indicators
 │  │  └─ do_indicators.py         Chilean Data Observatory comuna indicators for gen_admin
 │  ├─ tools/compress-bundles.mjs  EXT_meshopt_compression for every baked .glb (gltf-transform)
-│  └─ requirements.txt            the pipeline lane CI installs
+│  ├─ requirements.txt            the pipeline lane CI installs
+│  └─ requirements-bake.txt       the bake lane: geoscena pinned to the commit the bundles match
 ├─ data/
 │  ├─ README.md                   the two data contracts and the height-provenance rungs
 │  └─ derived/                    committed bundles: <slug>/{*.glb, manifest.json, admin.json},
@@ -53,7 +56,7 @@ CAOS_RES_Maqueta/
 | File | Lane | Holds |
 |---|---|---|
 | `data-pipeline/requirements.txt` + `requirements-dev.txt` | pipeline checks (CI, `.venv-pipeline`) | numpy, pytest, ruff: the tests, the index regeneration and the guards, none of which touch the network |
-| (not pinned yet) | baking | the geoscena core with its fetch extras, and geopandas / requests / shapely for `gen_admin`; see [data-pipeline/README.md](data-pipeline/README.md) |
+| `data-pipeline/requirements-bake.txt` | baking, `gen_admin` | the geoscena core with its fetch extras, pinned to the CAOS_GeoScena commit the bundles match (`ab0bbf8`); geopandas / requests / shapely come with it; see [data-pipeline/README.md](data-pipeline/README.md) |
 | `frontend/package-lock.json` | web app | exact versions of three, react, the shared shell, vite, typescript |
 | `data-pipeline/tools/package-lock.json` | bundle compression | gltf-transform and meshoptimizer |
 | `requirements.txt` | archetype runtime lane (`.venv`) | numpy; Maqueta runs no Python at request time |
