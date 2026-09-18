@@ -8,8 +8,16 @@ static host (nginx, a CDN, object storage) can serve.
 
 - **`maqueta.ml.fasl-work.com.nginx`** - a sample nginx site (SPA fallback + long-cache for the `.glb`
   bundles, short-cache for the versioned data JSON). Adapt the `server_name` / `root` for your host.
-- **`pages.md` / `fasl-*.service` / `domain.nginx`** - dormant template variants (Maqueta uses neither
-  GitHub Pages nor the `app/` backend); kept for reference.
+- **`fasl-slug.service` / `domain.nginx`** - dormant templates (a systemd unit and a reverse proxy) for
+  the optional `app/` backend, which Maqueta does not use; kept for reference.
+
+## Why not GitHub Pages
+
+The built site carries every baked bundle: `data/derived` holds about 1.8 GB of GLB layers for the 118
+places, above the 1 GB limit GitHub documents for a published Pages site. The template's Pages
+workflow therefore never applied here (it failed on every run and Pages was never enabled); it was
+removed on 2026-09-18, and `scripts/check_template_residue.py` fails the build if a template sync brings
+`deploy-pages.yml` back.
 
 ## Deploy flow
 
