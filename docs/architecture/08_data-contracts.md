@@ -1,26 +1,52 @@
-# The two data contracts
+# 08, the two data contracts
 
-A product is only real if data flows through two **enforced** contracts. Both are CI-checked.
+## CONTRACT 1, sources to pipeline: nothing enters a bundle without provenance
 
-## CONTRACT 1, ingestion (`raw → pipeline`), the *bring-your-own-data* gate
-`data-pipeline/examplelab/io/contract.py`. Declares the required schema (columns, units, ranges) + an explicit
-**outlier policy** (reject / clip / flag). A dataset is accepted iff it passes; bad rows are rejected **with a
-reason**, never silently coerced; suspicious-but-plausible rows are flagged (the flag is recorded in the
-manifest). This is what lets a third party point the tool at THEIR data instead of only replaying baked cases.
+Every layer geoscena writes carries a `LayerProvenance`: `source`, `url`, `license` (key), `license_name`,
+`license_url`, `commercial_ok`, `fetched` (the `--fetched` date), `method` and source-specific `extra`.
+Per-building attributes that do not form a layer are listed under the manifest's `modalities` with their
+own source and license, and the per-place environment block lists its `sources`.
 
-EXAMPLE (SIR): columns `case_id,beta,gamma,N,I0[,days]`; ranges per `RANGES`; reject NaN/Inf/out-of-range/`I0>N`;
-flag `R0>20`. Full table: [`data/README.md`](../../data/README.md).
+What the 118 committed manifests record:
 
-## CONTRACT 2, artifact (`pipeline → web`)
-`data-pipeline/examplelab/core/{trace.py, manifest.py}`. Every run writes a compact trace (`example.trace/v1`) +
-a manifest (`example.manifest/v2`) recording params, seed, engine+version, the artifact byte size, the measured
-**[lane/gate](03_the-gate.md)** verdict, the Contract-1 flags, and the evaluation metrics. A flat
-`data/derived/manifests/index.json` inventories every case.
+| Layer or attribute | Source | License (as recorded) | Places |
+|---|---|---|---:|
+| `terrain` | Copernicus GLO-30 DSM | Copernicus-free | 118 |
+| `buildings` (+ `buildings_lite` proxy at 25 large places) | Overture Maps buildings, release 2026-06-17.0 | ODbL-1.0 | 100 |
+| `roads` | Overture Maps transportation | ODbL-1.0 | 100 |
+| `population` | GHS-POP R2023A (JRC), OpenLandMap COG mirror | CC-BY-4.0 | 116 |
+| `water` / `green` / `rail` | OpenStreetMap through OSMnx | ODbL-1.0 | 24 / 26 / 23 |
+| `lod2` | 3D BAG LoD2 (TU Delft) | CC-BY-4.0 | 2 |
+| per building: `ndvi`, `ndwi`, `ndbi` | one Sentinel-2 L2A scene per place (id and date recorded) | `proprietary` | 100 |
+| per building: `soil_soc` | ISRIC SoilGrids 2.0 | CC-BY-4.0 | 71 |
+| per place: environment | PVGIS v5.3; Open-Meteo ERA5 archive (2023) | `proprietary`; cc-by-4.0 | 118 |
 
-**Enforcement:** `frontend/src/lib/contract.types.ts` mirrors this schema, a drift fails `tsc`. `scripts/check_artifacts.py`
-(run in CI) verifies index→manifests→artifacts exist, byte sizes match, and lane==gate. The web loads **only** these
-artifacts; it never recomputes (except the optional live lane, which emits the same trace schema).
+The Sentinel-2 and PVGIS license keys are recorded as `proprietary`; the terms that apply are described in
+[09](09_analytical-layers.md). No manifest flags a non-commercial layer (`any_noncommercial` is false at
+all 118 places).
 
-## Why this matters
-Without Contract 1 the app can't be applied to new data (it's a demo). Without Contract 2 the web can silently
-drift from what the pipeline produced. The contracts are the seam that makes the product a tool, not a slideshow.
+**Known gap.** Every baked building also carries a land-cover class (`class`, ESA WorldCover class codes,
+non-null on all 4,053,338 buildings), which the app offers as the "Land cover" colour and mix. No manifest
+records a provenance entry for it: it is neither a layer nor a listed modality. Until geoscena records it,
+this attribute is the exception to the rule above.
+
+## CONTRACT 2, pipeline to web: what the app reads
+
+| File | Written by | Read by the app for |
+|---|---|---|
+| `data/derived/index.json` | `regen_index` | the place picker: slug, names, tier, hierarchy, layer count, bytes |
+| `data/derived/<slug>/manifest.json` | geoscena (`SceneBundle.to_manifest`) | the layers to load, provenance, credits, environment |
+| `data/derived/<slug>/*.glb` | geoscena, then meshopt compression | the geometry and the per-building attributes |
+| `data/derived/<slug>/admin.json` | `gen_admin` (68 places) | sub-area polygons, environment and indicators per unit |
+| `data/derived/benchmark.json` | `regen_index` (via `benchmark.py`) | the Benchmark page |
+
+**Enforcement.**
+
+- `frontend/src/lib/contract.types.ts` mirrors these shapes, so a field the app uses cannot silently
+  disappear without failing `tsc`.
+- `scripts/check_artifacts.py` (CI) checks the files agree in both directions: every indexed place has a
+  manifest, every named layer exists and is a glTF 2.0 binary whose header length equals its size, every
+  layer has a source, license and fetch date, index byte counts and layer counts match the files, no file
+  in a place folder goes unnamed, and the benchmark rows match the index.
+- `python -m maquetalab.regen_index --check` (CI) proves the index and benchmark are exactly what the
+  pipeline derives from the bundles.

@@ -91,7 +91,7 @@ def gen_for_place(p) -> int:
     man = d / "manifest.json"
     if not man.exists():
         return -1
-    layers = {l["name"] for l in json.loads(man.read_text(encoding="utf-8")).get("layers", [])}
+    layers = {layer["name"] for layer in json.loads(man.read_text(encoding="utf-8")).get("layers", [])}
     if "buildings" not in layers:  # only places with buildings can be aggregated by sub-area
         return -1
     iso3 = ISO3.get(p.country)

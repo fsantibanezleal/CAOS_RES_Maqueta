@@ -1,28 +1,40 @@
-# Architecture, overview
+# 01, overview
 
-This product is an instance of the **CAOS product-repo archetype** ([ADR-0057]): offline-pipeline-heavy,
-backend-optional, deploying as a static deterministic-replay viewer. The base is **frozen** (instantiated, never
-re-litigated); per-product rework lives only in the **core**, models/algorithms, visualization, content.
+Maqueta reconstructs real places in 3D from open public geodata and keeps, for every building, the record
+of where its height came from. It has three parts.
 
-## The lanes (and what runs where)
-| Lane | Where | Deps | Notes |
-|---|---|---|---|
-| **Offline (precompute)** | `data-pipeline/` (`examplelab`), `.venv-pipeline` | `data-pipeline/requirements.txt` (SOTA engines) | bakes the committed artifacts |
-| **Live (client-side)** | `frontend/src/pyodide` + `examplelab/live.py` | Pyodide-safe wheels (`requirements.txt`) | optional small recompute in the browser; may be a reduced model |
-| **Replay** | `frontend/` | n/a | always present; the fallback (ADR-0054) |
-| **API (backend)** | `app/` (FastAPI) | `requirements-api.txt` | DORMANT; activate only on an ADR-0002 trigger |
+| Part | Where | What it does |
+|---|---|---|
+| Fusion core | `geoscena` ([CAOS_GeoScena](https://github.com/fsantibanezleal/CAOS_GeoScena)) | For one area of interest: fetch each source, fuse the per-building attributes (including the height-provenance ladder), mesh terrain, buildings and roads, and write a SceneBundle (one `.glb` per layer plus a provenance manifest). |
+| Bake pipeline | `data-pipeline/maquetalab` | The place registry (118 places), the bake orchestration, meshopt compression, the place index and benchmark, and the admin sub-areas. Runs offline on the maintainer's machine. |
+| Web app | `frontend/` | A React + Three.js single-page app on the shared `@fasl-work/caos-app-shell`. It reads the committed bundles and renders them; all analysis in the browser works on baked attributes. |
 
-A measured **[gate](03_the-gate.md)** decides live vs replay per case.
+## A place's path from sources to screen
 
-## The flow
-`data/raw` → **[CONTRACT 1](08_data-contracts.md)** (`io/contract.py`) → staged pipeline
-(preprocess → feature_extraction → train → infer → evaluate → export) → **[CONTRACT 2](08_data-contracts.md)**
-(`core/manifest.py`, compact artifact) → `data/derived/` (committed) → `frontend/` replays it.
+1. `places.py` defines the place: centre, half-size, tier, and where it sits in the continent / country /
+   city hierarchy.
+2. `build.py` calls `geoscena.build.build_scene`, which fetches the layers the manifest then records
+   (Copernicus GLO-30 terrain, Overture buildings and roads, GHS-POP population, OpenStreetMap water /
+   green / rail, 3D BAG LoD2 where it exists), attaches the per-building attributes (height and its rung,
+   land-cover class, Sentinel-2 NDVI / NDWI / NDBI, soil organic carbon where SoilGrids covers the place)
+   and the per-place environment block (PVGIS solar, Open-Meteo climate), and writes
+   `data/derived/<slug>/`.
+3. `tools/compress-bundles.mjs` applies `EXT_meshopt_compression` to every `.glb`.
+4. `regen_index.py` writes `index.json` (the place list the app loads first) and `benchmark.json` (the
+   Benchmark page) from the bundles on disk.
+5. `gen_admin.py` writes `admin.json` (geoBoundaries sub-areas with environment values and, in Chile,
+   Data Observatory indicators) for the places that have buildings: 68 of them today.
+6. `frontend/copy-data.mjs` copies `data/derived` into the build, and the static site serves it.
 
-## Frozen base vs rework
-- **Frozen:** the folder layout, the two contracts, the staged pipeline names, the gate, the manifest/trace,
-  the two-venv split, the cases-by-category mechanism, CI guards. Any area may be **dormant** (with a README).
-- **Rework (the only per-product surface):** the engine in `model/` + the stage bodies (the science), the
-  `frontend/` visualizations, and the cases + content + calibration.
+The browser never fetches or recomputes the geodata; [03](03_the-gate.md) explains why and
+[04](04_live-lane-pyodide.md) lists what it does compute. The one request to a third party at run time is
+the optional satellite drape (EOX Sentinel-2 cloudless WMS), made only when the viewer turns it on.
 
-[ADR-0057]: ../../../conventions/architecture/0-archetype/ADR-0057-product-repo-archetype.md
+## Archetype lanes in this product
+
+| Lane | Status |
+|---|---|
+| Offline bake | Active: `data-pipeline/`, local only (network fetches, GDAL-backed raster reads, meshing). |
+| Replay (static web) | Active: `frontend/`, the only thing deployed. |
+| Live recompute in the browser (Pyodide) | Not used, see [03](03_the-gate.md). |
+| API backend (`app/`) | Dormant archetype scaffold, not used. |

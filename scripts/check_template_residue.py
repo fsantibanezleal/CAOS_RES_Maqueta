@@ -41,6 +41,12 @@ FORBIDDEN_PATH_SUFFIX = (
 FORBIDDEN_PATH_NAME = (
     "INSTANTIATE.md",
     "instantiate.md",
+    # Maqueta's declared deploy is a static nginx site (maqueta.ml.fasl-work.com), not GitHub
+    # Pages: Pages is not enabled here, and the built site carries data/derived (about 1.8 GB of
+    # GLB), above the 1 GB GitHub Pages limit. The template's Pages workflow, triggering on every
+    # push to main, failed on all its runs and was removed on 2026-09-18; this entry stops the next
+    # template sync from bringing it back (same entry as in CAOS_RES_Fragua).
+    "deploy-pages.yml",
 )
 
 # Tracked TEXT content that must not survive instantiation (unambiguous template tokens only;
@@ -48,15 +54,21 @@ FORBIDDEN_PATH_NAME = (
 FORBIDDEN_CONTENT = (
     "examplelab",
     "SIRChart",
+    "SIRTrace",
     "CAOS product template",
+    "PLACEHOLDER (template)",  # the architecture-modal SVG placeholders under frontend/public/svg/tech
     "PENDING-training",
     "EX01_subcritical",
     "EX02_epidemic",
 )
 
+# Shell and PowerShell scripts, CSV samples and SVGs are scanned too: without them the guard missed
+# scripts/precompute.{sh,ps1} still running the example package, the example's params.csv, and the
+# five placeholder SVGs the app never referenced but every build shipped.
 TEXT_SUFFIXES = {
     ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".py", ".md", ".json",
     ".css", ".html", ".yml", ".yaml", ".toml", ".txt", ".cfg", ".ini",
+    ".sh", ".ps1", ".csv", ".svg",
 }
 
 
