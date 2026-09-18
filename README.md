@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/github/license/fsantibanezleal/CAOS_RES_Maqueta)](LICENSE)
 [![Live demo](https://img.shields.io/badge/demo-maqueta.ml.fasl--work.com-2ea44f)](https://maqueta.ml.fasl-work.com)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21519794-blue)](https://doi.org/10.5281/zenodo.21519794)
 
 **A multi-modal geospatial fusion tool: 3D visualization + reconstruction of real-world areas from open
 public geodata, using the height map as the entry point.** Maqueta bakes each curated place (cities, mining
