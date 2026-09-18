@@ -40,51 +40,29 @@ All notable changes to Maqueta. Format: [Keep a Changelog](https://keepachangelo
   World metros: Shanghai, Beijing, Hong Kong, Delhi, Bangkok, Jakarta, Dubai, Los Angeles, Chicago, Lagos.
   Iconic landmarks + landscapes: Giza Pyramids, Machu Picchu, Taj Mahal (Agra), Great Wall, Petra, Angkor
   Wat, Mount Fuji, Rio de Janeiro, Venice, Matterhorn, Yosemite, Victoria Falls, Santorini, Monument Valley.
-- **Searchable place picker.** Replaces the native select (unusable at 100+ places): type to filter by
-  city / country / landmark, results grouped by continent with sticky headers.
+  18 of the 107 places are terrain-only (no buildings).
+- **Searchable, categorized place picker.** Replaces the native select (unusable at 100+ places): type to
+  filter by city / country / landmark; built places are grouped by continent with sticky headers, and the
+  terrain-only areas have their own "Terrain & landscapes" group.
 
 ### Changed
 - **Cinematic default view.** The app opens on a low oblique that fills the frame with the built fabric and
   lets it recede to the far relief hazing into the sky.
 - **Terrain rendering overhaul** (fixes terrain-first places rendering off-screen and as a transparent/grey
-  surface): frame at the terrain's true altitude so high places (Atacama, Chuquicamata ~2500 m) are in
-  view; render the terrain DoubleSide with flipped normals (the baked TIN winding was inverted, back-face-
-  culling the flat surface); bake a hillshade + earthy hypsometric ramp with altitude-gated snow caps into
-  the vertex colours (lighting-independent). Terrain-first places now read as solid coloured 3D landscapes;
-  cities sit on visible coloured ground with the Andes as earthy relief.
+  surface). Meshes carry absolute altitude, so high places (Chuquicamata and Atacama at ~2500 m, Bogota
+  ~2600 m) rendered above the top of the frame; the camera, ground-pick and area tool now frame at the
+  scene's actual mean elevation. The terrain renders DoubleSide with flipped normals (the baked TIN winding
+  was inverted, back-face-culling the flat surface). A hillshade + earthy hypsometric ramp with
+  altitude-gated snow caps is baked into the vertex colours and rendered lighting-independent, so
+  terrain-first places read as solid coloured landscapes (Mount Fuji as a snow-capped cone, Chuquicamata
+  as a coloured pit + ridges), cities sit on visible coloured ground with the Andes as earthy relief, and
+  city relief never crushes to black.
+- **Default colour = Function** when the place has building-function data (else height).
 
 ### Fixed
 - Open Buildings 2.5D fetcher (`geoscena`): a `/vsicurl` COG open on GCS triggered a full bucket directory
   listing; added `GDAL_DISABLE_READDIR_ON_OPEN` + HTTP timeout/retries (mirrors `rastermod.py`), cutting
   each Global-South height fetch from minutes to seconds.
-
-[0.07.000]: https://github.com/fsantibanezleal/CAOS_RES_Maqueta/releases/tag/v0.07.000
-
-## [0.07.000] - 2026-07-13
-
-### Added
-- **29 more places (107 total).** Chilean cities: Calama, Antofagasta, Sierra Gorda, Valdivia, Chiloe
-  (Castro). Major world metros: Shanghai, Beijing, Hong Kong, Delhi, Bangkok, Jakarta, Dubai, Los Angeles,
-  Chicago, Lagos. Iconic landmarks + landscapes: Giza Pyramids, Machu Picchu, Taj Mahal, Great Wall, Petra,
-  Angkor Wat, Mount Fuji, Rio de Janeiro, Venice, Matterhorn, Yosemite, Victoria Falls, Santorini, Monument
-  Valley. 18 of the 107 places are terrain-only (no buildings).
-- **Searchable, categorized place picker** replacing the native select: type to filter by city / country /
-  landmark; built places grouped by continent, and the terrain-only areas pulled into their own "Terrain &
-  landscapes" group so the 107-place list is organized rather than a flat list.
-
-### Changed
-- **Terrain rendering overhaul.** Meshes carry absolute altitude, so high places (Chuquicamata, Atacama at
-  ~2500 m, Bogota ~2600 m) rendered above the top of the frame; the camera, ground-pick and area tool now
-  frame at the scene's actual mean elevation. Relief + colour are baked into the terrain vertex colours
-  (hillshade + earthy hypsometric ramp) and rendered lighting-independent, so terrain-first places show a
-  real coloured topographic surface (Mount Fuji reads as a snow-capped cone, Chuquicamata as a coloured
-  pit + ridges) instead of a washed-out flat grey, and city relief never crushes to black.
-- **Default colour = Function** when the place has building-function data (else height).
-- Open on the cinematic low-oblique default view.
-
-### Fixed
-- Open Buildings height fetch could stall for minutes on a GCS bucket listing (GDAL tuning in the geoscena
-  fetcher; each fetch now takes seconds).
 
 [0.07.000]: https://github.com/fsantibanezleal/CAOS_RES_Maqueta/releases/tag/v0.07.000
 
