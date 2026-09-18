@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Regenerate the figures for the Maqueta geospatial-reconstruction report from the COMMITTED benchmark. Two figures:
+"""Regenerate the figures for the Maqueta geospatial-reconstruction report from the repository benchmark
+(data/derived/benchmark.json, copied into ../data/mq.json). Two figures, drawn at single-column width:
 
-  fig-provenance.pdf - the honest height provenance across 118 fused places: what fraction of building heights are
-                       measured versus floor-count-inferred, raster-derived or a prior. Most are inferred.
-  fig-benchmark.pdf  - where authoritative LoD2 ground truth exists (two Dutch places), the fused-height error:
-                       RMSE, MAE and (signed) bias against the LoD2 reference.
+  fig-provenance.pdf - the height provenance of the 4.05 million buildings of the 118 baked places: the share whose
+                       height comes from a mapped height attribute (OpenStreetMap / Overture), from a mapped floor
+                       count, from the Google Open Buildings 2.5D height raster, or from the default prior.
+  fig-benchmark.pdf  - where a public LoD2 reference exists (two Dutch places, 3D BAG), the fused-height RMSE, MAE and
+                       signed bias against it, with the number of reference buildings and of matched fused buildings.
 
 Run:  python make_figs.py     (from repo root)
 Deps: matplotlib, numpy.
@@ -27,7 +29,7 @@ INK = "#1a1a2e"
 GRID = "#d8d8e0"
 
 plt.rcParams.update({
-    "font.family": "serif", "font.size": 9.4, "axes.edgecolor": INK,
+    "font.family": "serif", "font.size": 8.0, "axes.edgecolor": INK,
     "axes.labelcolor": INK, "text.color": INK, "xtick.color": INK, "ytick.color": INK,
     "axes.linewidth": 0.8, "figure.dpi": 200,
 })
@@ -41,18 +43,20 @@ def fig_provenance():
     d = _load()
     mix = d["global_mix"]
     order = ["measured", "floors", "raster", "prior"]
-    labels = ["measured\n(authoritative)", "floor-count\ninferred", "raster\n(DSM-derived)", "prior\n(assumed)"]
+    labels = ["mapped\nheight\n(OSM, Overture)", "mapped floor\ncount\n× 3.2 m", "Open Buildings\n2.5D height\nraster",
+              "default\nprior\n(8 m)"]
     vals = [100 * mix[k] for k in order]
     cols = ["#3fa34d", "#c99a1e", "#e07a3f", "#b23a48"]
-    fig, ax = plt.subplots(figsize=(6.2, 3.1))
-    bars = ax.bar(range(4), vals, color=cols, edgecolor=INK, linewidth=0.6, width=0.64, zorder=3)
+    fig, ax = plt.subplots(figsize=(3.45, 2.6))
+    ax.bar(range(4), vals, color=cols, edgecolor=INK, linewidth=0.6, width=0.64, zorder=3)
     for i, v in enumerate(vals):
-        ax.text(i, v + 1, f"{v:.1f}%", ha="center", va="bottom", fontsize=9.0, fontweight="bold")
+        ax.annotate(f"{v:.1f}%", (i, v), xytext=(0, 2), textcoords="offset points", ha="center", va="bottom",
+                    fontsize=7.6, fontweight="bold")
     ax.set_ylabel("share of building heights (%)")
-    ax.set_xticks(range(4)); ax.set_xticklabels(labels, fontsize=8.0)
-    ax.set_ylim(0, max(vals) * 1.18)
-    ax.set_title(f"Open-data 3D city heights are mostly inferred, not measured\n"
-                 f"({d['n_places']} places; only {vals[0]:.1f}% authoritative)", fontsize=9.0)
+    ax.set_xticks(range(4)); ax.set_xticklabels(labels, fontsize=6.6)
+    ax.set_ylim(0, max(vals) * 1.15)
+    ax.set_title(f"Height provenance, {d['n_places']} places\n({d['n_buildings'] / 1e6:.2f} million buildings)",
+                 fontsize=7.8)
     ax.grid(axis="y", color=GRID, linewidth=0.7, zorder=0)
     ax.set_axisbelow(True)
     for s in ("top", "right"):
@@ -65,26 +69,29 @@ def fig_provenance():
 def fig_benchmark():
     d = _load()
     gt = d["ground_truth"]
-    names = [g["name"] for g in gt]
     rmse = [g["rmse"] for g in gt]
     mae = [g["mae"] for g in gt]
     bias = [abs(g["bias"]) for g in gt]
     x = np.arange(len(gt)); w = 0.26
-    fig, ax = plt.subplots(figsize=(6.0, 3.1))
-    ax.bar(x - w, rmse, w, color="#1b6ca8", edgecolor=INK, linewidth=0.5, label="RMSE")
-    ax.bar(x, mae, w, color="#3fa34d", edgecolor=INK, linewidth=0.5, label="MAE")
-    ax.bar(x + w, bias, w, color="#e07a3f", edgecolor=INK, linewidth=0.5, label="|bias|")
+    fig, ax = plt.subplots(figsize=(3.45, 2.6))
+    ax.bar(x - w, rmse, w, color="#1b6ca8", edgecolor=INK, linewidth=0.5, label="RMSE", zorder=3)
+    ax.bar(x, mae, w, color="#3fa34d", edgecolor=INK, linewidth=0.5, label="MAE", zorder=3)
+    ax.bar(x + w, bias, w, color="#e07a3f", edgecolor=INK, linewidth=0.5, label="|bias|", zorder=3)
     for xi, r, m, b, g in zip(x, rmse, mae, bias, gt):
-        ax.text(xi - w, r + 0.15, f"{r:.1f}", ha="center", va="bottom", fontsize=7.2)
-        ax.text(xi + w, b + 0.15, f"{g['bias']:+.1f}", ha="center", va="bottom", fontsize=7.0, color="#c15a22")
+        ax.annotate(f"{r:.1f}", (xi - w, r), xytext=(0, 2), textcoords="offset points", ha="center", va="bottom",
+                    fontsize=6.8)
+        ax.annotate(f"{m:.1f}", (xi, m), xytext=(0, 2), textcoords="offset points", ha="center", va="bottom",
+                    fontsize=6.8)
+        ax.annotate(f"{g['bias']:+.1f}", (xi + w, b), xytext=(0, 2), textcoords="offset points", ha="center",
+                    va="bottom", fontsize=6.8, color="#c15a22")
     ax.set_xticks(x)
-    ax.set_xticklabels([f"{g['name']}\n({g['country']}, n={g['n_truth']})" for g in gt], fontsize=7.6)
+    ax.set_xticklabels([f"{g['name']}\n{g['n_truth']} reference,\n{g['matched']} matched" for g in gt], fontsize=6.8)
     ax.set_ylabel("building-height error (m)")
-    ax.set_title("Fused-height error vs authoritative LoD2, where it exists\n"
-                 "(only 2 of 118 places have public LoD2 ground truth)", fontsize=8.8)
+    ax.set_ylim(0, max(rmse) * 1.2)
+    ax.set_title("Fused heights against 3D BAG LoD2", fontsize=7.8)
     ax.grid(axis="y", color=GRID, linewidth=0.7, zorder=0)
     ax.set_axisbelow(True)
-    ax.legend(fontsize=7.8, frameon=True, facecolor="white", edgecolor=GRID, loc="upper right")
+    ax.legend(fontsize=6.8, frameon=True, facecolor="white", edgecolor=GRID, loc="upper right")
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     fig.tight_layout()
