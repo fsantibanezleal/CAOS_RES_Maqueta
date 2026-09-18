@@ -31,5 +31,4 @@ target; none is written yet.
 | react, react-dom | the UI | 19.2.7 |
 | @fasl-work/caos-app-shell | the shared shell: navigation, EN/ES, light/dark, the architecture modal | 0.3.0 |
 | katex | the equations on the Methodology page | 0.16.47 |
-| uplot | declared in `package.json` but not imported by the app today | 1.6.32 |
 | vite, typescript | build and type check | 6.4.3, 5.9.3 |
