@@ -112,7 +112,9 @@ def write(out_dir: Path = DERIVED, derived: Path = DERIVED) -> int:
     summaries = collect_summaries(derived)
     out_dir.mkdir(parents=True, exist_ok=True)
     for name, text in render(summaries).items():
-        (out_dir / name).write_text(text, encoding="utf-8")
+        # newline="\n": LF on every OS, so a regeneration on Windows is byte-identical to the committed files
+        # (git keeps them LF) and to a regeneration in CI; a CRLF copy used to reach the live host this way.
+        (out_dir / name).write_text(text, encoding="utf-8", newline="\n")
     return len(summaries)
 
 

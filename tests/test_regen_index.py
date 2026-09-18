@@ -35,6 +35,14 @@ def test_committed_index_and_benchmark_reproduce():
     assert n == len(places.list_places())
 
 
+def test_written_files_are_byte_identical_to_the_committed_ones(tmp_path):
+    """Byte for byte, on every OS: the writer emits LF, as git stores the committed files."""
+    out = tmp_path / "out"
+    regen_index.write(out)
+    for name in regen_index.OUTPUTS:
+        assert (out / name).read_bytes() == (DERIVED / name).read_bytes(), name
+
+
 def test_cli_check_exit_code(capsys):
     assert regen_index.main(["--check"]) == 0
     assert "--check OK" in capsys.readouterr().out
