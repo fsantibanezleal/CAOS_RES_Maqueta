@@ -56,5 +56,5 @@ all 118 places).
   manifest, every named layer exists and is a glTF 2.0 binary whose header length equals its size, every
   layer has a source, license and fetch date, index byte counts and layer counts match the files, no file
   in a place folder goes unnamed, and the benchmark rows match the index.
-- `python -m maquetalab.regen_index --check` (CI) proves the index and benchmark are exactly what the
+- `python data-pipeline/run.py regen-index --check` (CI) proves the index and benchmark are exactly what the
   pipeline derives from the bundles.

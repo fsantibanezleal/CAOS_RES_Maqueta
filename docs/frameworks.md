@@ -14,7 +14,7 @@ target; none is written yet.
 | rasterio (GDAL) | windowed `/vsicurl` reads of GLO-30, GHS-POP, Open Buildings 2.5D and Sentinel-2 | a geoscena dependency |
 | shapely, pyproj, geopandas, scipy, trimesh, mapbox-earcut, numpy | geometry, projection to the local metric frame, triangulation and meshing | geoscena dependencies |
 | geopandas, requests, shapely | `gen_admin`: geoBoundaries units, clipping, the environment calls | geoscena dependencies, installed with it |
-| numpy | the `maquetalab` package's own dependency, the only one CI needs | 2.4.6 (`data-pipeline/requirements.txt`) |
+| numpy | the pipeline lane, the only engine dependency CI needs | 2.4.6 (`data-pipeline/requirements.txt`) |
 
 ## Bundle compression (Node, `data-pipeline/tools/package-lock.json`)
 

@@ -5,5 +5,5 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=".venv-pipeline/bin/python"; [ -x "$PY" ] || PY=".venv-pipeline/Scripts/python.exe"
 [ -x "$PY" ] || PY="${PYTHON:-python}"
-"$PY" -m maquetalab.regen_index --check
+"$PY" data-pipeline/run.py regen-index --check
 "$PY" scripts/check_artifacts.py

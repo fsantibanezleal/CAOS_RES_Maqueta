@@ -6,7 +6,7 @@ of where its height came from. It has three parts.
 | Part | Where | What it does |
 |---|---|---|
 | Fusion core | `geoscena` ([CAOS_GeoScena](https://github.com/fsantibanezleal/CAOS_GeoScena)) | For one area of interest: fetch each source, fuse the per-building attributes (including the height-provenance ladder), mesh terrain, buildings and roads, and write a SceneBundle (one `.glb` per layer plus a provenance manifest). |
-| Bake pipeline | `data-pipeline/maquetalab` | The place registry (118 places), the bake orchestration, meshopt compression, the place index and benchmark, and the admin sub-areas. Runs offline on the maintainer's machine. |
+| Bake pipeline | `data-pipeline/pipeline` | The place registry (118 places), the bake orchestration, meshopt compression, the place index and benchmark, and the admin sub-areas. Runs offline on the maintainer's machine. |
 | Web app | `frontend/` | A React + Three.js single-page app on the shared `@fasl-work/caos-app-shell`. It reads the committed bundles and renders them; all analysis in the browser works on baked attributes. |
 
 ## A place's path from sources to screen

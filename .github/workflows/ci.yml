@@ -15,14 +15,14 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - name: Install (offline lane + dev + editable pkg)
-        run: pip install -r data-pipeline/requirements.txt -r requirements-dev.txt -e .
+      - name: Install (pipeline lane + dev tools; the pipeline itself is plain code, never installed)
+        run: pip install -r data-pipeline/requirements.txt -r requirements-dev.txt
       - name: Lint
         run: ruff check data-pipeline tests scripts
       - name: Tests
         run: pytest
       - name: Pipeline smoke (regenerate index + benchmark from the committed bundles; must match, writes nothing)
-        run: python -m maquetalab.regen_index --check
+        run: python data-pipeline/run.py regen-index --check
       - name: CONTRACT 2, manifests <-> artifacts consistent (no drift)
         run: python scripts/check_artifacts.py
 

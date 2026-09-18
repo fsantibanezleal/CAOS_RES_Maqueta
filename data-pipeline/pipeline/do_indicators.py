@@ -4,7 +4,7 @@ Atalaya mirrors the Chilean Data Observatory (datos.gob.cl) to ``E:\\_Datos\\ata
 are comuna-keyed, so they can be joined to the geoBoundaries comuna polygons Maqueta already uses for
 sub-area aggregation and rendered as a choropleth over the Santiago cases. This module reduces a few of those
 datasets to one scalar per comuna and exposes ``indicators_for(comuna_name)`` keyed by a stable indicator id,
-so :mod:`maquetalab.gen_admin` can attach them per admin unit (alongside the solar/climate environment).
+so :mod:`pipeline.gen_admin` can attach them per admin unit (alongside the solar/climate environment).
 
 Indicators (each a real DO dataset, honestly labelled, no fabrication):
 

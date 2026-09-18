@@ -19,8 +19,8 @@ that date; the manifest is Maqueta's trace.
 ## What is deterministic
 
 `index.json` and `benchmark.json` are a pure function of the committed bundles and the registry.
-`python -m maquetalab.regen_index` rebuilds them from disk, and CI runs
-`python -m maquetalab.regen_index --check`, which fails unless the committed files equal the regeneration
+`python data-pipeline/run.py regen-index` rebuilds them from disk, and CI runs
+`python data-pipeline/run.py regen-index --check`, which fails unless the committed files equal the regeneration
 exactly (read in text mode, so a CRLF checkout compares equal). The property also holds right after a bake,
 because the pipeline writes the index only through `regen_index`, after compression.
 

@@ -22,8 +22,9 @@ where they exist.
   manifest) from open public sources. Its 0.1.0 release on PyPI predates most of the fetchers used here; the
   committed bundles match repository commit `ab0bbf8` (2026-07-14), which `data-pipeline/requirements-bake.txt`
   pins.
-- **`maquetalab`** (this repo, `data-pipeline/`) is the product pipeline: the 118-place registry, the bake
-  wrapper, the orchestrator, the place index, the cross-place benchmark and the admin sub-areas.
+- **`data-pipeline/`** (this repo) is the product pipeline: the 118-place registry, the bake wrapper, the
+  orchestrator, the place index, the cross-place benchmark and the admin sub-areas. It is plain code run by
+  path (`python data-pipeline/run.py bake | regen-index | gen-admin`), not an installed package.
 - **`frontend/`** is the Three.js + shared-shell web app: a place-selector workbench with the 3D viewer,
   raycast building read-out, layer toggles, camera presets, plus the Introduction / Methodology /
   Implementation / Experiments / Benchmark pages and the in-app architecture modal (ADR-0058).

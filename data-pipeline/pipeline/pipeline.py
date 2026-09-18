@@ -1,13 +1,13 @@
-"""The offline pipeline orchestrator + CLI (ADR-0057).
+"""The offline bake orchestrator (ADR-0057), run as `python data-pipeline/run.py bake ...`.
 
 Bakes one place or all places into committed SceneBundles, meshopt-compresses them, then regenerates
 the place index + benchmark summary that the web app reads from every bundle on disk (regen_index is
 the single writer, so the recorded byte sizes are the compressed ones and a one-place bake keeps the
 places baked earlier in the index).
 
-    python -m maquetalab.pipeline --fetched 2026-07-12                 # all places
-    python -m maquetalab.pipeline berlin_mitte --fetched 2026-07-12    # one place
-    python -m maquetalab.pipeline --tier A --fetched 2026-07-12        # one tier
+    python data-pipeline/run.py bake --fetched 2026-07-12                 # all places
+    python data-pipeline/run.py bake berlin_mitte --fetched 2026-07-12    # one place
+    python data-pipeline/run.py bake --tier A --fetched 2026-07-12        # one tier
 """
 
 from __future__ import annotations
@@ -80,8 +80,8 @@ def _run_cli(selected: list[places.Place], fetched: str, compress: bool) -> None
         reindex()
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser(prog="maquetalab.pipeline")
+def main(argv: list[str] | None = None) -> None:
+    ap = argparse.ArgumentParser(prog="run.py bake")
     ap.add_argument("place", nargs="?", default=None, help="a place slug, or omit for a set")
     ap.add_argument("--tier", choices=["A", "B", "C"], help="bake only this tier")
     ap.add_argument("--fetched", required=True, help="ISO date for provenance (e.g. 2026-07-12)")
@@ -89,7 +89,7 @@ def main() -> None:
                     help="skip the meshopt delivery-compression step after baking")
     ap.add_argument("--compress-only", action="store_true",
                     help="skip baking; only run meshopt compression over existing bundles")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
     if args.compress_only:
         compress_bundles()
@@ -103,7 +103,3 @@ def main() -> None:
     else:
         selected = places.list_places()
     _run_cli(selected, fetched=args.fetched, compress=not args.no_compress)
-
-
-if __name__ == "__main__":
-    main()

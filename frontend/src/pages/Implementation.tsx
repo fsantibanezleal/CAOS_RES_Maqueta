@@ -31,8 +31,8 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
     <div className="mq-method">
       <p>
         {t(
-          'maquetalab bakes each registry place by calling geoscena: fetch every modality from its authoritative source, fuse, mesh, export and meshopt-compress. Geometric fetchers: Overture (footprints/roads), GLO-30 DSM and WorldCover (COG windowed reads via GDAL /vsicurl, keyless), OSM context (Overpass), GHS-POP, Open Buildings 2.5D heights, 3DBAG LoD2. Analytical fetchers: Sentinel-2 L2A via the Earth Search STAC (NDVI/NDWI/NDBI), environment via PVGIS + Open-Meteo, and gen_admin joining geoBoundaries sub-areas + the Data Observatory indicators. It is layer-tolerant: a natural area with no buildings bakes its terrain and records the gap rather than failing.',
-          'maquetalab precalcula cada lugar del registro llamando a geoscena: descarga cada modalidad de su fuente autoritativa, fusiona, mallea, exporta y comprime con meshopt. Fetchers geométricos: Overture (huellas/calles), GLO-30 DSM y WorldCover (lecturas COG por ventana vía GDAL /vsicurl, sin credenciales), contexto OSM (Overpass), GHS-POP, alturas 2.5D de Open Buildings, LoD2 de 3DBAG. Fetchers analíticos: Sentinel-2 L2A vía STAC de Earth Search (NDVI/NDWI/NDBI), ambiente vía PVGIS + Open-Meteo, y gen_admin uniendo subáreas de geoBoundaries + los indicadores del Observatorio de Datos. Es tolerante a capas: un área natural sin edificios precalcula su relieve y registra el hueco en vez de fallar.',
+          'The pipeline (data-pipeline/, plain code run by path: python data-pipeline/run.py bake) bakes each registry place by calling geoscena: fetch every modality from its authoritative source, fuse, mesh, export and meshopt-compress. Geometric fetchers: Overture (footprints/roads), GLO-30 DSM and WorldCover (COG windowed reads via GDAL /vsicurl, keyless), OSM context (Overpass), GHS-POP, Open Buildings 2.5D heights, 3DBAG LoD2. Analytical fetchers: Sentinel-2 L2A via the Earth Search STAC (NDVI/NDWI/NDBI), environment via PVGIS + Open-Meteo, and gen_admin joining geoBoundaries sub-areas + the Data Observatory indicators. It is layer-tolerant: a natural area with no buildings bakes its terrain and records the gap rather than failing.',
+          'El pipeline (data-pipeline/, código plano que se ejecuta por ruta: python data-pipeline/run.py bake) precalcula cada lugar del registro llamando a geoscena: descarga cada modalidad de su fuente autoritativa, fusiona, mallea, exporta y comprime con meshopt. Fetchers geométricos: Overture (huellas/calles), GLO-30 DSM y WorldCover (lecturas COG por ventana vía GDAL /vsicurl, sin credenciales), contexto OSM (Overpass), GHS-POP, alturas 2.5D de Open Buildings, LoD2 de 3DBAG. Fetchers analíticos: Sentinel-2 L2A vía STAC de Earth Search (NDVI/NDWI/NDBI), ambiente vía PVGIS + Open-Meteo, y gen_admin uniendo subáreas de geoBoundaries + los indicadores del Observatorio de Datos. Es tolerante a capas: un área natural sin edificios precalcula su relieve y registra el hueco en vez de fallar.',
         )}{' '}
         <Cite id="overture" /> <Cite id="sentinel2" /> <Cite id="pvgis" /> <Cite id="geoboundaries" />
       </p>
@@ -40,7 +40,7 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
         'Dos carriles: un precálculo offline pesado (descarga, fusión, malla, capas analíticas, meshopt) y una reproducción estática ligera. El manifiesto es el contrato entre ambos.')}>
         <svg className="mq-fig-svg" viewBox="0 0 640 200" role="img" preserveAspectRatio="xMidYMid meet">
           <rect className="f-grid" x="8" y="12" width="624" height="86" rx="8" />
-          <text className="f-mu" x="18" y="28">{t('offline bake lane (geoscena + maquetalab)', 'carril de precálculo offline (geoscena + maquetalab)')}</text>
+          <text className="f-mu" x="18" y="28">{t('offline bake lane (geoscena + data-pipeline)', 'carril de precálculo offline (geoscena + data-pipeline)')}</text>
           {[
             { x: 18, en: 'fetch modalities', es: 'descarga modalidades' },
             { x: 152, en: 'fuse (height ladder)', es: 'fusión (escalera)' },
@@ -117,8 +117,8 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
     <section className="page-body prose">
       <h2>{t('Implementation', 'Implementación')}</h2>
       <p className="mq-lead">
-        {t('The concrete system: a reusable geoscena package and a maquetalab pipeline that bakes every place offline into an audited SceneBundle, two data contracts that keep every value sourced, a read-only web app that only replays those bundles, and a static deploy.',
-          'El sistema concreto: un paquete geoscena reutilizable y un pipeline maquetalab que precalcula cada lugar offline en un SceneBundle auditado, dos contratos de datos que mantienen cada valor con fuente, una app web de solo lectura que solo reproduce esos bundles, y un despliegue estático.')}
+        {t('The concrete system: a reusable geoscena package and a pipeline (data-pipeline/) that bakes every place offline into an audited SceneBundle, two data contracts that keep every value sourced, a read-only web app that only replays those bundles, and a static deploy.',
+          'El sistema concreto: un paquete geoscena reutilizable y un pipeline (data-pipeline/) que precalcula cada lugar offline en un SceneBundle auditado, dos contratos de datos que mantienen cada valor con fuente, una app web de solo lectura que solo reproduce esos bundles, y un despliegue estático.')}
       </p>
       <SubTabs
         ariaLabel={t('Implementation topics', 'Temas de implementación')}

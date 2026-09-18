@@ -1,8 +1,9 @@
 # Guide 00, set up the environments
 
 1. **Pipeline checks (Python 3.11 or newer; CI uses 3.12).** `./scripts/setup.sh` (or `scripts\setup.ps1`)
-   creates `.venv-pipeline` with `data-pipeline/requirements.txt`, the dev tools and the editable
-   `maquetalab` package. That is all the tests, the index regeneration and the guards need.
+   creates `.venv-pipeline` with `data-pipeline/requirements.txt` and the dev tools. That is all the tests,
+   the index regeneration and the guards need; the pipeline code itself is never installed, it runs by path
+   (`python data-pipeline/run.py ...`).
 2. **Baking (optional).** Add the bake lane to `.venv-pipeline`: the geoscena core with its fetch extras,
    pinned to the CAOS_GeoScena commit the committed bundles match (`ab0bbf8`; its 0.1.0 release on PyPI
    predates most of the fetchers), which also brings the libraries `gen_admin` uses:

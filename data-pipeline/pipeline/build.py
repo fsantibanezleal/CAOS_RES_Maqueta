@@ -17,7 +17,7 @@ from geoscena.build import BuildConfig, build_scene
 
 from .places import Place
 
-# data-pipeline/maquetalab/build.py -> parents[2] = repo root
+# data-pipeline/pipeline/build.py -> parents[2] = repo root
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DERIVED = REPO_ROOT / "data" / "derived"
 

@@ -28,7 +28,7 @@ On every push to `main` or `develop` and on every pull request:
 |---|---|---|
 | `test` | Lint | `ruff check data-pipeline tests scripts` |
 | `test` | Tests | `pytest`: the registry, the benchmark aggregation, `regen_index` and the CONTRACT 2 guard, each guard proven to fail on injected faults |
-| `test` | Pipeline smoke | `python -m maquetalab.regen_index --check`: the committed index and benchmark reproduce from the bundles |
+| `test` | Pipeline smoke | `python data-pipeline/run.py regen-index --check`: the committed index and benchmark reproduce from the bundles |
 | `test` | CONTRACT 2 | `python scripts/check_artifacts.py` |
 | `guards` | Base integrity | no tracked `.env`, virtual environment, native binary, raw data format or local machine path |
 | `guards` | Template residue | `python scripts/check_template_residue.py` |

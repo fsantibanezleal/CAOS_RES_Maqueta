@@ -1,33 +1,37 @@
-# data-pipeline/, the offline bake (`maquetalab`)
+# data-pipeline/, the offline bake
 
 Everything that turns open public geodata into the committed SceneBundles runs here, offline, on the
-maintainer's machine; the web app only replays what this produces. `maquetalab` is the product-side
-pipeline. The fetching, per-building fusion and meshing are done by the `geoscena` core
-([CAOS_GeoScena](https://github.com/fsantibanezleal/CAOS_GeoScena)).
+maintainer's machine; the web app only replays what this produces. The fetching, per-building fusion and
+meshing are done by the `geoscena` core ([CAOS_GeoScena](https://github.com/fsantibanezleal/CAOS_GeoScena)).
+
+This is plain code, not a package (conventions/no-internal-packages.md): nothing here is installed, and the
+only way in is `run.py`, invoked by path, which puts this folder on `sys.path` and runs one command from the
+`pipeline/` folder. Up to release 0.08.000 this code was an installed internal package named `maquetalab`.
 
 ## Modules
 
 | Module | Role |
 |---|---|
-| `maquetalab/places.py` | The place registry: slug, centre, half-size, tier (A ground truth, B global-fusion city, C terrain-first), continent / country / city and a note per place. |
-| `maquetalab/build.py` | `bake_place`: builds the area of interest and the `BuildConfig`, runs `geoscena.build.build_scene`, removes the place's previous `.glb` layers and writes `data/derived/<slug>/`. |
-| `maquetalab/pipeline.py` | CLI and orchestrator: bake one place, one tier or all; meshopt-compress; regenerate the index. |
-| `maquetalab/regen_index.py` | The single writer of `index.json` + `benchmark.json`, from the bundles on disk. `--output DIR` writes elsewhere; `--check` compares with the committed files and writes nothing (the CI smoke). |
-| `maquetalab/benchmark.py` | The cross-place summary behind the Benchmark page. |
-| `maquetalab/gen_admin.py` | `admin.json` for every place with buildings: geoBoundaries units at the finest level (ADM4 to ADM1) with 2 to 40 units in the area, each with its environment values and, in Chile, its Data Observatory indicators. |
-| `maquetalab/do_indicators.py` | Chilean comuna indicators (health facilities, foreign-born residents, schools) from the Data Observatory mirror, for `gen_admin`. |
+| `run.py` | The entry point: `bake`, `regen-index` or `gen-admin`, each imported only when it runs. |
+| `pipeline/places.py` | The place registry: slug, centre, half-size, tier (A ground truth, B global-fusion city, C terrain-first), continent / country / city and a note per place. |
+| `pipeline/build.py` | `bake_place`: builds the area of interest and the `BuildConfig`, runs `geoscena.build.build_scene`, removes the place's previous `.glb` layers and writes `data/derived/<slug>/`. |
+| `pipeline/pipeline.py` | The `bake` command: bake one place, one tier or all; meshopt-compress; regenerate the index. |
+| `pipeline/regen_index.py` | The `regen-index` command and the single writer of `index.json` + `benchmark.json`, from the bundles on disk. `--output DIR` writes elsewhere; `--check` compares with the committed files and writes nothing (the CI smoke). |
+| `pipeline/benchmark.py` | The cross-place summary behind the Benchmark page. |
+| `pipeline/gen_admin.py` | The `gen-admin` command: `admin.json` for every place with buildings, geoBoundaries units at the finest level (ADM4 to ADM1) with 2 to 40 units in the area, each with its environment values and, in Chile, its Data Observatory indicators. |
+| `pipeline/do_indicators.py` | Chilean comuna indicators (health facilities, foreign-born residents, schools) from the Data Observatory mirror, for `gen_admin`. |
 | `tools/compress-bundles.mjs` | `EXT_meshopt_compression` over every `.glb` in place (gltf-transform + meshoptimizer). |
 
 ## Run
 
 ```bash
-python -m maquetalab.pipeline --fetched 2026-07-12                # bake all places, compress, reindex
-python -m maquetalab.pipeline berlin_mitte --fetched 2026-07-12   # one place; the index keeps the rest
-python -m maquetalab.pipeline --tier A --fetched 2026-07-12       # one tier
-python -m maquetalab.pipeline --compress-only --fetched 2026-07-12   # recompress existing bundles, reindex
-python -m maquetalab.gen_admin                                    # admin.json sub-areas, after a bake
-python -m maquetalab.regen_index                                  # rewrite index.json + benchmark.json only
-python -m maquetalab.regen_index --check                          # verify them; writes nothing
+python data-pipeline/run.py bake --fetched 2026-07-12                   # bake all places, compress, reindex
+python data-pipeline/run.py bake berlin_mitte --fetched 2026-07-12      # one place; the index keeps the rest
+python data-pipeline/run.py bake --tier A --fetched 2026-07-12          # one tier
+python data-pipeline/run.py bake --compress-only --fetched 2026-07-12   # recompress existing bundles, reindex
+python data-pipeline/run.py gen-admin                                   # admin.json sub-areas, after a bake
+python data-pipeline/run.py regen-index                                 # rewrite index.json + benchmark.json
+python data-pipeline/run.py regen-index --check                         # verify them; writes nothing
 ```
 
 `--fetched` is the date recorded as every layer's fetch date. Two switches are read by `build.py`:

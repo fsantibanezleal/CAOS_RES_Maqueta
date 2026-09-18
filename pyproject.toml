@@ -1,24 +1,7 @@
-# Maqueta offline engine package (ADR-0057 product). `maquetalab` wraps the `geoscena` fusion/meshing
-# core to bake per-place SceneBundles (fetch -> fuse -> mesh -> export). The heavy geospatial engines
-# are pinned in data-pipeline/requirements.txt and documented in docs/frameworks/.
-[build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "maquetalab"
-# PEP 440 form of the display version X.XX.XXX (see CHANGELOG.md + maquetalab.__version__).
-version = "0.1.0"
-description = "Maqueta offline pipeline: fuse open public geodata into per-place 3D SceneBundles."
-readme = "README.md"
-requires-python = ">=3.11"
-license = { text = "MIT" }
-authors = [{ name = "Felipe Santibanez-Leal", email = "fsantibanez@gmail.com" }]
-dependencies = ["numpy>=1.26"]
-
-[tool.setuptools.packages.find]
-where = ["data-pipeline"]
-
+# Repo-local tool configuration ONLY. A product declares NO package of its own
+# (conventions/no-internal-packages.md): if a package is required it is a separate repo with a valid PyPI
+# project, published and consumed as a dependency, as geoscena is. data-pipeline/ is plain code run by path:
+#   python data-pipeline/run.py bake | regen-index | gen-admin
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

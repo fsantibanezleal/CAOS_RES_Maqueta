@@ -6,7 +6,7 @@ listed at the end.
 
 ## How the parts fit
 
-The offline pipeline (`data-pipeline/maquetalab`, over the `geoscena` fusion core) bakes each registered
+The offline pipeline (`data-pipeline/pipeline`, over the `geoscena` fusion core) bakes each registered
 place into a SceneBundle under `data/derived/<slug>/`: one `.glb` per layer plus a `manifest.json` that
 records every layer's source, license and fetch date. `regen_index` summarises the bundles into
 `data/derived/index.json` and `data/derived/benchmark.json`, and `gen_admin` adds `admin.json` sub-areas.
@@ -18,19 +18,21 @@ Details: [docs/architecture/01_overview.md](docs/architecture/01_overview.md).
 ```
 CAOS_RES_Maqueta/
 ├─ README.md · CHANGELOG.md · LICENSE (MIT) · STRUCTURE.md · CONTRIBUTING.md · CODE_OF_CONDUCT.md · SECURITY.md
-├─ pyproject.toml                 the maquetalab pipeline package (installed editable for tests and CI)
+├─ pyproject.toml                 tool configuration only (pytest, ruff); the repo declares no package
 ├─ requirements.txt · requirements-dev.txt · requirements-api.txt
-├─ data-pipeline/
-│  ├─ maquetalab/
+├─ data-pipeline/                 plain code, never installed
+│  ├─ run.py                      the entry point, by path: bake | regen-index | gen-admin
+│  ├─ pipeline/
 │  │  ├─ places.py                the place registry: 118 areas of interest, tier, hierarchy, notes
 │  │  ├─ build.py                 bake one place with geoscena and write its bundle
-│  │  ├─ pipeline.py              CLI: bake, meshopt-compress, regenerate the index
+│  │  ├─ pipeline.py              the bake command: bake, meshopt-compress, regenerate the index
 │  │  ├─ regen_index.py           the single writer of index.json + benchmark.json (and --check)
 │  │  ├─ benchmark.py             cross-place summary: height-provenance mix, budgets, LoD2 rows
 │  │  ├─ gen_admin.py             admin.json per place: geoBoundaries units + environment + indicators
 │  │  └─ do_indicators.py         Chilean Data Observatory comuna indicators for gen_admin
 │  ├─ tools/compress-bundles.mjs  EXT_meshopt_compression for every baked .glb (gltf-transform)
-│  └─ requirements.txt            the pipeline lane CI installs
+│  ├─ requirements.txt            the pipeline lane CI installs
+│  └─ requirements-bake.txt       the bake lane: geoscena pinned to the commit the bundles match
 ├─ data/
 │  ├─ README.md                   the two data contracts and the height-provenance rungs
 │  └─ derived/                    committed bundles: <slug>/{*.glb, manifest.json, admin.json},
