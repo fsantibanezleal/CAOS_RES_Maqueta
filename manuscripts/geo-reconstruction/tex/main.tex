@@ -39,9 +39,9 @@
 % Page-1 header block (conventions/manuscript-header-standard.md). The four document
 % macros are set by the publishing tool when the version DOI is reserved.
 \newcommand{\doctype}{Technical report}
-\newcommand{\docversion}{v1.1}
+\newcommand{\docversion}{v1.2}
 \newcommand{\docdate}{18 September 2026}
-\newcommand{\versiondoi}{10.5281/zenodo.22824781}
+\newcommand{\versiondoi}{10.5281/zenodo.22837197}
 \newcommand{\conceptdoi}{10.5281/zenodo.21519794}
 \newcommand{\docrepo}{github.com/fsantibanezleal/CAOS\_RES\_Maqueta}
 \newcommand{\headerblock}{%
@@ -59,8 +59,8 @@ Not peer reviewed. Source code, data and computational records: \href{https://\d
 
 \title{Maqueta: Height Provenance in Open-Data\\ 3D Urban Reconstruction Across 118 Places}
 
-\author{Felipe~Santiba\~nez-Leal~\orcidlink{0000-0002-0150-3246}%
-\thanks{F. Santiba\~nez-Leal is with the CAOS open-research programme, Santiago, Chile
+\author{Felipe~Santib\'a\~nez-Leal~\orcidlink{0000-0002-0150-3246}%
+\thanks{F. Santib\'a\~nez-Leal is with the CAOS open-research programme, Santiago, Chile
 (e-mail: fsantibanez@gmail.com; ORCID 0000-0002-0150-3246).}%
 \thanks{Interactive tool and reproducible pipeline (MIT) at
 \url{https://github.com/fsantibanezleal/CAOS_RES_Maqueta}; the \texttt{geoscena} fusion core at
@@ -68,7 +68,7 @@ Not peer reviewed. Source code, data and computational records: \href{https://\d
 
 % The leading {} lets IEEEtran's \MakeUppercase reach \doctype, so the whole head is set in capitals.
 \markboth{{}\doctype\ \docversion, 2026}%
-{Santiba\~nez-Leal: Height provenance in open-data 3D urban reconstruction}
+{Santib\'a\~nez-Leal: Height provenance in open-data 3D urban reconstruction}
 
 \IEEEaftertitletext{\vspace{-0.6\baselineskip}\headerblock\vspace{0.2\baselineskip}}
 
@@ -120,7 +120,10 @@ grid~\cite{ghspop}. The layers present depend on the place (Table~\ref{tab:layer
 have population, $100$ have buildings and roads, $23$ to $26$ have the OpenStreetMap context layers, and the $18$
 places without buildings, landscapes and heritage sites such as the Grand Canyon, Machu Picchu and the Chuquicamata
 mine, have terrain and, at $16$ of them, population. The two Dutch places add
-the LoD2 reference of the 3D BAG~\cite{peters} as a layer of its own.
+the LoD2 reference of the 3D BAG~\cite{peters} as a layer of its own. Every building also carries a land-cover
+class from ESA WorldCover 2021~\cite{worldcover}, the $10$~m class sampled at a point inside its footprint, which
+the tool uses to colour and aggregate buildings by land cover; unlike the layers, this attribute has no provenance
+entry in the place manifests.
 
 \begin{table}[!t]
 \centering
@@ -225,10 +228,12 @@ The repository benchmark (\path{data/derived/benchmark.json}) carries, per place
 size totals, the height-provenance counts per rung and, where a LoD2 reference exists, the matched counts, the
 root-mean-square error, the mean absolute error and the bias. Each place's manifest
 (\path{data/derived/<place>/manifest.json}) records every layer's source, URL, licence, release, fetch date and
-method. The figure script under \path{manuscripts/geo-reconstruction/figures/} reads \path{mq.json} in the data folder
+method; the per-building land-cover class of Section~\ref{sec:method} is not recorded there. The figure script under \path{manuscripts/geo-reconstruction/figures/} reads \path{mq.json} in the data folder
 beside it, a copy of the benchmark figures. The \texttt{geoscena} fusion core and the product pipeline
 (\path{data-pipeline/}) rebuild a place from the recorded source releases; newer releases of the open sources change
-the result. The open layers are fetched under their own licences and are not redistributed.
+the result. The scenes were baked with \texttt{geoscena} at commit \texttt{ab0bbf8} (14 July 2026), pinned in
+\path{data-pipeline/requirements-bake.txt}; its 0.1.0 release on PyPI lacks the population, Open Buildings, LoD2,
+Sentinel-2 and environment fetchers that the bake uses. The open layers are fetched under their own licences and are not redistributed.
 
 \balance
 
@@ -259,6 +264,9 @@ doi:10.5270/ESA-c5d3d65.
 \url{https://overturemaps.org}.
 
 \bibitem{osm} OpenStreetMap contributors, ``OpenStreetMap,'' \url{https://www.openstreetmap.org}.
+
+\bibitem{worldcover} D.~Zanaga \emph{et al.}, ``ESA WorldCover 10 m 2021 v200,'' Zenodo, 2022.
+doi:10.5281/zenodo.7254221.
 
 \end{thebibliography}
 
