@@ -1,5 +1,5 @@
 # Cases
 
-The CATEGORY taxonomy + the coverage matrix + one page per documented case live in
-**[cases/README.md](cases/README.md)**. Each case carries a category, params, an expected band, and a
-real|synthetic flag; the App shows one case, Experiments/Benchmark summarize across categories.
+A Maqueta case is a place. The tiers, the coverage by continent, and what each bundle contains are in
+**[cases/README.md](cases/README.md)**. The App shows one place at a time; Experiments and Benchmark
+summarise across places.

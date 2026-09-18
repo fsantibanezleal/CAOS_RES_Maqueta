@@ -1,6 +1,5 @@
-# PRECOMPUTE lane, the heavy, research-chosen SOTA engines, in the .venv-pipeline (local-only, never deployed).
-# THIS is where the deep research becomes binding: every engine pinned here is documented in docs/frameworks/<tool>/
-# and actually used by data-pipeline/examplelab/stages/. The EXAMPLE engine (SIR) is numpy-only on purpose so the
-# template installs instantly with no native build; a real product adds e.g. yade / pychrono / ortools / mintpy /
-# torch here, each PINNED to the version it installs+verifies.
+# Pipeline lane (maquetalab), installed by CI and scripts/setup.* into .venv-pipeline. It pins what the offline
+# tests, the index regeneration (maquetalab.regen_index) and the guards need; none of them touch the network.
+# Baking places also needs the geoscena fusion core with its fetch extras, and gen_admin needs geopandas,
+# requests and shapely; data-pipeline/README.md ("Dependencies") explains why they are not pinned here yet.
 numpy==2.4.6

@@ -1,24 +1,19 @@
-# scripts/, environment + pipeline orchestration (cross-platform)
+# scripts/, environment setup, pipeline runs and the CI guards
 
-Local scripts so **anyone** can configure the env and run the flow. Provide every script in BOTH `*.sh`
-(macOS/Linux/Git-Bash) and `*.ps1` (Windows PowerShell, since Felipe runs PS).
+Every script exists as `*.sh` (macOS / Linux / Git Bash) and `*.ps1` (Windows PowerShell). They are
+idempotent and use only the repository's own virtual environments, never a global Python or Node.
 
-## How to populate
-
-| Script | What it must do |
+| Script | What it does |
 |---|---|
-| `setup.sh` / `setup.ps1` | create `.venv`, upgrade pip, install `requirements.txt -r requirements-dev.txt -r requirements-precompute.txt`; print the next commands. GPU/API lanes installed only on demand. |
-| `precompute.sh` / `precompute.ps1` | run the staged pipeline: `python -m examplelab.pipeline "$@"` (all cases, or one; `<slug>lab` after instantiation). |
-| `fetch-data.sh` / `fetch-data.ps1` | (optional) stage raw inputs into `data/raw/` (gitignored). Never commit raw. |
-| `serve-api.sh` / `serve-api.ps1` | (optional, only if `api/` is active) `uvicorn api.main:app --reload`. |
+| `setup.sh` / `setup.ps1` | Creates `.venv-pipeline` (pipeline lane, dev tools and the editable `maquetalab` package) and `.venv` (the archetype's runtime lane). Baking also needs the geoscena core, see [data-pipeline/README.md](../data-pipeline/README.md). |
+| `precompute.sh` / `precompute.ps1` | Runs `python -m maquetalab.pipeline` with your arguments, e.g. `./scripts/precompute.sh berlin_mitte --fetched 2026-07-12`. |
+| `smoke.sh` / `smoke.ps1` | The two data checks CI runs: `maquetalab.regen_index --check`, then `check_artifacts.py`. |
+| `dev.sh` / `dev.ps1` | Copies the bundles into `frontend/public/data` and starts the frontend dev server. |
 
-Rules: idempotent; detect `.venv/bin/python` vs `.venv/Scripts/python.exe`; never use global Python/Node.
-Pin nothing here, versions live in `requirements-*.txt`.
-
-## Guards (run in CI, keep them local-runnable)
+## Guards (run in CI, runnable locally)
 
 | Script | What it enforces |
 |---|---|
-| `check_artifacts.py` | Artifact contract 2: every manifest has its artifact and vice versa (no drift). |
-| `check_template_residue.py` | An instantiated product must not ship template residue (the example lab, SIR model, `EX0*` cases, placeholder text). No-op in the template itself while the `.template-source` sentinel exists; instantiation deletes the sentinel to arm it. See ADR-0057 / ADR-0061. |
-| `check_content_standards.py` | No em-dash (`U+2014`/`U+2015`) and no pictographic emoji in tracked content. Always on. Use comma/colon/semicolon/period/parentheses/middot instead. See ADR-0067. |
+| `check_artifacts.py` | CONTRACT 2 on disk, in both directions: index, manifests, GLB layers, `admin.json` and benchmark agree, and no file ships that no manifest names. Stdlib only. |
+| `check_template_residue.py` | No archetype example residue (the example package, its SIR cases, placeholder text) and no `deploy-pages.yml`, a deploy path this product does not use. |
+| `check_content_standards.py` | No em-dash and no pictographic emoji in tracked text files (ADR-0067). |

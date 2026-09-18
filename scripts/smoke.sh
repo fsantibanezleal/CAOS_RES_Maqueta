@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Smoke: validate the CONTRACT 2 artifacts on disk (index -> manifests -> artifacts consistent). A real product
-# extends this with an HTTP/static check of the built site (canonical routes/assets return 200 + non-empty).
+# Smoke: the two data checks CI runs. The committed index.json + benchmark.json must reproduce from the bundles
+# (writes nothing), and CONTRACT 2 must hold on disk (index, manifests, GLB layers and benchmark agree).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=".venv-pipeline/bin/python"; [ -x "$PY" ] || PY=".venv-pipeline/Scripts/python.exe"
 [ -x "$PY" ] || PY="${PYTHON:-python}"
+"$PY" -m maquetalab.regen_index --check
 "$PY" scripts/check_artifacts.py

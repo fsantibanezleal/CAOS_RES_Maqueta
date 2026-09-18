@@ -56,17 +56,19 @@ FORBIDDEN_CONTENT = (
     "SIRChart",
     "SIRTrace",
     "CAOS product template",
+    "PLACEHOLDER (template)",  # the architecture-modal SVG placeholders under frontend/public/svg/tech
     "PENDING-training",
     "EX01_subcritical",
     "EX02_epidemic",
 )
 
-# Shell and PowerShell scripts and CSV samples are scanned too: without them the guard missed
-# scripts/precompute.{sh,ps1} still running the example package and the example's params.csv.
+# Shell and PowerShell scripts, CSV samples and SVGs are scanned too: without them the guard missed
+# scripts/precompute.{sh,ps1} still running the example package, the example's params.csv, and the
+# five placeholder SVGs the app never referenced but every build shipped.
 TEXT_SUFFIXES = {
     ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".py", ".md", ".json",
     ".css", ".html", ".yml", ".yaml", ".toml", ".txt", ".cfg", ".ini",
-    ".sh", ".ps1", ".csv",
+    ".sh", ".ps1", ".csv", ".svg",
 }
 
 

@@ -122,7 +122,7 @@ All notable changes to Maqueta. Format: [Keep a Changelog](https://keepachangelo
 ## [0.01.000] - 2026-07-13
 
 ### Added
-- Instantiated from the CAOS product-repo template (ADR-0057); package renamed `examplelab` -> `maquetalab`.
+- Instantiated from the CAOS product-repo template (ADR-0057); the template's example package became `maquetalab`.
 - `maquetalab` pipeline over the `geoscena` core: the 40-place tiered registry (`places.py`), the bake
   wrapper (`build.py`), the orchestrator + CLI (`pipeline.py`), and the cross-place benchmark (`benchmark.py`).
 - Frontend (React + Three.js over `@fasl-work/caos-app-shell`): the App workbench (place selector + 3D

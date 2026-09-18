@@ -1,16 +1,18 @@
-# The live-vs-precompute gate
+# 03, why every scene is baked offline
 
-`data-pipeline/examplelab/core/gate.py :: classify_lane()`. A case runs **live** in the browser (Pyodide) iff , 
-by MEASUREMENT, never by hand-wave:
+The archetype lets a case run live in the browser (Pyodide) when a measured gate says it is pure Python,
+fast and small. No Maqueta place would pass that gate, so Maqueta has no gate and no live lane: every
+place is baked offline and the browser replays the result.
 
-- it is **pure-Python**, AND
-- its wheels are a subset of the Pyodide-safe set (`LIVE_WHEELS`, e.g. `{numpy}`), AND
-- `run_ms ≤ RUN_MS_GATE` (interaction budget), AND
-- `trace_bytes ≤ TRACE_BYTES_GATE` (small artifact).
+- **Network**: a bake reads cloud-optimised rasters through GDAL (`/vsicurl` windowed reads of GLO-30,
+  GHS-POP, Open Buildings and Sentinel-2), extracts a bounding box from Overture's GeoParquet on S3, queries
+  OpenStreetMap through Overpass, and calls the Sentinel-2 STAC catalogue, PVGIS and Open-Meteo. Several of
+  these take minutes, and none belongs in a page load.
+- **Dependencies**: the fetchers and the mesher run on rasterio (GDAL), shapely, pyproj, trimesh and
+  mapbox-earcut; the bake runs where those and the network are available, on the maintainer's machine.
+- **Size**: the committed bundles hold 1,783.5 MB of GLB for 118 places (`benchmark.json`, `total_mb`),
+  up to 87.2 MB for one place (`sao_paulo_full`). A replay of baked files is the only way to show them at
+  interactive speed.
 
-Otherwise the case is **precompute**: the offline pipeline bakes the artifact and the SPA replays it. Either way,
-a committed artifact always exists, so the site replays instantly on first paint (ADR-0054).
-
-The verdict + the measured numbers are written into the manifest (`gate` field) and CI fails if `manifest.lane`
-disagrees with the gate, so a heavy model can never be mislabeled "live". The EXAMPLE SIR case is pure-Python +
-numpy + small ⇒ classified `live`.
+What the browser does compute, interactively and over the baked attributes, is in
+[04](04_live-lane-pyodide.md).
