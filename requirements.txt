@@ -1,2 +1,3 @@
-# CORE / LIVE lane, minimal, Pyodide-safe. Pinned to the verified install (Python 3.12, 2026-06-20).
+# Runtime lane (.venv, created by scripts/setup.*). Maqueta runs no Python at request time (the web app is a static
+# replay), so this only pins the maquetalab package's own runtime dependency. Verified on Python 3.12.
 numpy==2.4.6

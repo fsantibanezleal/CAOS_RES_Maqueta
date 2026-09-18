@@ -1,10 +1,31 @@
-# Determinism + the trace
+# 02, reproducibility and provenance
 
-**A run is a pure function of `(params, seed)`.** Use `core/rng.py :: make_rng(seed)`, never a global/implicit
-RNG. Same inputs ⇒ byte-identical artifact (asserted in `tests/test_pipeline_smoke.py`). This is what makes the
-committed artifact a trustworthy source-of-truth the SPA merely animates (ADR-0052 / ADR-0054).
+Maqueta's inputs are live public services, so a bake is not a pure function of the code: Overture
+publishes new releases, OpenStreetMap is edited every day, and a least-cloud Sentinel-2 search can return
+a newer scene. Reproducibility therefore rests on the committed bundles and the provenance each one
+carries, plus one part that is fully deterministic and checked on every push.
 
-**The trace** (`core/trace.py`, schema `example.trace/v1`) is the compact, decimated replay artifact, not the raw
-solver state. `build_trace()` down-samples long trajectories to `MAX_POINTS` so the committed JSON stays small.
-For a heavy product the offline run also emits the full raw output (kept local/LFS, git-ignored); only the compact
-trace is committed and shipped. Its shape is mirrored by `frontend/src/lib/contract.types.ts` (CONTRACT 2).
+## What a bundle records
+
+Each `data/derived/<slug>/manifest.json` (geoscena's `SceneBundle.to_manifest`) records, for every layer,
+the source, URL, license key and name, whether commercial use is allowed, the fetch date given as
+`--fetched`, the access method (for example "overturemaps CLI bbox extract of GeoParquet on S3") and
+source-specific extras (the Overture release, `2026-06-17.0` in the current bake). The manifest also holds
+the scene `credits`, the per-building `modalities` (source and license of NDVI / NDWI / NDBI and soil
+carbon, including the exact Sentinel-2 scene id and date), the `environment` sources, the height-provenance
+mix and free-text `notes` saying what was skipped and why. A bundle is the record of what was fetched on
+that date; the manifest is Maqueta's trace.
+
+## What is deterministic
+
+`index.json` and `benchmark.json` are a pure function of the committed bundles and the registry.
+`python -m maquetalab.regen_index` rebuilds them from disk, and CI runs
+`python -m maquetalab.regen_index --check`, which fails unless the committed files equal the regeneration
+exactly (read in text mode, so a CRLF checkout compares equal). The property also holds right after a bake,
+because the pipeline writes the index only through `regen_index`, after compression.
+
+## What is not
+
+A re-bake of the same place on a later date can differ: a new Overture release, OpenStreetMap edits,
+another Sentinel-2 scene, or a service that was unavailable (recorded in `notes`). Comparing the manifests
+of two bakes shows which sources moved.

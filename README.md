@@ -17,60 +17,71 @@ where they exist.
 
 ## Architecture
 
-- **`geoscena`** ([CAOS_GeoScena](https://github.com/fsantibanezleal/CAOS_GeoScena), on PyPI) is the
-  reusable fusion/meshing core: it turns an Area of Interest into a `SceneBundle` (per-layer glTF + a
-  provenance manifest) from open public sources.
-- **`maquetalab`** (this repo, `data-pipeline/`) is the product pipeline: a 40-place registry, the bake
-  wrapper, the orchestrator, and the cross-place benchmark.
+- **`geoscena`** ([CAOS_GeoScena](https://github.com/fsantibanezleal/CAOS_GeoScena)) is the reusable
+  fusion/meshing core: it turns an Area of Interest into a `SceneBundle` (per-layer glTF + a provenance
+  manifest) from open public sources. Release 0.1.0 is on PyPI; the committed bundles were baked with newer
+  source from the repository.
+- **`maquetalab`** (this repo, `data-pipeline/`) is the product pipeline: the 118-place registry, the bake
+  wrapper, the orchestrator, the place index, the cross-place benchmark and the admin sub-areas.
 - **`frontend/`** is the Three.js + shared-shell web app: a place-selector workbench with the 3D viewer,
   raycast building read-out, layer toggles, camera presets, plus the Introduction / Methodology /
   Implementation / Experiments / Benchmark pages and the in-app architecture modal (ADR-0058).
 
 ## Data modalities (all open, provenance-tracked)
 
-Each scene fuses across modalities, every one carrying its source, license and fetch date:
+Each scene fuses across modalities; every layer's source, license and fetch date is recorded in the bundle
+manifest ([docs/architecture/08](docs/architecture/08_data-contracts.md) lists what the 118 manifests hold):
 
 - **Building footprints + roads**: Overture Maps (ODbL).
 - **Terrain**: Copernicus GLO-30 DSM (Copernicus free).
-- **Land cover**: ESA WorldCover 10 m (CC-BY-4.0).
+- **Land cover**: ESA WorldCover 10 m class per building (CC-BY-4.0); the one attribute whose provenance
+  the manifests do not record yet.
 - **Water / green / rail**: OpenStreetMap (ODbL).
 - **Population density**: GHS-POP (CC-BY-4.0).
 - **2.5D building heights**: Google Open Buildings Temporal (CC-BY-4.0), the Global-South rung of the
   height-provenance ladder where measured heights are sparse.
 - **LoD2 ground truth** (adaptive, tier-A places): 3DBAG for the Netherlands (CC-BY-4.0), used both as a
   benchmark and as a renderable layer.
+- **Satellite indices** per building: NDVI / NDWI / NDBI from one Sentinel-2 L2A scene per place.
+- **Soil organic carbon** per building: ISRIC SoilGrids 2.0 (CC-BY-4.0), where it covers the place.
+- **Solar and climate** per place and per sub-area: PVGIS v5.3 and Open-Meteo ERA5 (2023).
 
-The roadmap adds more topic modalities (land use / zoning, vegetation, solar potential, climate, hazards)
-per place where the public data exists; for the Chilean cases these come from the CC-BY geoportal.cl / IDE
-Chile national layers.
+Further topic modalities (land use / zoning, hazards, the Chilean IDE national layers) are on the roadmap
+where open data exists.
 
-## Places (target 40, tiered)
+## Places (118, tiered)
 
-- **A - ground truth (~10):** open LoD2/lidar available (Amsterdam, Berlin, Manhattan, Tokyo, Helsinki...).
-- **B - global-fusion cities (~22):** incl. Santiago, Valparaiso, Concepcion.
-- **C - terrain-first areas (~8):** Chuquicamata, Atacama, Torres del Paine, Grand Canyon...
+- **A - ground truth (10):** open LoD2/lidar available (Berlin, Amsterdam, Delft, Manhattan, Tokyo...);
+  Delft and Amsterdam are benchmarked against 3D BAG LoD2.
+- **B - global-fusion cities (90):** the 37 Gran Santiago comunas, 12 metro cores (Santiago and 11 world
+  cities) and 41 more cities worldwide.
+- **C - terrain-first areas (18):** Chuquicamata, Valle de la Luna (Atacama), Torres del Paine, Grand
+  Canyon, Mount Fuji...
+
+Details: [docs/cases/README.md](docs/cases/README.md).
 
 ## Run it locally
 
 ```bash
-# 1. bake places (the offline pipeline) into data/derived/
-python -m venv .venv-pipeline && .\.venv-pipeline\Scripts\pip install -e . "geoscena[overture,osm]"
-python -m maquetalab.pipeline berlin_mitte --fetched 2026-07-12   # one place
-python -m maquetalab.pipeline --fetched 2026-07-12                # all 40
-
-# 2. run the web app (replays the baked bundles)
-cd frontend && npm install && npm run dev
+# 1. environments (baking also needs the geoscena source, see docs/guides/00_setup.md)
+./scripts/setup.sh                                            # or scripts/setup.ps1
+# 2. bake places (the offline pipeline) into data/derived/
+./scripts/precompute.sh berlin_mitte --fetched 2026-07-12     # one place
+./scripts/precompute.sh --fetched 2026-07-12                  # all 118
+./scripts/smoke.sh                                            # the data checks CI runs
+# 3. run the web app (replays the baked bundles)
+cd frontend && npm ci && npm run dev
 ```
 
-Raw source downloads live on an out-of-git data volume (set `GEOSCENA_CACHE`); only the compact baked
-bundles are committed.
+Raw source downloads live in the geoscena fetch cache outside git (set `GEOSCENA_CACHE`); only the compact
+baked bundles are committed.
 
 ## Deploy
 
-Maqueta is a static site: bake the bundles offline, `npm run build` the frontend, and serve the
-resulting `dist/` from any static host (nginx or a CDN). The live instance runs at
-**[maqueta.ml.fasl-work.com](https://maqueta.ml.fasl-work.com)**. See [`deploy/`](deploy/) for a sample
-nginx config.
+Maqueta is a static site: bake the bundles offline, `npm run build` the frontend, and serve the resulting
+`dist/` (about 1.8 GB with the bundles) from the root of a domain on any static host with a single-page-app
+fallback. The live instance runs at **[maqueta.ml.fasl-work.com](https://maqueta.ml.fasl-work.com)**. See
+[`deploy/`](deploy/) for a sample nginx config and [docs/guides/04_web-app.md](docs/guides/04_web-app.md).
 
 ## Status
 
