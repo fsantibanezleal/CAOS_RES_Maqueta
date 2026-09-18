@@ -25,10 +25,18 @@ The Sentinel-2 and PVGIS license keys are recorded as `proprietary`; the terms t
 [09](09_analytical-layers.md). No manifest flags a non-commercial layer (`any_noncommercial` is false at
 all 118 places).
 
-**Known gap.** Every baked building also carries a land-cover class (`class`, ESA WorldCover class codes,
-non-null on all 4,053,338 buildings), which the app offers as the "Land cover" colour and mix. No manifest
-records a provenance entry for it: it is neither a layer nor a listed modality. Until geoscena records it,
-this attribute is the exception to the rule above.
+**Known gaps.**
+
+- Every baked building also carries a land-cover class (`class`, ESA WorldCover class codes, non-null on all
+  4,053,338 buildings), which the app offers as the "Land cover" colour and mix. No manifest records a
+  provenance entry for it: it is neither a layer nor a listed modality. Until geoscena records it, this
+  attribute is the exception to the rule above.
+- No bundle carries the per-building solar modality (`solar_ghi`), although the app would offer it:
+  geoscena reads it from a local Global Solar Atlas GHI GeoTIFF (`{cache}/solar/GHI.tif`), nothing in
+  geoscena or here downloads that file, and `build.py` passes no cache folder (`BuildConfig.cache_dir` is left
+  unset), so every building place recorded `modality solar_ghi skipped: FileNotFoundError`. Baking it needs
+  the GeoTIFF placed in a cache folder, `cache_dir` passed to the build, and a re-bake of the building places.
+  Solar potential is present per place instead, from PVGIS ([09](09_analytical-layers.md)).
 
 ## CONTRACT 2, pipeline to web: what the app reads
 
@@ -48,5 +56,5 @@ this attribute is the exception to the rule above.
   manifest, every named layer exists and is a glTF 2.0 binary whose header length equals its size, every
   layer has a source, license and fetch date, index byte counts and layer counts match the files, no file
   in a place folder goes unnamed, and the benchmark rows match the index.
-- `python -m maquetalab.regen_index --check` (CI) proves the index and benchmark are exactly what the
+- `python data-pipeline/run.py regen-index --check` (CI) proves the index and benchmark are exactly what the
   pipeline derives from the bundles.

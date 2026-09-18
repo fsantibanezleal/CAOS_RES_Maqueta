@@ -1,9 +1,9 @@
 # Cases: the 118 places
 
-A case is a place: an area of interest in `data-pipeline/maquetalab/places.py` (slug, centre, half-size,
+A case is a place: an area of interest in `data-pipeline/pipeline/places.py` (slug, centre, half-size,
 hierarchy, a note), baked into one bundle under `data/derived/<slug>/`. The tier is the category; it says
 what kind of evidence a place can offer. Counts below are read from `data/derived/index.json` and the
-manifests; `tests/test_maquetalab.py` fails if the registry and the index ever name different places.
+manifests; `tests/test_registry_and_benchmark.py` fails if the registry and the index ever name different places.
 
 ## Tiers
 

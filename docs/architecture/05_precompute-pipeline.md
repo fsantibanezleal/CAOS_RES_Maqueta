@@ -1,6 +1,6 @@
 # 05, the bake pipeline
 
-`python -m maquetalab.pipeline` (`data-pipeline/maquetalab/pipeline.py`) runs these steps in order; each
+`python data-pipeline/run.py bake` (`data-pipeline/pipeline/pipeline.py`) runs these steps in order; each
 step's output is a committed file the next one, or the web app, reads.
 
 | Step | Code | Reads | Writes |
@@ -9,7 +9,7 @@ step's output is a committed file the next one, or the web app, reads.
 | 2. Bake | `build.bake_place`, calling `geoscena.build.build_scene` | the open sources, `--fetched`, the environment switches | `data/derived/<slug>/*.glb` + `manifest.json` |
 | 3. Compress | `pipeline.compress_bundles`, running `tools/compress-bundles.mjs` | every `.glb` under `data/derived` | the same files with `EXT_meshopt_compression` + `KHR_mesh_quantization` |
 | 4. Index | `pipeline.reindex`, calling `regen_index.write` | every bundle on disk + the registry | `index.json`, `benchmark.json` |
-| 5. Sub-areas | `python -m maquetalab.gen_admin` (run separately) | manifests with a `buildings` layer, geoBoundaries, the environment APIs, the Data Observatory mirror | `data/derived/<slug>/admin.json` |
+| 5. Sub-areas | `python data-pipeline/run.py gen-admin` (run separately) | manifests with a `buildings` layer, geoBoundaries, the environment APIs, the Data Observatory mirror | `data/derived/<slug>/admin.json` |
 
 ## Step 2 in detail
 
@@ -37,7 +37,7 @@ reindexes without baking.
 ## Checks after a bake
 
 ```bash
-python -m maquetalab.regen_index --check   # index + benchmark reproduce from the bundles
+python data-pipeline/run.py regen-index --check   # index + benchmark reproduce from the bundles
 python scripts/check_artifacts.py          # CONTRACT 2 in both directions
 pytest                                     # includes: the registry and the index name the same places
 ```

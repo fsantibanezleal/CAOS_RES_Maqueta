@@ -1,7 +1,7 @@
 // In-app Architecture / "How it was built" modal (ADR-0058). Five hand-authored, theme-aware SVG
 // diagrams meeting the FLOOR: a shared <style> class vocabulary, type-coded boxes with real module
 // paths in monospace, labeled flows, bands/lanes. Every colour is a CSS-variable token so the diagrams
-// follow light/dark. Content is the CURRENT system (geoscena core + maquetalab pipeline + Three.js app).
+// follow light/dark. Content is the CURRENT system (geoscena core + data-pipeline/ + Three.js app).
 import type { ArchitectureConfig } from '@fasl-work/caos-app-shell';
 
 const STYLE = `
@@ -40,11 +40,11 @@ const APP = svg('mq-a1', 300, `
   <text class="mu" x="40" y="140">ESA WorldCover 10 m</text>
   <text class="mu" x="40" y="156">OpenStreetMap context</text>
   <text class="mu" x="40" y="172">Open Buildings 2.5D</text>
-  <text class="mu" x="40" y="188">USGS 3DEP / LoD2</text>
+  <text class="mu" x="40" y="188">3D BAG LoD2</text>
   <text class="cd mono" x="40" y="214">geoscena.fetch.*</text>
   <path class="flow" d="M180,166 L214,166" marker-end="url(#mq-a1)"/>
   <rect class="bx bx-pkg" x="216" y="86" width="200" height="160" rx="9"/>
-  <text class="ttl" x="228" y="108">geoscena (PyPI pkg)</text>
+  <text class="ttl" x="228" y="108">geoscena (CAOS_GeoScena)</text>
   <text class="it" x="228" y="130">fuse: height ladder</text>
   <text class="it" x="228" y="148">mesh: terrain TIN,</text>
   <text class="it" x="228" y="163">extrusion, ribbons</text>
@@ -70,9 +70,9 @@ const APP = svg('mq-a1', 300, `
 const LANES = svg('mq-a2', 250, `
   <text class="hd" x="20" y="30">Two lanes: heavy offline bake, light static replay</text>
   <rect class="grp" x="14" y="46" width="418" height="188" rx="10"/>
-  <text class="sub" x="28" y="66" style="font-weight:600;">OFFLINE (local machine + E:\\_Datos\\maqueta)</text>
+  <text class="sub" x="28" y="66" style="font-weight:600;">OFFLINE (local machine + local data volume)</text>
   <rect class="bx bx-compute" x="28" y="78" width="180" height="140" rx="9"/>
-  <text class="ttl" x="40" y="100">maquetalab.pipeline</text>
+  <text class="ttl" x="40" y="100">data-pipeline/run.py</text>
   <text class="mu" x="40" y="122">fetch (network, keyless)</text>
   <text class="mu" x="40" y="138">fuse + mesh (heavy)</text>
   <text class="mu" x="40" y="154">geoscena[overture,osm]</text>
@@ -181,9 +181,9 @@ export const architecture: ArchitectureConfig = {
       es: 'La app',
       svg: APP,
       body_en:
-        'Maqueta turns open public geodata into an honest 3D area. The geoscena package (on PyPI) fetches each source, fuses them (the height-provenance ladder), meshes them (adaptive terrain TIN, building extrusion, road ribbons) and exports a SceneBundle: one .glb per layer plus a manifest with per-layer source, license and date. The Three.js app only replays those audited bundles.',
+        'Maqueta turns open public geodata into an honest 3D area. The geoscena package fetches each source, fuses them (the height-provenance ladder), meshes them (adaptive terrain TIN, building extrusion, road ribbons) and exports a SceneBundle: one .glb per layer plus a manifest with per-layer source, license and date. The bundles were baked from geoscena source in its repository (CAOS_GeoScena), newer than the 0.1.0 release on PyPI, which lacks the population, Open Buildings, LoD2, Sentinel-2, soil and environment fetchers. The Three.js app only replays those audited bundles.',
       body_es:
-        'Maqueta convierte geodatos públicos abiertos en un área 3D honesta. El paquete geoscena (en PyPI) descarga cada fuente, las fusiona (la escalera de procedencia de alturas), las mallea (TIN adaptativa de relieve, extrusión de edificios, cintas de calles) y exporta un SceneBundle: un .glb por capa más un manifiesto con fuente, licencia y fecha por capa. La app Three.js solo reproduce esos paquetes auditados.',
+        'Maqueta convierte geodatos públicos abiertos en un área 3D honesta. El paquete geoscena descarga cada fuente, las fusiona (la escalera de procedencia de alturas), las mallea (TIN adaptativa de relieve, extrusión de edificios, cintas de calles) y exporta un SceneBundle: un .glb por capa más un manifiesto con fuente, licencia y fecha por capa. Los bundles se precalcularon con el código fuente de geoscena de su repositorio (CAOS_GeoScena), más reciente que la versión 0.1.0 publicada en PyPI, que no incluye los fetchers de población, Open Buildings, LoD2, Sentinel-2, suelo ni ambiente. La app Three.js solo reproduce esos paquetes auditados.',
     },
     {
       id: 'lanes',
@@ -191,9 +191,9 @@ export const architecture: ArchitectureConfig = {
       es: 'Los carriles',
       svg: LANES,
       body_en:
-        'Two lanes with separate dependencies. offline: the maquetalab pipeline runs on the local machine with heavy geo libraries, fetching from keyless public buckets and Overpass, meshing, and committing compact bundles; raw data stays on an out-of-git volume. web: the static site (nginx on the ml box) loads the committed .glb and replays them. No provider is contacted from the browser (ADR-0054), and the render loop is paused by default.',
+        'Two lanes with separate dependencies. offline: the pipeline (data-pipeline/run.py, plain code, never installed) runs on the local machine with heavy geo libraries, fetching from keyless public buckets and Overpass, meshing, and committing compact bundles; raw data stays on an out-of-git volume. web: the static site (nginx on the ml box) loads the committed .glb and replays them. The browser contacts no data provider (ADR-0054), except the optional satellite drape (EOX Sentinel-2 cloudless) when the viewer turns it on, and the render loop is paused by default.',
       body_es:
-        'Dos carriles con dependencias separadas. offline: el pipeline maquetalab se ejecuta en la máquina local con bibliotecas geo pesadas, descargando de buckets públicos sin credenciales y de Overpass, malleando y versionando bundles compactos; los datos crudos quedan fuera de git. web: el sitio estático (nginx en el box ml) carga los .glb versionados y los reproduce. No se contacta ningún proveedor desde el navegador (ADR-0054), y el bucle de render está pausado por defecto.',
+        'Dos carriles con dependencias separadas. offline: el pipeline (data-pipeline/run.py, código plano, nunca instalado) se ejecuta en la máquina local con bibliotecas geo pesadas, descargando de buckets públicos sin credenciales y de Overpass, malleando y versionando bundles compactos; los datos crudos quedan fuera de git. web: el sitio estático (nginx en el box ml) carga los .glb versionados y los reproduce. El navegador no contacta ningún proveedor de datos (ADR-0054), salvo el drapeado satelital opcional (EOX Sentinel-2 cloudless) cuando se activa, y el bucle de render está pausado por defecto.',
     },
     {
       id: 'web',

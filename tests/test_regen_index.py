@@ -1,6 +1,6 @@
 """The place index + benchmark are a pure function of the committed bundles (regen_index).
 
-The CI smoke runs `python -m maquetalab.regen_index --check`; these tests pin the same property from
+The CI smoke runs `python data-pipeline/run.py regen-index --check`; these tests pin the same property from
 pytest and prove the check fails when a bundle changes, so a green smoke means something.
 """
 
@@ -8,14 +8,11 @@ from __future__ import annotations
 
 import json
 import shutil
-import sys
 from pathlib import Path
 
+from pipeline import places, regen_index
+
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "data-pipeline"))
-
-from maquetalab import places, regen_index  # noqa: E402
-
 DERIVED = REPO / "data" / "derived"
 
 
@@ -36,6 +33,14 @@ def test_committed_index_and_benchmark_reproduce():
     n, drift = regen_index.check()
     assert drift == [], f"regenerated files differ from the committed ones: {drift}"
     assert n == len(places.list_places())
+
+
+def test_written_files_are_byte_identical_to_the_committed_ones(tmp_path):
+    """Byte for byte, on every OS: the writer emits LF, as git stores the committed files."""
+    out = tmp_path / "out"
+    regen_index.write(out)
+    for name in regen_index.OUTPUTS:
+        assert (out / name).read_bytes() == (DERIVED / name).read_bytes(), name
 
 
 def test_cli_check_exit_code(capsys):

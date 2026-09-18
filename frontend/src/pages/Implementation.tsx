@@ -12,11 +12,11 @@ export default function Implementation() {
     <div className="mq-method">
       <p>
         {t(
-          'The reusable, product-agnostic core is the Python package geoscena (Apache-2.0, on PyPI): it takes an AOI and produces a fused, meshed SceneBundle. Maqueta (the product) contributes place curation, styling, benchmarks and the web app. Extracting the reusable capability as a package, rather than leaving it buried in one product, is the house rule.',
-          'El núcleo reutilizable y agnóstico del producto es el paquete Python geoscena (Apache-2.0, en PyPI): toma un AOI y produce un SceneBundle fusionado y malleado. Maqueta (el producto) aporta la curaduría de lugares, el estilo, los benchmarks y la app web. Extraer la capacidad reutilizable como paquete, en vez de dejarla enterrada en un producto, es la regla de la casa.',
+          'The reusable, product-agnostic core is the Python package geoscena (Apache-2.0, in its own repository, CAOS_GeoScena): it takes an AOI and produces a fused, meshed SceneBundle. Its 0.1.0 release on PyPI predates most of the fetchers used here; the committed bundles were baked from later, unreleased source (their manifests match commit ab0bbf8) that adds the population, Open Buildings 2.5D, LoD2, Sentinel-2, soil and environment fetchers, so the install below takes that commit. Maqueta (the product) contributes place curation, styling, benchmarks and the web app. Extracting the reusable capability as a package, rather than leaving it buried in one product, is the house rule.',
+          'El núcleo reutilizable y agnóstico del producto es el paquete Python geoscena (Apache-2.0, en su propio repositorio, CAOS_GeoScena): toma un AOI y produce un SceneBundle fusionado y malleado. Su versión 0.1.0 en PyPI es anterior a la mayoría de los fetchers usados aquí; los bundles versionados se precalcularon con código fuente posterior, aún no publicado (sus manifiestos coinciden con el commit ab0bbf8), que agrega los fetchers de población, alturas 2.5D de Open Buildings, LoD2, Sentinel-2, suelo y ambiente, por lo que la instalación de abajo usa ese commit. Maqueta (el producto) aporta la curaduría de lugares, el estilo, los benchmarks y la app web. Extraer la capacidad reutilizable como paquete, en vez de dejarla enterrada en un producto, es la regla de la casa.',
         )}
       </p>
-      <pre className="mq-code"><code>{`pip install geoscena[overture,osm]
+      <pre className="mq-code"><code>{`pip install "geoscena[overture,osm] @ git+https://github.com/fsantibanezleal/CAOS_GeoScena@ab0bbf8421ef9d372dad5d1cba1397dd16be3aa4"
 
 from geoscena.aoi import AOI
 from geoscena.build import BuildConfig, build_scene
@@ -31,8 +31,8 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
     <div className="mq-method">
       <p>
         {t(
-          'maquetalab bakes each registry place by calling geoscena: fetch every modality from its authoritative source, fuse, mesh, export and meshopt-compress. Geometric fetchers: Overture (footprints/roads), GLO-30 DSM and WorldCover (COG windowed reads via GDAL /vsicurl, keyless), OSM context (Overpass), GHS-POP, Open Buildings 2.5D heights, 3DBAG LoD2. Analytical fetchers: Sentinel-2 L2A via the Earth Search STAC (NDVI/NDWI/NDBI), environment via PVGIS + Open-Meteo, and gen_admin joining geoBoundaries sub-areas + the Data Observatory indicators. It is layer-tolerant: a natural area with no buildings bakes its terrain and records the gap rather than failing.',
-          'maquetalab precalcula cada lugar del registro llamando a geoscena: descarga cada modalidad de su fuente autoritativa, fusiona, mallea, exporta y comprime con meshopt. Fetchers geométricos: Overture (huellas/calles), GLO-30 DSM y WorldCover (lecturas COG por ventana vía GDAL /vsicurl, sin credenciales), contexto OSM (Overpass), GHS-POP, alturas 2.5D de Open Buildings, LoD2 de 3DBAG. Fetchers analíticos: Sentinel-2 L2A vía STAC de Earth Search (NDVI/NDWI/NDBI), ambiente vía PVGIS + Open-Meteo, y gen_admin uniendo subáreas de geoBoundaries + los indicadores del Observatorio de Datos. Es tolerante a capas: un área natural sin edificios precalcula su relieve y registra el hueco en vez de fallar.',
+          'The pipeline (data-pipeline/, plain code run by path: python data-pipeline/run.py bake) bakes each registry place by calling geoscena: fetch every modality from its authoritative source, fuse, mesh, export and meshopt-compress. Geometric fetchers: Overture (footprints/roads), GLO-30 DSM and WorldCover (COG windowed reads via GDAL /vsicurl, keyless), OSM context (Overpass), GHS-POP, Open Buildings 2.5D heights, 3DBAG LoD2. Analytical fetchers: Sentinel-2 L2A via the Earth Search STAC (NDVI/NDWI/NDBI), environment via PVGIS + Open-Meteo, and gen_admin joining geoBoundaries sub-areas + the Data Observatory indicators. It is layer-tolerant: a natural area with no buildings bakes its terrain and records the gap rather than failing.',
+          'El pipeline (data-pipeline/, código plano que se ejecuta por ruta: python data-pipeline/run.py bake) precalcula cada lugar del registro llamando a geoscena: descarga cada modalidad de su fuente autoritativa, fusiona, mallea, exporta y comprime con meshopt. Fetchers geométricos: Overture (huellas/calles), GLO-30 DSM y WorldCover (lecturas COG por ventana vía GDAL /vsicurl, sin credenciales), contexto OSM (Overpass), GHS-POP, alturas 2.5D de Open Buildings, LoD2 de 3DBAG. Fetchers analíticos: Sentinel-2 L2A vía STAC de Earth Search (NDVI/NDWI/NDBI), ambiente vía PVGIS + Open-Meteo, y gen_admin uniendo subáreas de geoBoundaries + los indicadores del Observatorio de Datos. Es tolerante a capas: un área natural sin edificios precalcula su relieve y registra el hueco en vez de fallar.',
         )}{' '}
         <Cite id="overture" /> <Cite id="sentinel2" /> <Cite id="pvgis" /> <Cite id="geoboundaries" />
       </p>
@@ -40,7 +40,7 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
         'Dos carriles: un precálculo offline pesado (descarga, fusión, malla, capas analíticas, meshopt) y una reproducción estática ligera. El manifiesto es el contrato entre ambos.')}>
         <svg className="mq-fig-svg" viewBox="0 0 640 200" role="img" preserveAspectRatio="xMidYMid meet">
           <rect className="f-grid" x="8" y="12" width="624" height="86" rx="8" />
-          <text className="f-mu" x="18" y="28">{t('offline bake lane (geoscena + maquetalab)', 'carril de precálculo offline (geoscena + maquetalab)')}</text>
+          <text className="f-mu" x="18" y="28">{t('offline bake lane (geoscena + data-pipeline)', 'carril de precálculo offline (geoscena + data-pipeline)')}</text>
           {[
             { x: 18, en: 'fetch modalities', es: 'descarga modalidades' },
             { x: 152, en: 'fuse (height ladder)', es: 'fusión (escalera)' },
@@ -117,8 +117,8 @@ bundle.write("out/santiago")  # terrain/buildings/roads.glb + manifest.json (wit
     <section className="page-body prose">
       <h2>{t('Implementation', 'Implementación')}</h2>
       <p className="mq-lead">
-        {t('The concrete system: a reusable geoscena package and a maquetalab pipeline that bakes every place offline into an audited SceneBundle, two data contracts that keep every value sourced, a read-only web app that only replays those bundles, and a static deploy.',
-          'El sistema concreto: un paquete geoscena reutilizable y un pipeline maquetalab que precalcula cada lugar offline en un SceneBundle auditado, dos contratos de datos que mantienen cada valor con fuente, una app web de solo lectura que solo reproduce esos bundles, y un despliegue estático.')}
+        {t('The concrete system: a reusable geoscena package and a pipeline (data-pipeline/) that bakes every place offline into an audited SceneBundle, two data contracts that keep every value sourced, a read-only web app that only replays those bundles, and a static deploy.',
+          'El sistema concreto: un paquete geoscena reutilizable y un pipeline (data-pipeline/) que precalcula cada lugar offline en un SceneBundle auditado, dos contratos de datos que mantienen cada valor con fuente, una app web de solo lectura que solo reproduce esos bundles, y un despliegue estático.')}
       </p>
       <SubTabs
         ariaLabel={t('Implementation topics', 'Temas de implementación')}

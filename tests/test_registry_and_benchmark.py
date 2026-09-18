@@ -1,17 +1,14 @@
-"""Offline tests for maquetalab (no network): the place registry and the benchmark aggregation."""
+"""Offline tests for the pipeline code (no network): the place registry and the benchmark aggregation."""
 
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
+from pipeline import places
+from pipeline.benchmark import build_benchmark
+
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "data-pipeline"))
-
-from maquetalab import places  # noqa: E402
-from maquetalab.benchmark import build_benchmark  # noqa: E402
-
 INDEX = REPO / "data" / "derived" / "index.json"
 
 

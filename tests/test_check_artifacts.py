@@ -8,16 +8,12 @@ from __future__ import annotations
 import importlib.util
 import json
 import shutil
-import sys
 from pathlib import Path
 
 import pytest
+from pipeline import regen_index
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "data-pipeline"))
-
-from maquetalab import regen_index  # noqa: E402
-
 _spec = importlib.util.spec_from_file_location("check_artifacts", REPO / "scripts" / "check_artifacts.py")
 check_artifacts = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(check_artifacts)

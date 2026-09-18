@@ -2,7 +2,7 @@
 
 Maqueta is applied to new data by adding a place: any area of interest the open sources cover.
 
-1. **Register it** in `data-pipeline/maquetalab/places.py`:
+1. **Register it** in `data-pipeline/pipeline/places.py`:
 
    ```python
    Place("my_town", "My Town", "B", -70.60, -33.40, 1200, "South America", "Chile", "My Town",
@@ -15,7 +15,7 @@ Maqueta is applied to new data by adding a place: any area of interest the open 
 2. **Bake it**: `./scripts/precompute.sh my_town --fetched <today>` ([guide 01](01_precompute-pipeline.md)).
    The index then lists it next to the existing places.
 3. **Sub-areas**: if it has buildings and its country is in `gen_admin.ISO3`, run
-   `python -m maquetalab.gen_admin` to add its `admin.json`.
+   `python data-pipeline/run.py gen-admin` to add its `admin.json`.
 4. **Check**: `./scripts/smoke.sh` and `pytest`. `test_registry_matches_baked_index` fails until the place
    is both registered and baked, so neither half can be committed alone.
 5. **Commit** `places.py` together with `data/derived/my_town/`, `index.json` and `benchmark.json`.

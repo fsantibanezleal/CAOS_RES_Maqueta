@@ -1,5 +1,5 @@
 {
-  "name": "maquetalab-gltf-tools",
+  "name": "maqueta-gltf-tools",
   "private": true,
   "type": "module",
   "description": "Delivery-layer glTF compression for baked SceneBundles (meshopt).",

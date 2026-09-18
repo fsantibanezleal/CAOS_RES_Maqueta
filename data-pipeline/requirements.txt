@@ -1,5 +1,4 @@
-# Pipeline lane (maquetalab), installed by CI and scripts/setup.* into .venv-pipeline. It pins what the offline
-# tests, the index regeneration (maquetalab.regen_index) and the guards need; none of them touch the network.
-# Baking places also needs the geoscena fusion core with its fetch extras, and gen_admin needs geopandas,
-# requests and shapely; data-pipeline/README.md ("Dependencies") explains why they are not pinned here yet.
+# Pipeline lane, installed by CI and scripts/setup.* into .venv-pipeline. It pins what the offline tests, the
+# index regeneration and the guards need; none of them touch the network. Baking places (and gen_admin) also
+# needs requirements-bake.txt in this folder: the geoscena core pinned to the commit the bundles match.
 numpy==2.4.6

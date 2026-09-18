@@ -63,7 +63,7 @@ layer.
 
 ## 3. Socio-economic indicators: the Chilean Data Observatory (per comuna)
 
-`maquetalab.do_indicators` reduces datasets from the Data Observatory (Atalaya mirror of datos.gob.cl) to
+`pipeline.do_indicators` reduces datasets from the Data Observatory (Atalaya mirror of datos.gob.cl) to
 one scalar per comuna, joined to the geoBoundaries comunas by accent- and case-normalised name:
 
 | Indicator | Source | Coverage |
