@@ -18,7 +18,14 @@ import geopandas as gpd
 import requests
 from shapely.geometry import box
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "CAOS_GeoScena" / "src"))
+# Prefer the source of a CAOS_GeoScena checkout sitting next to this repository, when there is one: the
+# bundles were baked from geoscena source newer than its PyPI release (see data-pipeline/README.md). The
+# folders up from this file are [0] its package folder, [1] data-pipeline, [2] this repository and [3] the
+# folder that holds the repository and its siblings; the path used to be built from [2], inside this
+# repository, where no such folder exists, so the insert never took effect. No-op without a sibling checkout.
+_SIBLING_GEOSCENA_SRC = Path(__file__).resolve().parents[3] / "CAOS_GeoScena" / "src"
+if _SIBLING_GEOSCENA_SRC.is_dir():
+    sys.path.insert(0, str(_SIBLING_GEOSCENA_SRC))
 from geoscena.aoi import AOI  # noqa: E402
 from geoscena.fetch.environment import ENV_META, fetch_environment  # noqa: E402
 
