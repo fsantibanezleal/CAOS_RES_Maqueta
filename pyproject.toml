@@ -2,6 +2,7 @@
 # (conventions/no-internal-packages.md): if a package is required it is a separate repo with a valid PyPI
 # project, published and consumed as a dependency, as geoscena is. data-pipeline/ is plain code run by path:
 #   python data-pipeline/run.py bake | regen-index | gen-admin
+# The product version lives in VERSION (display form) and frontend/package.json (semver form).
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

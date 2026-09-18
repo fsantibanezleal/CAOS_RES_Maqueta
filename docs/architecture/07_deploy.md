@@ -27,7 +27,7 @@ On every push to `main` or `develop` and on every pull request:
 | Job | Step | Checks |
 |---|---|---|
 | `test` | Lint | `ruff check data-pipeline tests scripts` |
-| `test` | Tests | `pytest`: the registry, the benchmark aggregation, `regen_index` and the CONTRACT 2 guard, each guard proven to fail on injected faults |
+| `test` | Tests | `pytest`: the registry, the benchmark aggregation, `regen_index` (including byte-identical output) and the CONTRACT 2 guard, each guard proven to fail on injected faults; the by-path entry point and the no-package rule; version coherence (`VERSION`, `package.json`, its lock, the CHANGELOG) |
 | `test` | Pipeline smoke | `python data-pipeline/run.py regen-index --check`: the committed index and benchmark reproduce from the bundles |
 | `test` | CONTRACT 2 | `python scripts/check_artifacts.py` |
 | `guards` | Base integrity | no tracked `.env`, virtual environment, native binary, raw data format or local machine path |

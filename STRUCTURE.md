@@ -18,6 +18,7 @@ Details: [docs/architecture/01_overview.md](docs/architecture/01_overview.md).
 ```
 CAOS_RES_Maqueta/
 ├─ README.md · CHANGELOG.md · LICENSE (MIT) · STRUCTURE.md · CONTRIBUTING.md · CODE_OF_CONDUCT.md · SECURITY.md
+├─ VERSION                        the product version, display form (the single source of truth)
 ├─ pyproject.toml                 tool configuration only (pytest, ruff); the repo declares no package
 ├─ requirements.txt · requirements-dev.txt · requirements-api.txt
 ├─ data-pipeline/                 plain code, never installed

@@ -3,6 +3,51 @@
 All notable changes to Maqueta. Format: [Keep a Changelog](https://keepachangelog.com/); versions use
 `X.XX.XXX` (display). `0.x` while the place set and API stabilize. Tag every release.
 
+## [0.09.000] - 2026-09-18
+
+Collects the CI and deploy repair of #10/#11/#12, released to `main` without a version bump, and #13. No
+bundle content changed: the 118 places, their manifests, `index.json` and `benchmark.json` are the same data.
+
+### Added
+- A CI that passes: lint, tests, a pipeline smoke (the place index and benchmark regenerate from the
+  committed bundles, byte for byte), a CONTRACT 2 check in both directions, template-residue and content
+  guards, and a web job that type-checks, tests and builds the SPA.
+- `VERSION`, the display version and single source of truth, and a test that keeps it, `frontend/package.json`
+  (semver form), its lock file and this CHANGELOG in step. This supersedes the version-coherence PR #7.
+- `data-pipeline/requirements-bake.txt`: the bake lane, geoscena pinned to CAOS_GeoScena commit `ab0bbf8`, the
+  source the committed bundles match (not the 0.1.0 release on PyPI).
+- Docs written from the code and the manifests (architecture, cases, frameworks, guides), replacing the
+  archetype's example residue.
+
+### Changed
+- The pipeline is plain code run by path, `python data-pipeline/run.py bake | regen-index | gen-admin`, no
+  longer the installed internal package `maquetalab` (a product declares no package of its own). Replace
+  `python -m maquetalab.pipeline`, `.regen_index` and `.gen_admin` with those three commands.
+- `regen-index` is the single writer of `index.json` and `benchmark.json`, run after meshopt compression, so
+  the recorded byte sizes are the shipped ones and a one-place bake keeps the other places; it writes LF on
+  every OS.
+- A re-bake removes a place's previous layer files before writing the new bundle.
+- The SPA is built with root-absolute URLs (Vite `base: '/'`), and `index.html` is served with
+  `Cache-Control: no-cache` (the sample nginx config and the live host).
+
+### Fixed
+- Deep links with a trailing slash (`/benchmark/`, ...) loaded the page's script from under the route,
+  received the HTML fallback instead and stayed blank.
+- UI text, EN and ES: the footer said the code is Apache-2.0 (it is MIT); the architecture modal and the
+  Implementation page said geoscena is on PyPI (only 0.1.0 is, without most of the fetchers the bundles use);
+  the modal listed USGS 3DEP as a source (no bundle uses it), showed a local machine path and said the
+  browser contacts no provider (the optional satellite drape does); missing Spanish accents in the footer.
+- `gen_admin` meant to prefer a sibling CAOS_GeoScena checkout but built the path inside this repository.
+
+### Removed
+- The template's GitHub Pages workflow: Pages was never enabled and the built site is about 1.8 GB, above
+  the Pages limit; Maqueta is served as a static nginx site.
+- 17 stale layer files that no manifest named (23.9 MB), from the repository and from the live host, the
+  template's SIR example data and its placeholder diagrams.
+- The unused `uplot` dependency.
+
+[0.09.000]: https://github.com/fsantibanezleal/CAOS_RES_Maqueta/releases/tag/v0.09.000
+
 ## [0.08.000] - 2026-07-14
 
 ### Added
