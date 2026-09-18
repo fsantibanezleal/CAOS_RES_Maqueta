@@ -19,8 +19,9 @@ where they exist.
 
 - **`geoscena`** ([CAOS_GeoScena](https://github.com/fsantibanezleal/CAOS_GeoScena)) is the reusable
   fusion/meshing core: it turns an Area of Interest into a `SceneBundle` (per-layer glTF + a provenance
-  manifest) from open public sources. Release 0.1.0 is on PyPI; the committed bundles were baked with newer
-  source from the repository.
+  manifest) from open public sources. Its 0.1.0 release on PyPI predates most of the fetchers used here; the
+  committed bundles match repository commit `ab0bbf8` (2026-07-14), which `data-pipeline/requirements-bake.txt`
+  pins.
 - **`maquetalab`** (this repo, `data-pipeline/`) is the product pipeline: the 118-place registry, the bake
   wrapper, the orchestrator, the place index, the cross-place benchmark and the admin sub-areas.
 - **`frontend/`** is the Three.js + shared-shell web app: a place-selector workbench with the 3D viewer,

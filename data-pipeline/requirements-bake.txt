@@ -1,0 +1,7 @@
+# Bake lane: what a bake (and gen_admin) needs on top of the pipeline lane. CI never installs it, because the
+# checks never fetch. geoscena is pinned to the CAOS_GeoScena commit the committed bundles match (ab0bbf8,
+# 2026-07-14): its 0.1.0 release on PyPI predates the population, Open Buildings, LoD2, Sentinel-2, soil and
+# environment fetchers. geopandas, requests and shapely (used by gen_admin) come with it.
+#   .venv-pipeline/bin/python -m pip install -r data-pipeline/requirements-bake.txt
+-r requirements.txt
+geoscena[overture,osm] @ git+https://github.com/fsantibanezleal/CAOS_GeoScena@ab0bbf8421ef9d372dad5d1cba1397dd16be3aa4

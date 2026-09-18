@@ -40,12 +40,17 @@ is reported and skipped; its previous bundle stays in place.
 CI installs `requirements.txt` in this folder (numpy) and `../requirements-dev.txt` (pytest, ruff): enough
 for the tests, the index regeneration and the guards, none of which touch the network.
 
-A bake also needs the geoscena core with its fetch extras, and `gen_admin` needs geopandas, requests and
-shapely. These are not pinned here yet: the committed bundles were baked with geoscena source newer than
-its 0.1.0 release on PyPI, which has no population, Open Buildings, LoD2, Sentinel-2 or environment
-fetchers. Install geoscena from the CAOS_GeoScena repository into `.venv-pipeline`, for example
-`pip install -e "../CAOS_GeoScena[overture,osm]"`. Raw downloads are cached outside git under
-`$GEOSCENA_CACHE` (default `./.geoscena-cache`).
+A bake, and `gen_admin`, also need the geoscena core with its fetch extras: `requirements-bake.txt` in this
+folder pins it to CAOS_GeoScena commit `ab0bbf8` (2026-07-14), and geopandas, requests and shapely come with
+it. That commit, not the 0.1.0 release on PyPI, is what the committed bundles match: PyPI 0.1.0 predates the
+population, Open Buildings 2.5D, LoD2, Sentinel-2, soil and environment fetchers, and the git install reports
+the same `0.1.0` distribution version (its code says `__version__ = "0.05.000"`), so the version number
+alone cannot tell the two apart. How the commit was identified: all 118 manifests carry the notes that only
+`build.py` at `ab0bbf8` writes (the `environment:` note first appears there) and none from later commits,
+and they were committed on 2026-07-14 between `ab0bbf8` and the next CAOS_GeoScena commit (2026-07-18). The
+manifests do not record the geoscena version, so uncommitted local edits at bake time cannot be ruled out.
+When a CAOS_GeoScena checkout sits next to this repository, `gen_admin` prefers its `src/`. Raw downloads are
+cached outside git under `$GEOSCENA_CACHE` (default `./.geoscena-cache`).
 
 More: [docs/architecture/05_precompute-pipeline.md](../docs/architecture/05_precompute-pipeline.md) and
 [docs/guides/01_precompute-pipeline.md](../docs/guides/01_precompute-pipeline.md).

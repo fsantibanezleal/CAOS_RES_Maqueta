@@ -40,11 +40,11 @@ const APP = svg('mq-a1', 300, `
   <text class="mu" x="40" y="140">ESA WorldCover 10 m</text>
   <text class="mu" x="40" y="156">OpenStreetMap context</text>
   <text class="mu" x="40" y="172">Open Buildings 2.5D</text>
-  <text class="mu" x="40" y="188">USGS 3DEP / LoD2</text>
+  <text class="mu" x="40" y="188">3D BAG LoD2</text>
   <text class="cd mono" x="40" y="214">geoscena.fetch.*</text>
   <path class="flow" d="M180,166 L214,166" marker-end="url(#mq-a1)"/>
   <rect class="bx bx-pkg" x="216" y="86" width="200" height="160" rx="9"/>
-  <text class="ttl" x="228" y="108">geoscena (PyPI pkg)</text>
+  <text class="ttl" x="228" y="108">geoscena (CAOS_GeoScena)</text>
   <text class="it" x="228" y="130">fuse: height ladder</text>
   <text class="it" x="228" y="148">mesh: terrain TIN,</text>
   <text class="it" x="228" y="163">extrusion, ribbons</text>
@@ -181,9 +181,9 @@ export const architecture: ArchitectureConfig = {
       es: 'La app',
       svg: APP,
       body_en:
-        'Maqueta turns open public geodata into an honest 3D area. The geoscena package (on PyPI) fetches each source, fuses them (the height-provenance ladder), meshes them (adaptive terrain TIN, building extrusion, road ribbons) and exports a SceneBundle: one .glb per layer plus a manifest with per-layer source, license and date. The Three.js app only replays those audited bundles.',
+        'Maqueta turns open public geodata into an honest 3D area. The geoscena package fetches each source, fuses them (the height-provenance ladder), meshes them (adaptive terrain TIN, building extrusion, road ribbons) and exports a SceneBundle: one .glb per layer plus a manifest with per-layer source, license and date. The bundles were baked from geoscena source in its repository (CAOS_GeoScena), newer than the 0.1.0 release on PyPI, which lacks the population, Open Buildings, LoD2, Sentinel-2, soil and environment fetchers. The Three.js app only replays those audited bundles.',
       body_es:
-        'Maqueta convierte geodatos públicos abiertos en un área 3D honesta. El paquete geoscena (en PyPI) descarga cada fuente, las fusiona (la escalera de procedencia de alturas), las mallea (TIN adaptativa de relieve, extrusión de edificios, cintas de calles) y exporta un SceneBundle: un .glb por capa más un manifiesto con fuente, licencia y fecha por capa. La app Three.js solo reproduce esos paquetes auditados.',
+        'Maqueta convierte geodatos públicos abiertos en un área 3D honesta. El paquete geoscena descarga cada fuente, las fusiona (la escalera de procedencia de alturas), las mallea (TIN adaptativa de relieve, extrusión de edificios, cintas de calles) y exporta un SceneBundle: un .glb por capa más un manifiesto con fuente, licencia y fecha por capa. Los bundles se precalcularon con el código fuente de geoscena de su repositorio (CAOS_GeoScena), más reciente que la versión 0.1.0 publicada en PyPI, que no incluye los fetchers de población, Open Buildings, LoD2, Sentinel-2, suelo ni ambiente. La app Three.js solo reproduce esos paquetes auditados.',
     },
     {
       id: 'lanes',

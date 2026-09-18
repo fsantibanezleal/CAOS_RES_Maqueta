@@ -53,7 +53,7 @@ CAOS_RES_Maqueta/
 | File | Lane | Holds |
 |---|---|---|
 | `data-pipeline/requirements.txt` + `requirements-dev.txt` | pipeline checks (CI, `.venv-pipeline`) | numpy, pytest, ruff: the tests, the index regeneration and the guards, none of which touch the network |
-| (not pinned yet) | baking | the geoscena core with its fetch extras, and geopandas / requests / shapely for `gen_admin`; see [data-pipeline/README.md](data-pipeline/README.md) |
+| `data-pipeline/requirements-bake.txt` | baking, `gen_admin` | the geoscena core with its fetch extras, pinned to the CAOS_GeoScena commit the bundles match (`ab0bbf8`); geopandas / requests / shapely come with it; see [data-pipeline/README.md](data-pipeline/README.md) |
 | `frontend/package-lock.json` | web app | exact versions of three, react, the shared shell, vite, typescript |
 | `data-pipeline/tools/package-lock.json` | bundle compression | gltf-transform and meshoptimizer |
 | `requirements.txt` | archetype runtime lane (`.venv`) | numpy; Maqueta runs no Python at request time |
