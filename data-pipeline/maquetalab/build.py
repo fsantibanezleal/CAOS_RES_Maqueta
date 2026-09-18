@@ -29,6 +29,19 @@ def _terrain_knobs(place: Place) -> tuple[float, int]:
     return (1.2, 6000)
 
 
+def _remove_previous_layers(out_dir: Path) -> None:
+    """Delete the .glb layers of the previous bake of this place before the new bundle is written.
+
+    A re-bake can yield fewer layers than the last one (OSM context skipped with MAQUETA_NO_CONTEXT=1,
+    or a place resized so it no longer gets the buildings_lite proxy). Without this the old files stay
+    in the folder, ship with the site although no manifest names them, and fail the CONTRACT 2 check
+    (scripts/check_artifacts.py). admin.json is kept: gen_admin writes it after the bake.
+    """
+    if out_dir.is_dir():
+        for stale in out_dir.glob("*.glb"):
+            stale.unlink()
+
+
 def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict:
     """Fetch, fuse, mesh and write the SceneBundle for a place. Returns a summary dict."""
     out_root = out_root or DERIVED
@@ -47,6 +60,7 @@ def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict
     )
     bundle = build_scene(aoi, cfg)
     out_dir = out_root / place.slug
+    _remove_previous_layers(out_dir)  # only once the new bundle exists; a failed fetch keeps the old one
     bundle.write(out_dir)
 
     man = bundle.to_manifest()
