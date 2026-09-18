@@ -17,6 +17,13 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
+    # The page itself is never served from a stale cache: each release points it at new hashed assets.
+    # no-cache = revalidate every time (a cheap 304 while unchanged). "/", every deep link (via the SPA
+    # fallback above, an internal redirect to /index.html) and /index.html itself all land here.
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+    }
+
     # GLB bundles: long-cache (content is versioned by the place set).
     location ~* \.(glb)$ {
         add_header Cache-Control "public, max-age=604800";
