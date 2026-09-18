@@ -21,11 +21,11 @@ DERIVED = REPO_ROOT / "data" / "derived"
 def _summary_from_manifest(slug: str, manifest: dict) -> dict:
     p = places.get_place(slug)
     layers = manifest.get("layers", [])
-    total_tris = sum(l["stats"].get("triangles", 0) for l in layers)
+    total_tris = sum(layer["stats"].get("triangles", 0) for layer in layers)
     total_bytes = sum(
-        (DERIVED / slug / l["file"]).stat().st_size
-        for l in layers
-        if (DERIVED / slug / l["file"]).exists()
+        (DERIVED / slug / layer["file"]).stat().st_size
+        for layer in layers
+        if (DERIVED / slug / layer["file"]).exists()
     )
     return {
         "slug": slug,
@@ -36,7 +36,7 @@ def _summary_from_manifest(slug: str, manifest: dict) -> dict:
         "country": p.country,
         "city": p.city,
         "note": p.note,
-        "n_layers": len([l for l in layers if l.get("name") != "buildings_lite"]),
+        "n_layers": len([layer for layer in layers if layer.get("name") != "buildings_lite"]),
         "total_triangles": int(total_tris),
         "total_bytes": int(total_bytes),
         "height_mix": manifest.get("stats", {}).get("height_mix", {}),

@@ -50,9 +50,11 @@ def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict
     bundle.write(out_dir)
 
     man = bundle.to_manifest()
-    total_tris = sum(l["stats"].get("triangles", 0) for l in man["layers"])
+    total_tris = sum(layer["stats"].get("triangles", 0) for layer in man["layers"])
     total_bytes = sum(
-        (out_dir / l["file"]).stat().st_size for l in man["layers"] if (out_dir / l["file"]).exists()
+        (out_dir / layer["file"]).stat().st_size
+        for layer in man["layers"]
+        if (out_dir / layer["file"]).exists()
     )
     return {
         "slug": place.slug,
@@ -63,8 +65,8 @@ def bake_place(place: Place, fetched: str, out_root: Path | None = None) -> dict
         "country": place.country,
         "city": place.city,
         "note": place.note,
-        "layers": [l["name"] for l in man["layers"]],
-        "n_layers": len([l for l in man["layers"] if l["name"] != "buildings_lite"]),
+        "layers": [layer["name"] for layer in man["layers"]],
+        "n_layers": len([layer for layer in man["layers"] if layer["name"] != "buildings_lite"]),
         "total_triangles": int(total_tris),
         "total_bytes": int(total_bytes),
         "height_mix": man["stats"].get("height_mix", {}),
