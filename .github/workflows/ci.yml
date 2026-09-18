@@ -18,7 +18,7 @@ jobs:
       - name: Install (offline lane + dev + editable pkg)
         run: pip install -r data-pipeline/requirements.txt -r requirements-dev.txt -e .
       - name: Lint
-        run: ruff check data-pipeline tests
+        run: ruff check data-pipeline tests scripts
       - name: Tests
         run: pytest
       - name: Pipeline smoke (regenerate index + benchmark from the committed bundles; must match, writes nothing)
@@ -54,3 +54,29 @@ jobs:
         run: python scripts/check_template_residue.py
       - name: No em-dash or emoji in product content (ADR-0067)
         run: python scripts/check_content_standards.py
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install (locked)
+        run: npm ci
+      - name: Unit tests (vitest)
+        run: npm test
+      - name: Build the SPA (copy-data.mjs overlays data/derived, then tsc + vite build)
+        run: npm run build
+      - name: The built site uses root-absolute URLs and ships the committed index
+        run: |
+          grep -q 'src="/assets/' dist/index.html
+          if grep -q '"\./assets/' dist/index.html; then
+            echo "::error::dist/index.html references ./assets/ (breaks /route/ deep links)"; exit 1; fi
+          cmp ../data/derived/index.json dist/data/index.json
+          cmp ../data/derived/benchmark.json dist/data/benchmark.json
