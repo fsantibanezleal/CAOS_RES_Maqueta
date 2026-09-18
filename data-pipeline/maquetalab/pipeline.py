@@ -1,7 +1,9 @@
 """The offline pipeline orchestrator + CLI (ADR-0057).
 
-Bakes one place or all places into committed SceneBundles and writes the place index +
-benchmark summary that the web app reads.
+Bakes one place or all places into committed SceneBundles, meshopt-compresses them, then regenerates
+the place index + benchmark summary that the web app reads from every bundle on disk (regen_index is
+the single writer, so the recorded byte sizes are the compressed ones and a one-place bake keeps the
+places baked earlier in the index).
 
     python -m maquetalab.pipeline --fetched 2026-07-12                 # all places
     python -m maquetalab.pipeline berlin_mitte --fetched 2026-07-12    # one place
@@ -11,14 +13,12 @@ benchmark summary that the web app reads.
 from __future__ import annotations
 
 import argparse
-import json
 import shutil
 import subprocess
 import traceback
 from pathlib import Path
 
-from . import places
-from .benchmark import build_benchmark
+from . import places, regen_index
 from .build import DERIVED, bake_place
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -42,36 +42,18 @@ def compress_bundles() -> None:
     subprocess.run([node, str(script), str(DERIVED)], cwd=str(TOOLS), check=False)
 
 
-def _write_index(summaries: list[dict]) -> None:
-    DERIVED.mkdir(parents=True, exist_ok=True)
-    index = {
-        "schema_version": 1,
-        "n_places": len(summaries),
-        "tiers": places.by_tier(),
-        "places": [
-            {
-                "slug": s["slug"],
-                "name": s["name"],
-                "tier": s["tier"],
-                "category": s["category"],
-                "continent": s.get("continent", ""),
-                "country": s["country"],
-                "city": s.get("city", s["name"]),
-                "n_layers": s["n_layers"],
-                "total_bytes": s["total_bytes"],
-                "manifest_path": s["manifest_path"],
-            }
-            for s in summaries
-        ],
-        "hierarchy": places.hierarchy(),
-    }
-    (DERIVED / "index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
-    (DERIVED / "benchmark.json").write_text(
-        json.dumps(build_benchmark(summaries), indent=2), encoding="utf-8"
-    )
+def reindex() -> None:
+    """Rewrite index.json + benchmark.json from every bundle on disk (regen_index is the single writer).
+
+    Called after compression, because meshopt changes the .glb sizes the index records, and never from
+    the in-memory summaries of one bake, which would drop every place not baked in this run.
+    """
+    n = regen_index.write()
+    print(f"wrote index.json + benchmark.json ({n} places) -> {DERIVED}", flush=True)
 
 
 def run(selected: list[places.Place], fetched: str) -> list[dict]:
+    """Bake the selected places; returns the per-place summaries (the index is written by reindex)."""
     summaries: list[dict] = []
     for p in selected:
         print(f"baking {p.slug} ({p.category}) ...", flush=True)
@@ -87,16 +69,15 @@ def run(selected: list[places.Place], fetched: str) -> list[dict]:
                 print(f"  notes: {s['notes']}", flush=True)
         except Exception:  # noqa: BLE001 - one place failing must not sink the batch
             print(f"  FAILED {p.slug}:\n{traceback.format_exc()}", flush=True)
-    if summaries:
-        _write_index(summaries)
-        print(f"wrote index.json + benchmark.json ({len(summaries)} places) -> {DERIVED}", flush=True)
     return summaries
 
 
 def _run_cli(selected: list[places.Place], fetched: str, compress: bool) -> None:
-    run(selected, fetched=fetched)
+    summaries = run(selected, fetched=fetched)
     if compress:
         compress_bundles()
+    if summaries:
+        reindex()
 
 
 def main() -> None:
@@ -112,6 +93,7 @@ def main() -> None:
 
     if args.compress_only:
         compress_bundles()
+        reindex()  # compression changed the .glb sizes the index records
         return
 
     if args.place:
