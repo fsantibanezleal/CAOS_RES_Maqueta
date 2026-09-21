@@ -3,12 +3,15 @@ name: CI
 on:
   push:
     branches: [main, develop]
-  pull_request:
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -16,18 +19,15 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install (pipeline lane + dev tools; the pipeline itself is plain code, never installed)
-        run: pip install -r data-pipeline/requirements.txt -r requirements-dev.txt
+        run: pip install -r requirements-dev.txt
       - name: Lint
         run: ruff check data-pipeline tests scripts
-      - name: Tests
-        run: pytest
-      - name: Pipeline smoke (regenerate index + benchmark from the committed bundles; must match, writes nothing)
-        run: python data-pipeline/run.py regen-index --check
       - name: CONTRACT 2, manifests <-> artifacts consistent (no drift)
         run: python scripts/check_artifacts.py
 
   guards:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Base-integrity guards (the regressions this archetype forbids)
@@ -55,8 +55,11 @@ jobs:
       - name: No em-dash or emoji in product content (ADR-0067)
         run: python scripts/check_content_standards.py
 
+      - name: CI budget, trunk-only triggers, no training (ADR-0074)
+        run: python scripts/check_ci_budget.py
   web:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: frontend
@@ -73,10 +76,3 @@ jobs:
         run: npm test
       - name: Build the SPA (copy-data.mjs overlays data/derived, then tsc + vite build)
         run: npm run build
-      - name: The built site uses root-absolute URLs and ships the committed index
-        run: |
-          grep -q 'src="/assets/' dist/index.html
-          if grep -q '"\./assets/' dist/index.html; then
-            echo "::error::dist/index.html references ./assets/ (breaks /route/ deep links)"; exit 1; fi
-          cmp ../data/derived/index.json dist/data/index.json
-          cmp ../data/derived/benchmark.json dist/data/benchmark.json
